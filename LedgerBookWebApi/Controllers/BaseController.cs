@@ -11,20 +11,11 @@ namespace LedgerBookWebApi.Controllers;
 public class BaseController : Controller
 {
     protected readonly ILoginService _loginService;
-    private readonly IViewRenderService _viewRenderService;
     private readonly IActivityLogService _activityLogService;
 
     protected BaseController(ILoginService loginService, IActivityLogService activityLogService)
     {
         _loginService = loginService;
-        _activityLogService = activityLogService;
-    }
-
-    protected BaseController(ILoginService loginService,
-        IViewRenderService viewRenderService, IActivityLogService activityLogService)
-    {
-        _loginService = loginService;
-        _viewRenderService = viewRenderService;
         _activityLogService = activityLogService;
     }
 
@@ -71,16 +62,16 @@ public class BaseController : Controller
     }
     #endregion
 
-    #region partial view response
-    protected async Task<ViewResponseModel> PartialViewResponse(string viewName, object model, string message = null, ErrorType errorType = ErrorType.Success)
-    {
-        ViewResponseModel partialViewResponseModel = new();
-        partialViewResponseModel.Message = message;
-        partialViewResponseModel.ErrorType = errorType;
-        partialViewResponseModel.HTML = await _viewRenderService.RenderToStringAsync($"Views/{viewName}", model);
-        return partialViewResponseModel;
-    }
-    #endregion
+    // #region partial view response
+    // protected async Task<ViewResponseModel> PartialViewResponse(string viewName, object model, string message = null, ErrorType errorType = ErrorType.Success)
+    // {
+    //     ViewResponseModel partialViewResponseModel = new();
+    //     partialViewResponseModel.Message = message;
+    //     partialViewResponseModel.ErrorType = errorType;
+    //     partialViewResponseModel.HTML = await _viewRenderService.RenderToStringAsync($"Views/{viewName}", model);
+    //     return partialViewResponseModel;
+    // }
+    // #endregion
 
     #region set activity log
     protected async Task<ActivityLogs> SetActivityLog(string message, EnumHelper.Actiontype action, EnumHelper.ActivityEntityType entityType, int EntityTypeId, int? createdById = null, EnumHelper.ActivityEntityType? subEntityType = null, int? subEntityTypeId = null)

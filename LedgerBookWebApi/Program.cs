@@ -24,7 +24,16 @@ builder.Services.AddDbContext<LedgerBookDbContext>(options =>
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
                     .AddEntityFrameworkStores<LedgerBookDbContext>();
 
-builder.Services.AddScoped<IViewRenderService, ViewRenderService>();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowLocalhost",
+        policy => policy.WithOrigins("http://localhost:5189")
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+    );
+});
+
+// builder.Services.AddScoped<IViewRenderService, ViewRenderService>();
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<IJWTTokenService, JWTTokenService>();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -41,7 +50,7 @@ builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 builder.Services.AddScoped<IGenericRepo, GenericRepo>();
 builder.Services.AddScoped<ITransactionReportSevice, TransactionReportService>();
 builder.Services.AddScoped<IExceptionService, ExceptionService>();
-builder.Services.AddScoped<IActivityLogService,ActivityLogService>();
+builder.Services.AddScoped<IActivityLogService, ActivityLogService>();
 
 builder.Services.AddAuthentication(x =>
 {
@@ -123,6 +132,7 @@ builder.Services.AddSession(
     }
 );
 
+builder.Services.AddDistributedMemoryCache();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -151,11 +161,10 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 
-app.UseRotativa();
-
 app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseRouting();
+app.UseCors("AllowLocalhost");
 app.UseAuthorization();
 app.UseAuthentication();
 app.MapControllers();

@@ -2,13 +2,15 @@ using System.Net;
 
 namespace DataAccessLayer.ViewModels;
 
-public class ApiResponse
+public class ApiResponse<T>
 {
-    public HttpStatusCode httpStatusCode { get; set; }
+    public HttpStatusCode HttpStatusCode { get; set; }
 
     public bool IsSuccess { get; set; } = true;
 
-    public List<string> ErrorMessage { get; set; }
+    public List<string> ErrorMessages { get; set; }
 
-    public Object Result { get; set; }
+    public string ToasterMessage { get; set; }
+
+    public T Result { get; set; }
 }

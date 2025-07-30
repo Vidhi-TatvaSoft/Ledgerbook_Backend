@@ -9,6 +9,8 @@ public class ConstantVariables
 
     public static int port = 587;
 
+    public static string LoginLink = "http://localhost:5189";
+
     public static string SenderEmail = "test.dotnet@etatvasoft.com";
 
     public static string SenderName = "Ledgerbook";
