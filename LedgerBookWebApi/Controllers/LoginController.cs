@@ -40,7 +40,7 @@ public class LoginController : BaseController
     [Route("Login")]
     public async Task<IActionResult> Login()
     {
-        ApiResponse<CookiesViewModel> apiResponse = new();
+        // ApiResponse<CookiesViewModel> apiResponse = new();
         CookiesViewModel cookiesViewModel = new();
         string token = GetData(TokenKey.UserToken);
         if (token != null)
@@ -48,9 +48,7 @@ public class LoginController : BaseController
             ApplicationUser user = _loginService.GetUserFromTokenIdentity(token);
             if (user == null)
             {
-                apiResponse.IsSuccess = false;
-                apiResponse.HttpStatusCode = HttpStatusCode.NotFound;
-                return Ok(apiResponse);
+                return Ok(new ApiResponse<string>(false));
             }
             else
             {
@@ -60,12 +58,10 @@ public class LoginController : BaseController
                     cookiesViewModel.ProfilePhoto = attachmentViewModel.BusinesLogoPath;
                 }
                 cookiesViewModel.UserName = user.FirstName + " " + user.LastName;
-                apiResponse.IsSuccess = true;
-                apiResponse.Result = cookiesViewModel;
-                return Ok(apiResponse);
+                return Ok(new ApiResponse<CookiesViewModel>(true, result: cookiesViewModel));
             }
         }
-        return Ok(apiResponse);
+        return Ok(new ApiResponse<CookiesViewModel>(false));
     }
     #endregion
 
@@ -74,22 +70,15 @@ public class LoginController : BaseController
     [HttpPost]
     public async Task<IActionResult> Registration([FromForm] RegistrationViewModel RegisterVM)
     {
-        ApiResponse<string> apiResponse = new();
         if (RegisterVM.Email == null || RegisterVM.Password == null)
         {
-            apiResponse.HttpStatusCode = HttpStatusCode.BadRequest;
-            apiResponse.ToasterMessage = Messages.InvalidCredentilMessage;
-            apiResponse.IsSuccess = false;
-            return Ok(apiResponse);
+            return Ok(new ApiResponse<string>(false, Messages.InvalidCredentilMessage, null, HttpStatusCode.BadRequest));
         }
         else
         {
             if (_loginService.IsEmailExist(RegisterVM.Email) && _userService.IsUserRegistered(RegisterVM.Email))
             {
-                apiResponse.HttpStatusCode = HttpStatusCode.BadRequest;
-                apiResponse.ToasterMessage = Messages.EmailExistMessage;
-                apiResponse.IsSuccess = false;
-                return Ok(apiResponse);
+                return Ok(new ApiResponse<string>(false, Messages.EmailExistMessage, null, HttpStatusCode.BadRequest));
             }
             else
             {
@@ -99,18 +88,11 @@ public class LoginController : BaseController
                     string verificationCode = _jwtTokenService.GenerateTokenEmailVerificationToken(RegisterVM.Email, verificationToken);
                     string verificationLink = "http://localhost:5189/Login/VerifyEmail?verificationCode=" + verificationCode;
                     _ = CommonMethods.RegisterEmail(RegisterVM.FirstName + " " + RegisterVM.LastName, RegisterVM.Email, verificationLink, ConstantVariables.LoginLink);
-                    apiResponse.HttpStatusCode = HttpStatusCode.Created;
-                    apiResponse.ToasterMessage = Messages.RegistrationSuccessMessage;
-                    apiResponse.Result = verificationToken;
-                    apiResponse.IsSuccess = true;
-                    return Ok(apiResponse);
+                    return Ok(new ApiResponse<string>(true, Messages.RegistrationSuccessMessage, verificationToken, HttpStatusCode.Created));
                 }
                 else
                 {
-                    apiResponse.HttpStatusCode = HttpStatusCode.BadRequest;
-                    apiResponse.ToasterMessage = Messages.ExceptionMessage;
-                    apiResponse.IsSuccess = false;
-                    return Ok(apiResponse);
+                    return Ok(new ApiResponse<string>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest));
                 }
             }
         }
@@ -127,12 +109,7 @@ public class LoginController : BaseController
         bool isEmailVerified = await _loginService.EmailVerification(email, emailToken);
         if (isEmailVerified)
         {
-            ApiResponse<string> apiResponse = new()
-            {
-                IsSuccess = true,
-                ToasterMessage = Messages.VerificationSuccessMessage
-            };
-            return Ok(apiResponse);
+            return Ok(new ApiResponse<string>(true, Messages.VerificationSuccessMessage, null, HttpStatusCode.OK));
         }
         else
         {
@@ -141,7 +118,7 @@ public class LoginController : BaseController
                 IsSuccess = false,
                 ToasterMessage = Messages.VerificationErrorMessage
             };
-            return Ok(apiResponse);
+            return Ok(new ApiResponse<string>(false, Messages.VerificationErrorMessage, null, HttpStatusCode.BadRequest));
         }
     }
     #endregion
@@ -155,27 +132,23 @@ public class LoginController : BaseController
         CookiesViewModel cookiesViewModel = new();
         if (!ModelState.IsValid)
         {
-            apiResponse.IsSuccess = false;
-            apiResponse.ToasterMessage = Messages.InvalidCredentilMessage;
+            return Ok(new ApiResponse<string>(false, Messages.InvalidCredentilMessage, null, HttpStatusCode.BadRequest));
         }
         else
         {
             if (!_loginService.IsEmailExist(loginViewModel.Email))
             {
-                apiResponse.IsSuccess = false;
-                apiResponse.ToasterMessage = Messages.EmailDoesNotExistMessage;
+                return Ok(new ApiResponse<string>(false, Messages.EmailDoesNotExistMessage, null, HttpStatusCode.BadRequest));
             }
             else if (!_userService.IsUserRegistered(loginViewModel.Email))
             {
-                apiResponse.IsSuccess = false;
-                apiResponse.ToasterMessage = Messages.EmailDoesNotExistMessage;
+                return Ok(new ApiResponse<string>(false, Messages.EmailDoesNotExistMessage, null, HttpStatusCode.BadRequest));
             }
             else
             {
                 if (!_loginService.IsEmailVerified(loginViewModel.Email))
                 {
-                    apiResponse.IsSuccess = false;
-                    apiResponse.ToasterMessage = Messages.NotVerifiedEmailMessae;
+                    return Ok(new ApiResponse<string>(false, Messages.NotVerifiedEmailMessae, null, HttpStatusCode.BadRequest));
                 }
                 else
                 {
@@ -187,9 +160,7 @@ public class LoginController : BaseController
                         ApplicationUser user = _loginService.GetUserFromTokenIdentity(verificaitonToken);
                         if (user == null)
                         {
-                            apiResponse.IsSuccess = false;
-                            apiResponse.ToasterMessage = Messages.InvalidCredentilMessage;
-                            return Ok(apiResponse);
+                            return Ok(new ApiResponse<string>(false, Messages.InvalidCredentilMessage, null, HttpStatusCode.BadRequest));
                         }
                         else
                         {
@@ -197,24 +168,128 @@ public class LoginController : BaseController
                             {
                                 AttachmentViewModel attachmentViewModel = _attachmentService.GetAttachmentById((int)user.ProfileAttachmentId);
                                 cookiesViewModel.ProfilePhoto = attachmentViewModel.BusinesLogoPath;
-                                // _cookieService.SetCookie(Response, TokenKey.ProfilePhoto, attachmentViewModel.BusinesLogoPath);
                             }
                             cookiesViewModel.UserName = user.FirstName + " " + user.LastName;
-                            // _cookieService.SetCookie(Response, TokenKey.UserName, user.FirstName + " " + user.LastName);
-                            apiResponse.IsSuccess = true;
-                            apiResponse.Result = cookiesViewModel;
+                            return Ok(new ApiResponse<CookiesViewModel>(true, null, cookiesViewModel, HttpStatusCode.OK));
                         }
                     }
                     else
                     {
                         apiResponse.IsSuccess = false;
                         apiResponse.ToasterMessage = Messages.InvalidCredentilMessage;
+                        return Ok(new ApiResponse<string>(false, Messages.InvalidCredentilMessage, null, HttpStatusCode.BadRequest));
                     }
                 }
             }
         }
         return Ok(apiResponse);
     }
-    #endregion 
+    #endregion
 
+    #region forgot password post
+    [HttpPost]
+    [Route("ForgotPassword")]
+    public IActionResult ForgotPassword([FromForm] string email)
+    {
+        if (email != null)
+        {
+            if (_loginService.IsEmailExist(email))
+            {
+                if (_userService.IsUserRegistered(email))
+                {
+                    //send email
+                    ApplicationUser user = _userService.GetuserByEmail(email);
+                    string username = user.FirstName + " " + user.LastName;
+                    string resetPasswordToken = _jwtTokenService.GenerateTokenEmailPassword(email, user.PasswordHash);
+                    string resetLink = ConstantVariables.LoginLink + "/Login/ResetPassword?resetPasswordToken=" + resetPasswordToken;
+                    _ = CommonMethods.ResetPasswordEmail(email, username, resetLink, ConstantVariables.LoginLink);
+                    return Ok(new ApiResponse<string>(true, Messages.SendResetPasswordMailSuccess, null, HttpStatusCode.OK));
+                }
+                else
+                {
+                    return Ok(new ApiResponse<string>(false, Messages.EmailDoesNotExistMessage, null, HttpStatusCode.BadRequest));
+                }
+            }
+            else
+            {
+                return Ok(new ApiResponse<string>(false, Messages.EmailDoesNotExistMessage, null, HttpStatusCode.BadRequest));
+            }
+        }
+        return Ok(new ApiResponse<string>(false, Messages.InvalidCredentilMessage, null, HttpStatusCode.BadRequest));
+    }
+    #endregion
+
+    #region resetpassword get
+    [HttpGet]
+    [Route("ResetPassword")]
+    public IActionResult ResetPassword(string resetPasswordToken)
+    {
+        // ApiResponse<string> apiResponse = new();
+        try
+        {
+            string email = _jwtTokenService.GetClaimValue(resetPasswordToken, "email")!;
+            string newpassword = _jwtTokenService.GetClaimValue(resetPasswordToken, "password")!;
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(newpassword) || !_loginService.IsEmailExist(email))
+            {
+                return Ok(new ApiResponse<string>(false, Messages.InvalidResetPasswordLink, null, HttpStatusCode.BadRequest));
+            }
+            ApplicationUser user = _userService.GetuserByEmail(email);
+            string savedPassword = user.PasswordHash!;
+
+            if (savedPassword == newpassword)
+            {
+                return Ok(new ApiResponse<string>(true, null, email, HttpStatusCode.BadRequest));
+            }
+            return Ok(new ApiResponse<string>(false, Messages.LinkAlreadyUsedMessage, null, HttpStatusCode.BadRequest));
+        }
+        catch (Exception e)
+        {
+            return Ok(new ApiResponse<string>(false, Messages.InvalidResetPasswordLink, null, HttpStatusCode.BadRequest));
+
+        }
+    }
+    #endregion
+
+    #region reset password post
+    [HttpPost]
+    [Route("ResetPasswordAsync")]
+    public async Task<IActionResult> ResetPasswordAsync([FromForm] ResetPasswordViewModel resetPasswordViewModel)
+    {
+        if (!ModelState.IsValid)
+        {
+            return Ok(new ApiResponse<string>(false, Messages.InvalidCredentilMessage, null, HttpStatusCode.BadRequest));
+        }
+        else
+        {
+            ApplicationUser user = _userService.GetuserByEmail(resetPasswordViewModel.Email);
+            if (user != null)
+            {
+                PasswordHasher<ApplicationUser> passwordHasher = new PasswordHasher<ApplicationUser>();
+                PasswordVerificationResult result = passwordHasher.VerifyHashedPassword(user, user.PasswordHash, resetPasswordViewModel.Password);
+                if (result != PasswordVerificationResult.Failed)
+                {
+                    // apiResponse.IsSuccess = false;
+                    // TempData["ErrorMessage"] = Messages.SamePasswordsErrorMessage;
+                    return Ok(new ApiResponse<string>(false, Messages.SamePasswordsErrorMessage, null, HttpStatusCode.BadRequest));
+                }
+                else
+                {
+                    bool IsPasswordUpdated = await _userService.UpdatePassword(resetPasswordViewModel);
+                    if (IsPasswordUpdated)
+                    {
+                        return Ok(new ApiResponse<string>(true, string.Format(Messages.GlobalAddUpdateMesage, "Password", "updated"), null, HttpStatusCode.OK));
+                    }
+                    else
+                    {
+                        return Ok(new ApiResponse<string>(false, string.Format(Messages.GlobalAddUpdateFailMessage, "update", "Password"), null, HttpStatusCode.BadRequest));
+                    }
+                }
+            }
+            else
+            {
+                return Ok(new ApiResponse<string>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest));
+            }
+        }
+    }
+    #endregion
 }

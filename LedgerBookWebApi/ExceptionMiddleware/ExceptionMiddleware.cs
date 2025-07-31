@@ -77,19 +77,19 @@ public class ExceptionMiddleware
         }
         else
         {
-            if (!context.Response.HasStarted)
-            {
-                string redirectUrl = $"/ErrorPage/HandleError/{(int)code}";
-                context.Response.StatusCode = (int)HttpStatusCode.Redirect;
-                context.Response.Headers["Location"] = redirectUrl;
-                await context.Response.CompleteAsync();
-            }
-            else
-            {
-                _logger.LogWarning(Messages.ResponseStartedLogWarning);
-                context.Response.StatusCode = (int)code;
-                await context.Response.WriteAsync(message);
-            }
+            // if (!context.Response.HasStarted)
+            // {
+            //     string redirectUrl = $"/ErrorPage/HandleError/{(int)code}";
+            //     context.Response.StatusCode = (int)HttpStatusCode.Redirect;
+            //     context.Response.Headers["Location"] = redirectUrl;
+            //     await context.Response.CompleteAsync();
+            // }
+            // else
+            // {
+            //     _logger.LogWarning(Messages.ResponseStartedLogWarning);
+            //     context.Response.StatusCode = (int)code;
+            //     await context.Response.WriteAsync(message);
+            // }
         }
     }
 }
