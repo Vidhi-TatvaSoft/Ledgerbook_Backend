@@ -11,52 +11,61 @@ namespace LedgerBookWebApi.Controllers;
 
 [ApiController]
 [Route("api/Login")]
-public class LoginController : ControllerBase
+public class LoginController : BaseController
 {
-    private readonly ILoginService _loginService;
+    // private readonly ILoginService _loginService;
     private readonly IUserService _userService;
     private readonly IJWTTokenService _jwtTokenService;
     private readonly ICookieService _cookieService;
     private readonly IAttachmentService _attachmentService;
+
     public LoginController(
         IUserService userService,
         IJWTTokenService jWTTokenService,
         ICookieService cookieService,
         ILoginService loginService,
-        IAttachmentService attachmentService)
+        IActivityLogService activityLogService,
+        IAttachmentService attachmentService) : base(loginService, activityLogService)
 
     {
         _userService = userService;
         _jwtTokenService = jWTTokenService;
         _cookieService = cookieService;
         _attachmentService = attachmentService;
-        _loginService = loginService;
+        // _loginService = loginService;
     }
 
     #region login get method
     [HttpGet]
+    [Route("Login")]
     public async Task<IActionResult> Login()
     {
-        string token = Request.Cookies[TokenKey.UserToken];
+        ApiResponse<CookiesViewModel> apiResponse = new();
+        CookiesViewModel cookiesViewModel = new();
+        string token = GetData(TokenKey.UserToken);
         if (token != null)
         {
             ApplicationUser user = _loginService.GetUserFromTokenIdentity(token);
             if (user == null)
             {
-                return NotFound();
+                apiResponse.IsSuccess = false;
+                apiResponse.HttpStatusCode = HttpStatusCode.NotFound;
+                return Ok(apiResponse);
             }
             else
             {
                 if (user.ProfileAttachmentId != null)
                 {
                     AttachmentViewModel attachmentViewModel = _attachmentService.GetAttachmentById((int)user.ProfileAttachmentId);
-                    _cookieService.SetCookie(Response, TokenKey.ProfilePhoto, attachmentViewModel.BusinesLogoPath);
+                    cookiesViewModel.ProfilePhoto = attachmentViewModel.BusinesLogoPath;
                 }
-                _cookieService.SetCookie(Response, TokenKey.UserName, user.FirstName + " " + user.LastName);
-                return Ok();
+                cookiesViewModel.UserName = user.FirstName + " " + user.LastName;
+                apiResponse.IsSuccess = true;
+                apiResponse.Result = cookiesViewModel;
+                return Ok(apiResponse);
             }
         }
-        return NotFound();
+        return Ok(apiResponse);
     }
     #endregion
 
@@ -142,12 +151,12 @@ public class LoginController : ControllerBase
     [Route("LoginAsync")]
     public async Task<IActionResult> LoginAsync([FromForm] LoginViewModel loginViewModel)
     {
-        ApiResponse<LoginViewModel> apiResponse = new();
-        if (loginViewModel.Email == null || loginViewModel.Password == null)
+        ApiResponse<CookiesViewModel> apiResponse = new();
+        CookiesViewModel cookiesViewModel = new();
+        if (!ModelState.IsValid)
         {
             apiResponse.IsSuccess = false;
             apiResponse.ToasterMessage = Messages.InvalidCredentilMessage;
-            apiResponse.Result = loginViewModel;
         }
         else
         {
@@ -155,13 +164,11 @@ public class LoginController : ControllerBase
             {
                 apiResponse.IsSuccess = false;
                 apiResponse.ToasterMessage = Messages.EmailDoesNotExistMessage;
-                apiResponse.Result = loginViewModel;
             }
             else if (!_userService.IsUserRegistered(loginViewModel.Email))
             {
                 apiResponse.IsSuccess = false;
                 apiResponse.ToasterMessage = Messages.EmailDoesNotExistMessage;
-                apiResponse.Result = loginViewModel;
             }
             else
             {
@@ -169,51 +176,42 @@ public class LoginController : ControllerBase
                 {
                     apiResponse.IsSuccess = false;
                     apiResponse.ToasterMessage = Messages.NotVerifiedEmailMessae;
-                    apiResponse.Result = loginViewModel;
                 }
                 else
                 {
                     string verificaitonToken = await _loginService.VerifyPassword(loginViewModel);
                     if (verificaitonToken != null)
                     {
-                        if (verificaitonToken != null)
+                        cookiesViewModel.UserToken = verificaitonToken;
+                        // _cookieService.SetCookie(Response, TokenKey.UserToken, verificaitonToken);
+                        ApplicationUser user = _loginService.GetUserFromTokenIdentity(verificaitonToken);
+                        if (user == null)
                         {
-                            // _cookieService.SetCookie(Response, TokenKey.UserToken, verificaitonToken);
-                            ApplicationUser user = _loginService.GetUserFromTokenIdentity(verificaitonToken);
-                            if (user == null)
-                            {
-                                apiResponse.IsSuccess = false;
-                                apiResponse.ToasterMessage = Messages.InvalidCredentilMessage;
-                                apiResponse.Result = loginViewModel;
-                                return Ok(apiResponse);
-                            }
-                            else
-                            {
-                                if (user.ProfileAttachmentId != null)
-                                {
-                                    AttachmentViewModel attachmentViewModel = _attachmentService.GetAttachmentById((int)user.ProfileAttachmentId);
-                                    _cookieService.SetCookie(Response, TokenKey.ProfilePhoto, attachmentViewModel.BusinesLogoPath);
-                                }
-                                _cookieService.SetCookie(Response, TokenKey.UserName, user.FirstName + " " + user.LastName);
-
-                            }
-
+                            apiResponse.IsSuccess = false;
+                            apiResponse.ToasterMessage = Messages.InvalidCredentilMessage;
+                            return Ok(apiResponse);
                         }
-
-                        if (loginViewModel.RememberMe)
+                        else
                         {
-                            _cookieService.SetCookie(Response, TokenKey.RememberMe, loginViewModel.Email);
+                            if (user.ProfileAttachmentId != null)
+                            {
+                                AttachmentViewModel attachmentViewModel = _attachmentService.GetAttachmentById((int)user.ProfileAttachmentId);
+                                cookiesViewModel.ProfilePhoto = attachmentViewModel.BusinesLogoPath;
+                                // _cookieService.SetCookie(Response, TokenKey.ProfilePhoto, attachmentViewModel.BusinesLogoPath);
+                            }
+                            cookiesViewModel.UserName = user.FirstName + " " + user.LastName;
+                            // _cookieService.SetCookie(Response, TokenKey.UserName, user.FirstName + " " + user.LastName);
+                            apiResponse.IsSuccess = true;
+                            apiResponse.Result = cookiesViewModel;
                         }
                     }
                     else
                     {
                         apiResponse.IsSuccess = false;
                         apiResponse.ToasterMessage = Messages.InvalidCredentilMessage;
-                        apiResponse.Result = loginViewModel;
                     }
                 }
             }
-
         }
         return Ok(apiResponse);
     }
