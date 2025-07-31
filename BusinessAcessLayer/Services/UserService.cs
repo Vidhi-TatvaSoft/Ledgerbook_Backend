@@ -128,6 +128,8 @@ public class UserService : IUserService
         }
     }
 
+    
+
     public async Task<bool> UpdatePassword(ResetPasswordViewModel resetPasswordViewModel)
     {
         ApplicationUser user = _genericRepository.Get<ApplicationUser>(x => x.Email.Trim().ToLower() == resetPasswordViewModel.Email.Trim().ToLower());

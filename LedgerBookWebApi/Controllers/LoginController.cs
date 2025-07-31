@@ -35,7 +35,7 @@ public class LoginController : BaseController
         // _loginService = loginService;
     }
 
-    #region login get method
+    #region login 
     [HttpGet]
     [Route("Login")]
     public async Task<IActionResult> Login()
@@ -63,67 +63,7 @@ public class LoginController : BaseController
         }
         return Ok(new ApiResponse<CookiesViewModel>(false));
     }
-    #endregion
 
-    #region register
-    [Route("Register")]
-    [HttpPost]
-    public async Task<IActionResult> Registration([FromForm] RegistrationViewModel RegisterVM)
-    {
-        if (RegisterVM.Email == null || RegisterVM.Password == null)
-        {
-            return Ok(new ApiResponse<string>(false, Messages.InvalidCredentilMessage, null, HttpStatusCode.BadRequest));
-        }
-        else
-        {
-            if (_loginService.IsEmailExist(RegisterVM.Email) && _userService.IsUserRegistered(RegisterVM.Email))
-            {
-                return Ok(new ApiResponse<string>(false, Messages.EmailExistMessage, null, HttpStatusCode.BadRequest));
-            }
-            else
-            {
-                if (await _loginService.SaveUser(RegisterVM))
-                {
-                    string verificationToken = _loginService.GetEmailVerifiactionToken(RegisterVM.Email);
-                    string verificationCode = _jwtTokenService.GenerateTokenEmailVerificationToken(RegisterVM.Email, verificationToken);
-                    string verificationLink = "http://localhost:5189/Login/VerifyEmail?verificationCode=" + verificationCode;
-                    _ = CommonMethods.RegisterEmail(RegisterVM.FirstName + " " + RegisterVM.LastName, RegisterVM.Email, verificationLink, ConstantVariables.LoginLink);
-                    return Ok(new ApiResponse<string>(true, Messages.RegistrationSuccessMessage, verificationToken, HttpStatusCode.Created));
-                }
-                else
-                {
-                    return Ok(new ApiResponse<string>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest));
-                }
-            }
-        }
-    }
-    #endregion
-
-    #region verify email
-    [Route("VerifyEmail")]
-    [HttpPost]
-    public async Task<IActionResult> VerifyEmail([FromForm] string verificationCode)
-    {
-        string email = _jwtTokenService.GetClaimValue(verificationCode, "email")!;
-        string emailToken = _jwtTokenService.GetClaimValue(verificationCode, "token")!;
-        bool isEmailVerified = await _loginService.EmailVerification(email, emailToken);
-        if (isEmailVerified)
-        {
-            return Ok(new ApiResponse<string>(true, Messages.VerificationSuccessMessage, null, HttpStatusCode.OK));
-        }
-        else
-        {
-            ApiResponse<string> apiResponse = new()
-            {
-                IsSuccess = false,
-                ToasterMessage = Messages.VerificationErrorMessage
-            };
-            return Ok(new ApiResponse<string>(false, Messages.VerificationErrorMessage, null, HttpStatusCode.BadRequest));
-        }
-    }
-    #endregion
-
-    #region Login
     [HttpPost]
     [Route("LoginAsync")]
     public async Task<IActionResult> LoginAsync([FromForm] LoginViewModel loginViewModel)
@@ -186,110 +126,61 @@ public class LoginController : BaseController
     }
     #endregion
 
-    #region forgot password post
+    #region register
+    [Route("Register")]
+    [HttpPost]
+    public async Task<IActionResult> Registration([FromForm] RegistrationViewModel RegisterVM)
+    {
+        if (!ModelState.IsValid)
+            return Ok(new ApiResponse<string>(false, Messages.InvalidCredentilMessage, null, HttpStatusCode.BadRequest));
+        else
+            return Ok(await _loginService.RegisterUser(RegisterVM));
+    }
+    #endregion
+
+    #region verify email
+    [Route("VerifyEmail")]
+    [HttpPost]
+    public async Task<IActionResult> VerifyEmail([FromForm] string verificationCode)
+    {
+        if (verificationCode == null)
+            return Ok(new ApiResponse<string>(false, Messages.InvalidCredentilMessage, null, HttpStatusCode.BadRequest));
+        else
+            return Ok(await _loginService.EmailVerification(verificationCode));
+    }
+    #endregion
+
+
+    #region send email for forgot password
     [HttpPost]
     [Route("ForgotPassword")]
     public IActionResult ForgotPassword([FromForm] string email)
     {
         if (email != null)
-        {
-            if (_loginService.IsEmailExist(email))
-            {
-                if (_userService.IsUserRegistered(email))
-                {
-                    //send email
-                    ApplicationUser user = _userService.GetuserByEmail(email);
-                    string username = user.FirstName + " " + user.LastName;
-                    string resetPasswordToken = _jwtTokenService.GenerateTokenEmailPassword(email, user.PasswordHash);
-                    string resetLink = ConstantVariables.LoginLink + "/Login/ResetPassword?resetPasswordToken=" + resetPasswordToken;
-                    _ = CommonMethods.ResetPasswordEmail(email, username, resetLink, ConstantVariables.LoginLink);
-                    return Ok(new ApiResponse<string>(true, Messages.SendResetPasswordMailSuccess, null, HttpStatusCode.OK));
-                }
-                else
-                {
-                    return Ok(new ApiResponse<string>(false, Messages.EmailDoesNotExistMessage, null, HttpStatusCode.BadRequest));
-                }
-            }
-            else
-            {
-                return Ok(new ApiResponse<string>(false, Messages.EmailDoesNotExistMessage, null, HttpStatusCode.BadRequest));
-            }
-        }
+            return Ok(_loginService.ForgotPassword(email));
         return Ok(new ApiResponse<string>(false, Messages.InvalidCredentilMessage, null, HttpStatusCode.BadRequest));
     }
     #endregion
 
-    #region resetpassword get
+    #region resetpassword 
     [HttpGet]
-    [Route("ResetPassword")]
-    public IActionResult ResetPassword(string resetPasswordToken)
+    [Route("VerifyResetPasswordToken")]
+    public IActionResult VerifyResetPasswordToken(string resetPasswordToken)
     {
-        // ApiResponse<string> apiResponse = new();
-        try
-        {
-            string email = _jwtTokenService.GetClaimValue(resetPasswordToken, "email")!;
-            string newpassword = _jwtTokenService.GetClaimValue(resetPasswordToken, "password")!;
-            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(newpassword) || !_loginService.IsEmailExist(email))
-            {
-                return Ok(new ApiResponse<string>(false, Messages.InvalidResetPasswordLink, null, HttpStatusCode.BadRequest));
-            }
-            ApplicationUser user = _userService.GetuserByEmail(email);
-            string savedPassword = user.PasswordHash!;
-
-            if (savedPassword == newpassword)
-            {
-                return Ok(new ApiResponse<string>(true, null, email, HttpStatusCode.BadRequest));
-            }
-            return Ok(new ApiResponse<string>(false, Messages.LinkAlreadyUsedMessage, null, HttpStatusCode.BadRequest));
-        }
-        catch (Exception e)
-        {
-            return Ok(new ApiResponse<string>(false, Messages.InvalidResetPasswordLink, null, HttpStatusCode.BadRequest));
-
-        }
+        if (resetPasswordToken == null)
+            return Ok(new ApiResponse<string>(false, Messages.InvalidCredentilMessage, null, HttpStatusCode.BadRequest));
+        else
+            return Ok(_loginService.VerifyResetPasswordToken(resetPasswordToken));
     }
-    #endregion
 
-    #region reset password post
     [HttpPost]
     [Route("ResetPasswordAsync")]
     public async Task<IActionResult> ResetPasswordAsync([FromForm] ResetPasswordViewModel resetPasswordViewModel)
     {
         if (!ModelState.IsValid)
-        {
             return Ok(new ApiResponse<string>(false, Messages.InvalidCredentilMessage, null, HttpStatusCode.BadRequest));
-        }
         else
-        {
-            ApplicationUser user = _userService.GetuserByEmail(resetPasswordViewModel.Email);
-            if (user != null)
-            {
-                PasswordHasher<ApplicationUser> passwordHasher = new PasswordHasher<ApplicationUser>();
-                PasswordVerificationResult result = passwordHasher.VerifyHashedPassword(user, user.PasswordHash, resetPasswordViewModel.Password);
-                if (result != PasswordVerificationResult.Failed)
-                {
-                    // apiResponse.IsSuccess = false;
-                    // TempData["ErrorMessage"] = Messages.SamePasswordsErrorMessage;
-                    return Ok(new ApiResponse<string>(false, Messages.SamePasswordsErrorMessage, null, HttpStatusCode.BadRequest));
-                }
-                else
-                {
-                    bool IsPasswordUpdated = await _userService.UpdatePassword(resetPasswordViewModel);
-                    if (IsPasswordUpdated)
-                    {
-                        return Ok(new ApiResponse<string>(true, string.Format(Messages.GlobalAddUpdateMesage, "Password", "updated"), null, HttpStatusCode.OK));
-                    }
-                    else
-                    {
-                        return Ok(new ApiResponse<string>(false, string.Format(Messages.GlobalAddUpdateFailMessage, "update", "Password"), null, HttpStatusCode.BadRequest));
-                    }
-                }
-            }
-            else
-            {
-                return Ok(new ApiResponse<string>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest));
-            }
-        }
+            return Ok(_loginService.ResetPassword(resetPasswordViewModel));
     }
     #endregion
 }

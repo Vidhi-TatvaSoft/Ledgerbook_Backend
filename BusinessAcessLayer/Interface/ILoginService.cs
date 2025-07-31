@@ -5,9 +5,13 @@ namespace BusinessAcessLayer.Interface;
 
 public interface ILoginService
 {
+    Task<ApiResponse<string>> RegisterUser(RegistrationViewModel RegisterVM);
     Task<bool> SaveUser(RegistrationViewModel registrationViewModel);
     string GetEmailVerifiactionToken(string email);
-    Task<bool> EmailVerification(string email, string emailToken);
+    Task<ApiResponse<string>> EmailVerification(string verificationCode);
+    ApiResponse<string> ForgotPassword(string email);
+    ApiResponse<string> VerifyResetPasswordToken(string resetPasswordToken);
+    Task<ApiResponse<string>> ResetPassword(ResetPasswordViewModel resetPasswordViewModel);
     bool IsEmailVerified(string email);
     Task<string> VerifyPassword(LoginViewModel loginViewModel);
     bool IsEmailExist(string Email);
