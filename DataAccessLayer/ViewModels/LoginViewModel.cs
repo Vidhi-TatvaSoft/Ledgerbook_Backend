@@ -11,7 +11,6 @@ public class LoginViewModel
     [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,8}$", ErrorMessage = MessageHelper.ValidEmailMessage)]
     public string Email { get; set; }
 
-
     [Required(ErrorMessage = MessageHelper.PasswordRequireMessage)]
     [DataType(DataType.Password)]
     [MinLength(6, ErrorMessage = MessageHelper.minLengthPasswordMessage)]

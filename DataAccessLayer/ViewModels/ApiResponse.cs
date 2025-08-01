@@ -13,7 +13,7 @@ public class ApiResponse<T>
     public T? Result { get; set; }
 
     public ApiResponse(bool? isSuccess = false,  string? message = null, T? result = default,HttpStatusCode? statusCode = System.Net.HttpStatusCode.OK)
-    {
+    {   
         IsSuccess = isSuccess;
         HttpStatusCode = statusCode;
         ToasterMessage = message;

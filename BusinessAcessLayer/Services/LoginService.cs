@@ -21,6 +21,7 @@ public class LoginService : ILoginService
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly IUserService _userService;
+    private readonly IAttachmentService _attachmentService;
 
     public LoginService(LedgerBookDbContext context,
     IJWTTokenService jWTTokenService,
@@ -28,7 +29,8 @@ public class LoginService : ILoginService
     IActivityLogService activityLogService,
     UserManager<ApplicationUser> userManager,
     SignInManager<ApplicationUser> signInManager,
-    IUserService userService
+    IUserService userService,
+    IAttachmentService attachmentService
      )
     {
         _context = context;
@@ -38,6 +40,7 @@ public class LoginService : ILoginService
         _userManager = userManager;
         _signInManager = signInManager;
         _userService = userService;
+        _attachmentService = attachmentService;
     }
 
     public async Task<ApiResponse<string>> RegisterUser(RegistrationViewModel RegisterVM)
@@ -59,6 +62,77 @@ public class LoginService : ILoginService
             else
             {
                 return new ApiResponse<string>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
+            }
+        }
+    }
+
+    public ApiResponse<CookiesViewModel> Login(string token)
+    {
+        if (token != null)
+        {
+            CookiesViewModel cookiesViewModel = new();
+            ApplicationUser user = GetUserFromTokenIdentity(token);
+            if (user == null)
+            {
+                return new ApiResponse<CookiesViewModel>(false, null, null, HttpStatusCode.BadRequest);
+            }
+            else
+            {
+                if (user.ProfileAttachmentId != null)
+                {
+                    AttachmentViewModel attachmentViewModel = _attachmentService.GetAttachmentById((int)user.ProfileAttachmentId);
+                    cookiesViewModel.ProfilePhoto = attachmentViewModel.BusinesLogoPath;
+                }
+                cookiesViewModel.UserName = user.FirstName + " " + user.LastName;
+                return new ApiResponse<CookiesViewModel>(true, null, result: cookiesViewModel, HttpStatusCode.OK);
+            }
+        }
+        return new ApiResponse<CookiesViewModel>(false, null, null, HttpStatusCode.BadRequest);
+    }
+
+    public async Task<ApiResponse<CookiesViewModel>> LoginAsync(LoginViewModel loginViewModel)
+    {
+        CookiesViewModel cookiesViewModel = new();
+        if (!IsEmailExist(loginViewModel.Email))
+        {
+            return new ApiResponse<CookiesViewModel>(false, Messages.EmailDoesNotExistMessage, null, HttpStatusCode.BadRequest);
+        }
+        else if (!_userService.IsUserRegistered(loginViewModel.Email))
+        {
+            return new ApiResponse<CookiesViewModel>(false, Messages.EmailDoesNotExistMessage, null, HttpStatusCode.BadRequest);
+        }
+        else
+        {
+            if (!IsEmailVerified(loginViewModel.Email))
+            {
+                return new ApiResponse<CookiesViewModel>(false, Messages.NotVerifiedEmailMessae, null, HttpStatusCode.BadRequest);
+            }
+            else
+            {
+                string verificaitonToken = await VerifyPassword(loginViewModel);
+                if (verificaitonToken != null)
+                {
+                    cookiesViewModel.UserToken = verificaitonToken;
+                    ApplicationUser user = GetUserFromTokenIdentity(verificaitonToken);
+                    if (user == null)
+                    {
+                        return new ApiResponse<CookiesViewModel>(false, Messages.InvalidCredentilMessage, null, HttpStatusCode.BadRequest);
+                    }
+                    else
+                    {
+                        if (user.ProfileAttachmentId != null)
+                        {
+                            AttachmentViewModel attachmentViewModel = _attachmentService.GetAttachmentById((int)user.ProfileAttachmentId);
+                            cookiesViewModel.ProfilePhoto = attachmentViewModel.BusinesLogoPath;
+                        }
+                        cookiesViewModel.UserName = user.FirstName + " " + user.LastName;
+                        return new ApiResponse<CookiesViewModel>(true, null, cookiesViewModel, HttpStatusCode.OK);
+                    }
+                }
+                else
+                {
+                    return new ApiResponse<CookiesViewModel>(false, Messages.InvalidCredentilMessage, null, HttpStatusCode.BadRequest);
+                }
             }
         }
     }
@@ -236,19 +310,26 @@ public class LoginService : ILoginService
 
     public async Task<string> VerifyPassword(LoginViewModel loginViewModel)
     {
-        ApplicationUser user = _genericRepository.Get<ApplicationUser>(e => e.Email == loginViewModel.Email.ToLower().Trim() && e.DeletedAt == null)!;
-
-        if (user != null)
+        try
         {
-            SignInResult result = await _signInManager.PasswordSignInAsync(loginViewModel.Email, loginViewModel.Password, loginViewModel.RememberMe, lockoutOnFailure: false);
-            if (result.Succeeded)
+            ApplicationUser user = _genericRepository.Get<ApplicationUser>(e => e.Email == loginViewModel.Email.ToLower().Trim() && e.DeletedAt == null)!;
+
+            if (user != null)
             {
-                string token = _jwttokenService.GenerateToken(loginViewModel.Email);
-                return token;
+                var result = await _signInManager.PasswordSignInAsync(user.Email, loginViewModel.Password, isPersistent:true, lockoutOnFailure: false);
+                if (result.Succeeded)
+                {
+                    string token = _jwttokenService.GenerateToken(loginViewModel.Email);
+                    return token;
+                }
+                return null;
             }
             return null;
         }
-        return null;
+        catch (Exception e)
+        {
+            return null;
+        }
     }
 
     public bool IsEmailExist(string Email)

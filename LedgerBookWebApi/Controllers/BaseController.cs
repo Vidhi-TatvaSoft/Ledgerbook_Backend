@@ -23,35 +23,41 @@ public class BaseController : ControllerBase
 
     #region get data from ajax header
     [HttpGet]
-    public string GetData(string tokenKey)
+    public string? GetData(string tokenKey)
     {
-        if (Request.Headers.TryGetValue(tokenKey, out StringValues _headerValues))
+        try
         {
-            string customHeaderValue = _headerValues.FirstOrDefault()!;
-            return customHeaderValue;
+            if (Request.Headers.TryGetValue(tokenKey, out StringValues _headerValues))
+            {
+                string customHeaderValue = _headerValues.FirstOrDefault()!;
+                return customHeaderValue;
+            }
+            return null;
         }
-        return null;
+        catch (Exception e)
+        {
+            return null;
+        }
+
     }
     #endregion
 
-    // #region get current user from token
-    // protected ApplicationUser GetCurrentUserIdentity()
-    // {
-    //     string token = Request.Cookies[TokenKey.UserToken];
-    //     if (string.IsNullOrEmpty(token))
-    //     {
-    //         return null;
-    //         // throw new Exception("User is not authenticated. Please log in.");
-    //     }
-    //     ApplicationUser user = _loginService.GetUserFromTokenIdentity(token);
-    //     if (user == null)
-    //     {
-    //         return null;
-    //         // throw new Exception("Invalid token or user not found.");
-    //     }
-    //     return user;
-    // }
-    // #endregion
+    #region get current user from token
+    protected ApplicationUser GetCurrentUserIdentity()
+    {
+        string token = GetData(TokenKey.UserToken)!;
+        if (string.IsNullOrEmpty(token))
+        {
+            return null;
+        }
+        ApplicationUser user = _loginService.GetUserFromTokenIdentity(token);
+        if (user == null)
+        {
+            return null;
+        }
+        return user;
+    }
+    #endregion
 
     // #region render to login page if not authorized
     // protected IActionResult RedirectToLoginIfNotAuthenticated()

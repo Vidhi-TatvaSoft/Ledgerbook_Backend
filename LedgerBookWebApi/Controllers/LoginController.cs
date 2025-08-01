@@ -1,11 +1,9 @@
 using System.Net;
 using BusinessAcessLayer.Constant;
-using BusinessAcessLayer.Helper;
 using BusinessAcessLayer.Interface;
-using DataAccessLayer.Models;
 using DataAccessLayer.ViewModels;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
 namespace LedgerBookWebApi.Controllers;
 
@@ -38,96 +36,36 @@ public class LoginController : BaseController
     #region login 
     [HttpGet]
     [Route("Login")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Login()
     {
-        // ApiResponse<CookiesViewModel> apiResponse = new();
-        CookiesViewModel cookiesViewModel = new();
         string token = GetData(TokenKey.UserToken);
-        if (token != null)
+        if (token.IsNullOrEmpty())
         {
-            ApplicationUser user = _loginService.GetUserFromTokenIdentity(token);
-            if (user == null)
-            {
-                return Ok(new ApiResponse<string>(false));
-            }
-            else
-            {
-                if (user.ProfileAttachmentId != null)
-                {
-                    AttachmentViewModel attachmentViewModel = _attachmentService.GetAttachmentById((int)user.ProfileAttachmentId);
-                    cookiesViewModel.ProfilePhoto = attachmentViewModel.BusinesLogoPath;
-                }
-                cookiesViewModel.UserName = user.FirstName + " " + user.LastName;
-                return Ok(new ApiResponse<CookiesViewModel>(true, result: cookiesViewModel));
-            }
+            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.BadRequest));
         }
-        return Ok(new ApiResponse<CookiesViewModel>(false));
+        return Ok(_loginService.Login(token));
     }
 
     [HttpPost]
     [Route("LoginAsync")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> LoginAsync([FromForm] LoginViewModel loginViewModel)
     {
-        ApiResponse<CookiesViewModel> apiResponse = new();
-        CookiesViewModel cookiesViewModel = new();
+
         if (!ModelState.IsValid)
-        {
             return Ok(new ApiResponse<string>(false, Messages.InvalidCredentilMessage, null, HttpStatusCode.BadRequest));
-        }
         else
-        {
-            if (!_loginService.IsEmailExist(loginViewModel.Email))
-            {
-                return Ok(new ApiResponse<string>(false, Messages.EmailDoesNotExistMessage, null, HttpStatusCode.BadRequest));
-            }
-            else if (!_userService.IsUserRegistered(loginViewModel.Email))
-            {
-                return Ok(new ApiResponse<string>(false, Messages.EmailDoesNotExistMessage, null, HttpStatusCode.BadRequest));
-            }
-            else
-            {
-                if (!_loginService.IsEmailVerified(loginViewModel.Email))
-                {
-                    return Ok(new ApiResponse<string>(false, Messages.NotVerifiedEmailMessae, null, HttpStatusCode.BadRequest));
-                }
-                else
-                {
-                    string verificaitonToken = await _loginService.VerifyPassword(loginViewModel);
-                    if (verificaitonToken != null)
-                    {
-                        cookiesViewModel.UserToken = verificaitonToken;
-                        // _cookieService.SetCookie(Response, TokenKey.UserToken, verificaitonToken);
-                        ApplicationUser user = _loginService.GetUserFromTokenIdentity(verificaitonToken);
-                        if (user == null)
-                        {
-                            return Ok(new ApiResponse<string>(false, Messages.InvalidCredentilMessage, null, HttpStatusCode.BadRequest));
-                        }
-                        else
-                        {
-                            if (user.ProfileAttachmentId != null)
-                            {
-                                AttachmentViewModel attachmentViewModel = _attachmentService.GetAttachmentById((int)user.ProfileAttachmentId);
-                                cookiesViewModel.ProfilePhoto = attachmentViewModel.BusinesLogoPath;
-                            }
-                            cookiesViewModel.UserName = user.FirstName + " " + user.LastName;
-                            return Ok(new ApiResponse<CookiesViewModel>(true, null, cookiesViewModel, HttpStatusCode.OK));
-                        }
-                    }
-                    else
-                    {
-                        apiResponse.IsSuccess = false;
-                        apiResponse.ToasterMessage = Messages.InvalidCredentilMessage;
-                        return Ok(new ApiResponse<string>(false, Messages.InvalidCredentilMessage, null, HttpStatusCode.BadRequest));
-                    }
-                }
-            }
-        }
-        return Ok(apiResponse);
+            return Ok(await _loginService.LoginAsync(loginViewModel));
     }
     #endregion
 
     #region register
     [Route("Register")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [HttpPost]
     public async Task<IActionResult> Registration([FromForm] RegistrationViewModel RegisterVM)
     {
@@ -140,6 +78,8 @@ public class LoginController : BaseController
 
     #region verify email
     [Route("VerifyEmail")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [HttpPost]
     public async Task<IActionResult> VerifyEmail([FromForm] string verificationCode)
     {
@@ -165,6 +105,9 @@ public class LoginController : BaseController
     #region resetpassword 
     [HttpGet]
     [Route("VerifyResetPasswordToken")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+
     public IActionResult VerifyResetPasswordToken(string resetPasswordToken)
     {
         if (resetPasswordToken == null)
@@ -175,12 +118,14 @@ public class LoginController : BaseController
 
     [HttpPost]
     [Route("ResetPasswordAsync")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ResetPasswordAsync([FromForm] ResetPasswordViewModel resetPasswordViewModel)
     {
         if (!ModelState.IsValid)
             return Ok(new ApiResponse<string>(false, Messages.InvalidCredentilMessage, null, HttpStatusCode.BadRequest));
         else
-            return Ok(_loginService.ResetPassword(resetPasswordViewModel));
+            return Ok(await _loginService.ResetPassword(resetPasswordViewModel));
     }
     #endregion
 }

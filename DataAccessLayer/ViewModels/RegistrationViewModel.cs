@@ -12,12 +12,12 @@ public class RegistrationViewModel
     public string Email { get; set; }
 
 
-    // [Required(ErrorMessage = MessageHelper.PasswordRequireMessage)]
-    // [DataType(DataType.Password)]
-    // [MinLength(8, ErrorMessage = MessageHelper.minLengthPasswordRegisterMessage)]
-    // [MaxLength(128, ErrorMessage = MessageHelper.maxLengthPasswordMessage)]
-    // [RegularExpression(@"^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$",
-    //           ErrorMessage = MessageHelper.InvalidPasswordMessage)]
+    [Required(ErrorMessage = MessageHelper.PasswordRequireMessage)]
+    [DataType(DataType.Password)]
+    [MinLength(8, ErrorMessage = MessageHelper.minLengthPasswordRegisterMessage)]
+    [MaxLength(128, ErrorMessage = MessageHelper.maxLengthPasswordMessage)]
+    [RegularExpression(@"^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$",
+              ErrorMessage = MessageHelper.InvalidPasswordMessage)]
     public string Password { get; set; }
 
     // [Required(ErrorMessage = MessageHelper.ConfirmPasswordRequireMessage)]
@@ -29,9 +29,9 @@ public class RegistrationViewModel
     // [Compare("Password", ErrorMessage = MessageHelper.comparePasswords)]
     public string ConfirmPassword { get; set; }
 
-    // [Required(AllowEmptyStrings = false, ErrorMessage = MessageHelper.FirstNameRequireMessage)]
-    // [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = MessageHelper.InvalidFirstNameMessage)]
-    // [StringLength(50, ErrorMessage = MessageHelper.FirstNameLengthMessage)]
+    [Required(AllowEmptyStrings = false, ErrorMessage = MessageHelper.FirstNameRequireMessage)]
+    [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = MessageHelper.InvalidFirstNameMessage)]
+    [StringLength(50, ErrorMessage = MessageHelper.FirstNameLengthMessage)]
     public string FirstName { get; set; }
 
     // [Required(AllowEmptyStrings = false, ErrorMessage = MessageHelper.LastNameRequireMessage)]

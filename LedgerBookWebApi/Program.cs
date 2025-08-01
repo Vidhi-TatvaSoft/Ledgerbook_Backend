@@ -51,7 +51,7 @@ builder.Services.AddScoped<IGenericRepo, GenericRepo>();
 builder.Services.AddScoped<ITransactionReportSevice, TransactionReportService>();
 builder.Services.AddScoped<IExceptionService, ExceptionService>();
 builder.Services.AddScoped<IActivityLogService, ActivityLogService>();
-
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthentication(x =>
 {
     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

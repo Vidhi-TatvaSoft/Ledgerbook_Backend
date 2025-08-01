@@ -3,6 +3,7 @@ using System.Reflection.Metadata;
 using System.Text.Json;
 using BusinessAcessLayer.Constant;
 using BusinessAcessLayer.Interface;
+using DataAccessLayer.ViewModels;
 
 
 namespace LedgerBook.ExceptionMiddleware;
@@ -49,47 +50,20 @@ public class ExceptionMiddleware
         };
         message = Messages.ExceptionMessage;
 
-        // _logger.LogError(exception, Messages.UnhandledExceptionMessage);
-
-        bool isAjax = context.Request.Headers["X-Requested-With"] == "XMLHttpRequest";
-
         //add exception in db
         using IServiceScope scope = _serviceScopeFactory.CreateAsyncScope();
         IExceptionService exceptionserive = scope.ServiceProvider.GetRequiredService<IExceptionService>();
         await exceptionserive.AddExceptionLog(context, exception);
 
-        if (isAjax)
+        context.Response.ContentType = "application/json";
+
+        var jsonResponse = new ApiResponse<string>(false, message, null, code);
+        var options = new JsonSerializerOptions
         {
-            context.Response.ContentType = "application/json";
-            context.Response.StatusCode = 200; // Always OK (to avoid redirect issues)
-
-            context.Response.Headers.Add("X-Error", "true");
-
-            var jsonResponse = new
-            {
-                success = false,
-                statusCode = (int)code,
-                error = message
-            };
-
-            string jsonMessage = JsonSerializer.Serialize(jsonResponse);
-            await context.Response.WriteAsync(jsonMessage);
-        }
-        else
-        {
-            // if (!context.Response.HasStarted)
-            // {
-            //     string redirectUrl = $"/ErrorPage/HandleError/{(int)code}";
-            //     context.Response.StatusCode = (int)HttpStatusCode.Redirect;
-            //     context.Response.Headers["Location"] = redirectUrl;
-            //     await context.Response.CompleteAsync();
-            // }
-            // else
-            // {
-            //     _logger.LogWarning(Messages.ResponseStartedLogWarning);
-            //     context.Response.StatusCode = (int)code;
-            //     await context.Response.WriteAsync(message);
-            // }
-        }
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            WriteIndented = true 
+        };
+        string jsonMessage = JsonSerializer.Serialize(jsonResponse,options);
+        await context.Response.WriteAsync(jsonMessage);
     }
 }
