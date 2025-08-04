@@ -1,3 +1,4 @@
+using System.Net;
 using BusinessAcessLayer.Constant;
 using BusinessAcessLayer.Interface;
 using DataAccessLayer.Constant;
@@ -59,17 +60,17 @@ public class BaseController : ControllerBase
     }
     #endregion
 
-    // #region render to login page if not authorized
-    // protected IActionResult RedirectToLoginIfNotAuthenticated()
-    // {
-    //     string token = Request.Cookies[TokenKey.UserToken];
-    //     if (Request.Cookies[TokenKey.UserToken] == null)
-    //     {
-    //         return RedirectToAction("Login", "Login");
-    //     }
-    //     return null;
-    // }
-    // #endregion
+    #region render to login page if not authorized
+    protected IActionResult RedirectToLoginIfNotAuthenticated()
+    {
+        ApplicationUser user = GetCurrentUserIdentity();
+        if (user == null)
+        {
+            return Ok(new ApiResponse<ApplicationUser>(false, null, null, HttpStatusCode.Forbidden));
+        }
+        return Ok(new ApiResponse<ApplicationUser>(true, null, user, HttpStatusCode.OK));
+    }
+    #endregion
 
     // #region render to login page if not authorized
     // protected IActionResult RedirectToIndexIfBusinessNotFound()

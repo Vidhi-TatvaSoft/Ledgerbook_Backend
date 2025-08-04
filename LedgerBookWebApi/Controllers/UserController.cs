@@ -1,9 +1,11 @@
 
+using BusinessAcessLayer.Constant;
 using BusinessAcessLayer.Interface;
 using DataAccessLayer.Models;
 using DataAccessLayer.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace LedgerBookWebApi.Controllers;
 
@@ -30,7 +32,21 @@ public class UserController : BaseController
         if (user == null)
             return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Forbidden));
         UserProfileViewModel userProfileViewModel = _userService.GetUserProfile(user.Id);
-        return Ok(new ApiResponse<UserProfileViewModel>(false, null, userProfileViewModel, HttpStatusCode.Forbidden));
+        return Ok(new ApiResponse<UserProfileViewModel>(true, null, userProfileViewModel, HttpStatusCode.OK));
+    }
+
+    [HttpPost]
+    [Route("UpdateProfile")]
+    public async Task<IActionResult> UpdateProfile([FromForm] UserProfileViewModel userProfileViewModel)
+    {
+        ApplicationUser user = GetCurrentUserIdentity();
+        if (user == null)
+            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Forbidden));
+        if (!ModelState.IsValid)
+        {
+            return Ok(new ApiResponse<string>(false, Messages.InvalidCredentilMessage, null, HttpStatusCode.BadRequest));
+        }
+        return Ok(await _userService.UpdateUserProfile(userProfileViewModel));
     }
     #endregion
 

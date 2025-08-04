@@ -14,7 +14,7 @@ public interface IUserService
     Task<int> UpdatePersonalDetails(UserViewmodel userViewmodel, int userId);
     Task<bool> UpdatePassword(ResetPasswordViewModel resetPasswordViewModel);
     UserProfileViewModel GetUserProfile(int userId);
-    Task<bool> UpdateUserProfile(UserProfileViewModel userProfileViewModel);
+    Task<ApiResponse<CookiesViewModel>> UpdateUserProfile(UserProfileViewModel userProfileViewModel);
     string GetuserNameById(int userId);
     // Task<bool> ConvertdataToAspNetUsers();
 }

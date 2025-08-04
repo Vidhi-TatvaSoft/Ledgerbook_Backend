@@ -1,12 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 using DataAccessLayer.Constant;
+using Microsoft.AspNetCore.Http;
 
 namespace DataAccessLayer.ViewModels;
 
 public class UserProfileViewModel
 {
-    public int UserId { get; set; }
-
     [Required(AllowEmptyStrings = false, ErrorMessage = MessageHelper.FirstNameRequireMessage)]
     [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = MessageHelper.InvalidFirstNameMessage)]
     [StringLength(50, ErrorMessage = MessageHelper.FirstNameLengthMessage)]
@@ -26,13 +25,9 @@ public class UserProfileViewModel
     [Range(1000000000, 9999999999, ErrorMessage = MessageHelper.MobileNumberlength)]
     public long? MobileNumber { get; set; }
 
-    public string MobileNumberString { get; set; }
-
-    public string Pasword { get; set; }
-
     public int? ProfileAttachmentId { get; set; }
+    public IFormFile BusinessLogo { get; set; }
 
     public AttachmentViewModel AttachmentViewModel { get; set; }
-
 
 }

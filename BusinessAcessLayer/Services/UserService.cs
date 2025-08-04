@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using System.Net;
 using System.Threading.Tasks;
 using BusinessAcessLayer.Constant;
 using BusinessAcessLayer.Helper;
@@ -6,6 +7,7 @@ using BusinessAcessLayer.Interface;
 using DataAccessLayer.Constant;
 using DataAccessLayer.Models;
 using DataAccessLayer.ViewModels;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Org.BouncyCastle.Bcpg;
@@ -128,7 +130,7 @@ public class UserService : IUserService
         }
     }
 
-    
+
 
     public async Task<bool> UpdatePassword(ResetPasswordViewModel resetPasswordViewModel)
     {
@@ -161,7 +163,6 @@ public class UserService : IUserService
         if (user != null)
         {
             userProfileViewModel.FirstName = user.FirstName;
-            userProfileViewModel.UserId = user.Id;
             userProfileViewModel.LastName = user.LastName;
             userProfileViewModel.Email = user.Email;
             userProfileViewModel.MobileNumber = user.PhoneNumber == null ? 0 : long.Parse(user.PhoneNumber);
@@ -180,22 +181,46 @@ public class UserService : IUserService
         return userProfileViewModel;
     }
 
-    public async Task<bool> UpdateUserProfile(UserProfileViewModel userProfileViewModel)
+    public async Task<ApiResponse<CookiesViewModel>> UpdateUserProfile(UserProfileViewModel userProfileViewModel)
     {
-        ApplicationUser user = _genericRepository.Get<ApplicationUser>(x => x.Id == userProfileViewModel.UserId && !x.DeletedAt.HasValue);
+        ApplicationUser user = _genericRepository.Get<ApplicationUser>(x => x.Email.ToLower().Trim() == userProfileViewModel.Email.ToLower().Trim() && !x.DeletedAt.HasValue);
         if (user != null)
         {
             user.FirstName = userProfileViewModel.FirstName;
             user.LastName = userProfileViewModel.LastName;
-            user.PhoneNumber = userProfileViewModel.MobileNumber.ToString();
+            user.PhoneNumber = userProfileViewModel.MobileNumber == null ? null : userProfileViewModel.MobileNumber.ToString();
+            if (userProfileViewModel.BusinessLogo != null)
+            {
+                string[] extension = userProfileViewModel.BusinessLogo.FileName.Split(".");
+                string fileNameTemp = userProfileViewModel.BusinessLogo.FileName;
+                if (extension[extension.Length - 1] == "jpg" || extension[extension.Length - 1] == "jpeg" || extension[extension.Length - 1] == "png")
+                {
+                    string path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
+                    string imageFileName = CommonMethods.UploadImage(userProfileViewModel.BusinessLogo, path);
+                    userProfileViewModel.AttachmentViewModel = new()
+                    {
+                        BusinesLogoPath = $"/uploads/{imageFileName}",
+                        FileExtension = extension[extension.Length - 1],
+                        FileName = fileNameTemp
+                    };
+                }
+                else
+                {
+                    return new ApiResponse<CookiesViewModel>(false, Messages.InvalidImageExtensionMessage, null, HttpStatusCode.BadRequest);
+                }
+            }
+            else
+            {
+                userProfileViewModel.AttachmentViewModel = new();
+            }
             if (userProfileViewModel.AttachmentViewModel != null)
             {
-                if (userProfileViewModel.AttachmentViewModel.BusinessLogo != null)
+                if (userProfileViewModel.BusinessLogo != null)
                 {
                     int attachmentId = await _attachmentService.SaveAttachment(userProfileViewModel.AttachmentViewModel, user.Id);
                     if (attachmentId == 0)
                     {
-                        return false;
+                        return new ApiResponse<CookiesViewModel>(false, string.Format(Messages.GlobalAddUpdateFailMessage, "update", "user Profile"), null, HttpStatusCode.BadRequest);
                     }
                     else
                     {
@@ -210,10 +235,17 @@ public class UserService : IUserService
             {
                 string message = string.Format(Messages.BusinessActivity, "User", "updated", user.FirstName + " " + user.LastName);
                 await _activityLogService.SetActivityLog(message, EnumHelper.Actiontype.Update, EnumHelper.ActivityEntityType.User, user.Id, user.Id);
-                return true;
+                CookiesViewModel cookiesViewModel = new()
+                {
+                    UserToken = _jwttokenService.GenerateToken(userProfileViewModel.Email),
+                    UserName = user.FirstName + " " + user.LastName,
+                    ProfilePhoto = userProfileViewModel.AttachmentViewModel.BusinesLogoPath
+                };
+                return new ApiResponse<CookiesViewModel>(true, string.Format(Messages.GlobalAddUpdateMesage, "User Profile", "Updated"), cookiesViewModel, HttpStatusCode.OK);
             }
         }
-        return false;
+        return new ApiResponse<CookiesViewModel>(false, string.Format(Messages.GlobalAddUpdateFailMessage, "update", "user Profile"), null, HttpStatusCode.BadRequest);
+
     }
 
     public string GetuserNameById(int userId)
