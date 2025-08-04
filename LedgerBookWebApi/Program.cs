@@ -24,14 +24,27 @@ builder.Services.AddDbContext<LedgerBookDbContext>(options =>
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
                     .AddEntityFrameworkStores<LedgerBookDbContext>();
 
+// builder.Services.AddCors(options =>
+// {
+//     options.AddPolicy("AllowLocalhost",
+//         policy => policy.WithOrigins("http://localhost:5189")
+//             .AllowAnyMethod()
+//             .AllowAnyHeader()
+//     );
+// });
+
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowLocalhost",
-        policy => policy.WithOrigins("http://localhost:5189")
-            .AllowAnyMethod()
-            .AllowAnyHeader()
-    );
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
 });
+// var app = builder.Build();
+
+// app.UseCors();
 
 // builder.Services.AddScoped<IViewRenderService, ViewRenderService>();
 builder.Services.AddScoped<ILoginService, LoginService>();
@@ -164,7 +177,8 @@ app.UseStaticFiles();
 app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseRouting();
-app.UseCors("AllowLocalhost");
+// app.UseCors("AllowLocalhost");
+app.UseCors();
 app.UseAuthorization();
 app.UseAuthentication();
 app.MapControllers();

@@ -50,4 +50,11 @@ public class UserController : BaseController
     }
     #endregion
 
+    [HttpGet]
+    [Route("getusers")]
+    public IActionResult getusers()
+    {
+        return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.OK));
+    }
+
 }

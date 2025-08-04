@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Businesss - LedgerBook</title>
+    <link rel="icon" type="image/x-icon" href="/images/logotransparent.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/Ledgerbook/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/additional-methods.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.dataTables.css" />
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script>
+</head>
+
+<body>
+    <div class="overlay">
+        <div class="overlay-loader"></div>
+    </div>
+    <div class="container-fluid">
+        <div class="row">
+
+            <!-- rightside  -->
+            <div class="right-side-main-div ">
+                <div class="row">
+                    <!-- navbar -->
+                    <div class="header-line bg-color d-flex shadow justify-content-between align-items-center"
+                        style="z-index: 6; height: 70px;">
+                        <div class="left-elements d-flex">
+                            <!-- logo text-->
+                            <div class="logo-main-div d-flex  mt-2 mb-2 ">
+                                <div class="logo-image me-2 d-flex">
+                                    <img src="/Ledgerbook/Images/logo.jpg" class="img-fluid" width="50vw"
+                                        style="border-radius: 50%; height: auto;">
+
+                                </div>
+                                <div class="logo-text text-white fs-3 mt-2 fw-bold d-none d-sm-block"
+                                    id="ledgerbook-title">Ledgerbook
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        <!-- profile -->
+                        <div class="profilepic-div d-flex  mt-2 mb-2 ">
+
+                            <!-- profile-->
+                            <div class="dropdown mt-1">
+                                <div class=" dropdown-toggle" type="button" id="dropdownMenuButton1"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="text-white fs-5 fw-bold me-1" id="businesscard-layout-userName"></span>
+                                    <img id="businesscard-layout-profilePhoto" style="border-radius: 50%;" width="40px"
+                                        height="35px" alt="">
+                                </div>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+
+                                    <li><a class="dropdown-item cursor-pointer" onclick="MyProfile()">My
+                                            Profile</a></li>
+                                    <li><a class="dropdown-item cursor-pointer" data-bs-toggle="modal"
+                                            data-bs-target="#change-password-modal"
+                                            onclick="changePasswordModal()">Change Password</a></li>
+                                    <li><a class="dropdown-item cursor-pointer" asp-action="ActivityLog"
+                                            asp-controller="ActivityLog">Activity Logs</a></li>
+                                    <li><a class="dropdown-item cursor-pointer" data-bs-toggle="modal"
+                                            data-bs-target="#logout-modal">Logout</a></li>
+
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container" style="height: calc(100vh - 70px);">
+
+
+                        <!-- ---------------------------------------profile------------------------------------------------ -->
+                        <div class=" d-flex justify-content-center align-items-center h-100">
+                            <div class=" rounded border bg-white shadow  profile-card">
+                                <!--Add new user  -->
+                                <div class="add-user-main-div d-flex justify-content-center mt-2">
+                                    <!-- user txt -->
+                                    <div class="user-div d-flex">
+                                        <div class=" fs-2 fw-bold text-color">My Profile</div>
+                                    </div>
+                                </div>
+
+                                <!-- form -->
+                                <div class="form-main-div mx-auto " style="width: 98%;">
+                                    <div class="row d-flex ">
+
+                                        <form id="profileFormId" enctype="multipart/form-data">
+                                            <!-- profile pic -->
+                                            <div class="row">
+                                                <!-- <div class=""> -->
+                                                <div
+                                                    class="col-12 mt-3 d-flex justify-content-center align-content-center">
+
+                                                    <div class="position-relative rounded-circle overflow-hidden border bg-white"
+                                                        style="width: 130px; height: 130px;">
+
+                                                        <!-- Hidden File Input -->
+                                                        <input type="file" onchange="readURL(this);" class="d-none"
+                                                            id="profile-image" accept=".jpeg, .jpg, .png" />
+
+                                                        <!-- Label acts as both placeholder and click target -->
+                                                        <label for="profile-image"
+                                                            class="w-100 h-100 d-block position-relative"
+                                                            onmouseover="removeOpacity()" onmouseout="addOpacity()"
+                                                            style="cursor: pointer;">
+
+                                                            <!-- Uploaded image -->
+                                                            <img src="/Ledgerbook/Images/user.png" id="uploadedimage"
+                                                                class="w-100 h-100 object-fit-cover rounded-circle img-fluid uploadedimage-class-profile" />
+
+                                                            <!-- Placeholder icon and text -->
+                                                            <div id="placeholder"
+                                                                class="w-100 h-100 d-flex flex-column justify-content-center align-items-center text-secondary bg-light rounded-circle"
+                                                                style="cursor: pointer;">
+                                                                <i class="fa-solid fa-cloud-arrow-up fs-4 mb-1"></i>
+                                                                <small>Browse</small>
+                                                            </div>
+
+                                                            <!-- Hover overlay: visible only when image is shown -->
+                                                            <div
+                                                                class="image-overlay position-absolute top-0 start-0 w-100 h-100 rounded-circle d-flex flex-column justify-content-center align-items-center text-white fw-medium opacity-class">
+
+                                                                <!-- Upload icon and label -->
+                                                                <div class="text-center">
+                                                                    <i
+                                                                        class="fa-solid fa-cloud-arrow-up me-2"></i>Change
+                                                                </div>
+
+                                                                <!-- Horizontal line -->
+                                                                <div class="mt-2"
+                                                                    style="width: 60%; border-bottom: 1px solid rgba(255, 255, 255, 0.5);">
+                                                                </div>
+                                                            </div>
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+
+                                                <!-- </div> -->
+                                            </div>
+                                            <div class="row p-3">
+                                                <!-- two cols -->
+                                                <div class=" col-12 mt-3">
+                                                    <div class="form-floating ">
+                                                        <input type="hidden" id="profile-userId">
+                                                        <input type="text" class="form-control" id="profile-FirstName"
+                                                            placeholder="First Name"
+                                                            onkeyup="nameValidation(this,'First')"
+                                                            onblur="nameValidation(this,'First')">
+                                                        <label for="profile-FirstName" class="fs-6 text-secondary">First
+                                                            Name*</label>
+                                                        <span class="text-danger FirstNameValidationMessage"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12 mt-3">
+                                                    <div class="form-floating ">
+                                                        <input type="text" class="form-control" id="profile-LastName"
+                                                            placeholder="Last Name*"
+                                                            onkeyup="nameValidation(this,'Last')"
+                                                            onblur="nameValidation(this,'Last')">
+                                                        <label for="profile-LastName" class="fs-6 text-secondary">Last
+                                                            Name*</label>
+                                                        <span class="text-danger LastNameValidationMessage"></span>
+
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-12 mt-3">
+                                                    <div class="form-floating ">
+                                                        <input type="text" class="form-control" id="profile-email"
+                                                            placeholder="Email" disabled>
+                                                        <label for="profile-email"
+                                                            class="fs-6 text-secondary">Email</label>
+                                                        <span class="text-danger"></span>
+
+                                                    </div>
+                                                </div>
+                                                <div class="col-12 mt-3">
+                                                    <div class="form-floating">
+                                                        <input type="Number" class="form-control"
+                                                            oninput="NumberValidation(this)" id="profile-mobilenumber"
+                                                            placeholder="Mobile Number">
+                                                        <label for="profile-mobilenumber"
+                                                            class="fs-6 text-secondary">Mobile number</label>
+                                                        <span class="text-danger numberValidationMessage"></span>
+
+                                                    </div>
+                                                </div>
+
+                                                <div class="d-flex mb-4 d-flex justify-content-end">
+                                                    <div class="craete-button mt-3">
+                                                        <button class="btn btn-primary text-light  border text"
+                                                            type="submit">
+                                                            Update</button>
+                                                    </div>
+
+                                                    <div class="craete-button mt-3 text-primary ms-3">
+                                                        <a class="btn  btn-outline-primary border border-primary  border "
+                                                            onclick="calcelProfile()">Cancel</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="logout-modal" class="modal fade" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal-header">Logout Confirmation</h5>
+                    <button type="button" class="btn-close userdetail-confirmation-modal-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body ">
+                    <div class="delete-cat-image d-flex flex-column  align-items-center">
+                        <p>Are you sure you want to Logout?</p>
+                    </div>
+                </div>
+                <div class="modal-footer d-flex justify-content-center">
+                    <a type="submit" onclick="Logout()" class="btn btn-primary">Yes</a>
+                    <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="change-password-modal" class="modal fade" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered" id="changepassword-body-id">
+
+        </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://cdn.datatables.net/2.3.2/js/dataTables.js"></script>
+    <script src="/Ledgerbook/app.js"></script>
+    <script src="/Ledgerbook/Helper/constant.js"></script>
+    <script src="/Ledgerbook/Helper/constVariables.js"></script>
+    <script src="/Ledgerbook/Helper/cookie.js"></script>
+    <script src="/Ledgerbook/Helper/site.js"></script>
+    <script src="/Ledgerbook/Helper/validations.js"></script>
+    <script src="/Ledgerbook/Helper/ajaxCall.js"></script>
+    <script src="/Ledgerbook/Login/Login.js"></script>
+    <script src="/Ledgerbook/User/profile.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+
+    <script>
+        function GetprofileDtails() {
+            let params = setParameter("/User/GetProfile", GET, null, NODATA, null, getProfileSuccess);
+            ajaxCall(params);
+        }
+
+        function updateProfile(formData) {
+            let params = setParameter("/User/UpdateProfile", POST, null, FORMDATA, formData, setProfileSuccess);
+            ajaxCall(params);
+        }
+
+        function calcelProfile() {
+            if (getCookie(Business_Token)) {
+                window.location = "/Party/Managebusiness"
+            } else {
+                window.location = "/Business/Index"
+            }
+        }
+
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $('#uploadedimage').attr('src', e.target.result).width(50).height(50);
+                    document.getElementById("uploadedimage").classList.remove("d-none")
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        $("#profile-image").change(function () {
+            const file = this.files[0];
+            if (!file) {
+                return;
+            }
+            const validImageTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+            if (validImageTypes.includes(file.type)) {
+                $("#browseFileText").text(file.name);
+                return;
+            } else {
+                Toaster("Please Upload an Image in JPEG, PNG or JPG format", "error");
+                this.value = null;
+            }
+        });
+
+        $(document).ready(function () {
+            GetprofileDtails();
+            SetuserNameImage();
+
+            $(document).on("submit", "#profileFormId", function (e) {
+                e.preventDefault();
+                let isValidForm = validateProfileForm();
+                if (isValidForm) {
+                    let formData = new FormData();
+                    formData.append("Email", $("#profile-email").val())
+                    formData.append("FirstName", $("#profile-FirstName").val())
+                    formData.append("LastName", $("#profile-LastName").val())
+                    formData.append("MobileNumber", $("#profile-mobilenumber").val())
+
+                    const fileInput = document.getElementById("profile-image");
+                    const file = fileInput.files[0];
+                    console.log(file)
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            formData.append("BusinessLogo", file)
+                            updateProfile(formData);
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        updateProfile(formData);
+                    }
+                }
+            })
+        })
+
+        function removeOpacity() {
+            let classname = document.getElementsByClassName("uploadedimage-class-profile")[0].getAttribute('src')
+            if (classname != "#") {
+                document.getElementsByClassName("image-overlay")[0].classList.remove("opacity-class")
+            }
+        }
+
+        function addOpacity() {
+            let classname = document.getElementsByClassName("uploadedimage-class-profile")[0].getAttribute('src')
+            if (classname != "#") {
+                document.getElementsByClassName("image-overlay")[0].classList.add("opacity-class")
+            }
+        }
+    </script>
+</body>
+
+</html>
