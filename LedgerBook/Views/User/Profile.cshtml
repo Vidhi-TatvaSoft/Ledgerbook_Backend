@@ -1,0 +1,227 @@
+@using LedgerBook.Constant
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor;
+
+@{
+    ViewData["Title"] = "User Profile";
+    Layout = "~/Views/Shared/_BusinessCardLayout.cshtml";
+}
+
+
+<div class=" d-flex justify-content-center align-items-center h-100">
+    <div class=" rounded border bg-white shadow  profile-card">
+        <!--Add new user  -->
+        <div class="add-user-main-div d-flex justify-content-center mt-2">
+            <!-- user txt -->
+            <div class="user-div d-flex">
+                <div class=" fs-2 fw-bold text-color">My Profile</div>
+            </div>
+        </div>
+
+        <!-- form -->
+        <div class="form-main-div mx-auto " style="width: 98%;">
+            <div class="row d-flex ">
+
+                <form id="profileFormId" enctype="multipart/form-data">
+                    <!-- profile pic -->
+                    <div class="row">
+                        <!-- <div class=""> -->
+                        <div class="col-12 mt-3 d-flex justify-content-center align-content-center">
+
+                            <div class="position-relative rounded-circle overflow-hidden border bg-white"
+                                style="width: 130px; height: 130px;">
+
+                                <!-- Hidden File Input -->
+                                <input type="file" onchange="readURL(this);" class="d-none" id="profile-image"
+                                    accept=".jpeg, .jpg, .png" />
+
+                                <!-- Label acts as both placeholder and click target -->
+                                <label for="profile-image" class="w-100 h-100 d-block position-relative"
+                                    onmouseover="removeOpacity()" onmouseout="addOpacity()" style="cursor: pointer;">
+
+                                    <!-- Uploaded image -->
+                                    <img src="/images/user.png" id="uploadedimage"
+                                        class="w-100 h-100 object-fit-cover rounded-circle img-fluid uploadedimage-class-profile" />
+
+                                    <!-- Placeholder icon and text -->
+                                    <div id="placeholder"
+                                        class="w-100 h-100 d-flex flex-column justify-content-center align-items-center text-secondary bg-light rounded-circle"
+                                        style="cursor: pointer;">
+                                        <i class="fa-solid fa-cloud-arrow-up fs-4 mb-1"></i>
+                                        <small>Browse</small>
+                                    </div>
+
+                                    <!-- Hover overlay: visible only when image is shown -->
+                                    <div
+                                        class="image-overlay position-absolute top-0 start-0 w-100 h-100 rounded-circle d-flex flex-column justify-content-center align-items-center text-white fw-medium opacity-class">
+
+                                        <!-- Upload icon and label -->
+                                        <div class="text-center">
+                                            <i class="fa-solid fa-cloud-arrow-up me-2"></i>Change
+                                        </div>
+
+                                        <!-- Horizontal line -->
+                                        <div class="mt-2"
+                                            style="width: 60%; border-bottom: 1px solid rgba(255, 255, 255, 0.5);">
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+
+                        <!-- </div> -->
+                    </div>
+                    <div class="row p-3">
+                        <!-- two cols -->
+                        <div class=" col-12 mt-3">
+                            <div class="form-floating ">
+                                <input type="hidden" id="profile-userId">
+                                <input type="text" class="form-control" id="profile-FirstName" placeholder="First Name"
+                                    onkeyup="nameValidation(this,'First')" onblur="nameValidation(this,'First')">
+                                <label for="profile-FirstName" class="fs-6 text-secondary">First Name*</label>
+                                <span class="text-danger FirstNameValidationMessage"></span>
+                            </div>
+                        </div>
+                        <div class="col-12 mt-3">
+                            <div class="form-floating ">
+                                <input type="text" class="form-control" id="profile-LastName" placeholder="Last Name*"
+                                    onkeyup="nameValidation(this,'Last')" onblur="nameValidation(this,'Last')">
+                                <label for="profile-LastName" class="fs-6 text-secondary">Last
+                                    Name*</label>
+                                <span class="text-danger LastNameValidationMessage"></span>
+
+                            </div>
+                        </div>
+
+                        <div class="col-12 mt-3">
+                            <div class="form-floating ">
+                                <input type="text" class="form-control" id="profile-email" placeholder="Email" disabled>
+                                <label for="profile-email" class="fs-6 text-secondary">Email</label>
+                                <span class="text-danger"></span>
+
+                            </div>
+                        </div>
+                        <div class="col-12 mt-3">
+                            <div class="form-floating">
+                                <input type="Number" class="form-control" oninput="NumberValidation(this)"
+                                    id="profile-mobilenumber" placeholder="Mobile Number">
+                                <label for="profile-mobilenumber" class="fs-6 text-secondary">Mobile number</label>
+                                <span class="text-danger numberValidationMessage"></span>
+
+                            </div>
+                        </div>
+
+                        <div class="d-flex mb-4 d-flex justify-content-end">
+                            <div class="craete-button mt-3">
+                                <button class="btn btn-primary text-light  border text" type="submit">
+                                    Update</button>
+                            </div>
+
+                            <div class="craete-button mt-3 text-primary ms-3">
+                                <a class="btn  btn-outline-primary border border-primary  border "
+                                    onclick="calcelProfile()">Cancel</a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        function GetprofileDtails() {
+            let params = setParameter("/User/GetProfile", GET, null, NODATA, null, getProfileSuccess);
+            ajaxCall(params);
+        }
+
+        function updateProfile(formData) {
+            let params = setParameter("/User/UpdateProfile", POST, null, FORMDATA, formData, setProfileSuccess);
+            ajaxCall(params);
+        }
+
+        function calcelProfile() {
+            if (getCookie(Business_Token)) {
+                window.location = "/Party/Managebusiness"
+            } else {
+                window.location = "/Business/Index"
+            }
+        }
+
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $('#uploadedimage').attr('src', e.target.result).width(50).height(50);
+                    document.getElementById("uploadedimage").classList.remove("d-none")
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        $("#profile-image").change(function () {
+            const file = this.files[0];
+            if (!file) {
+                return;
+            }
+            const validImageTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+            if (validImageTypes.includes(file.type)) {
+                $("#browseFileText").text(file.name);
+                return;
+            } else {
+                Toaster("Please Upload an Image in JPEG, PNG or JPG format", "error");
+                this.value = null;
+            }
+        });
+
+        $(document).ready(function () {
+            GetprofileDtails();
+
+            $(document).on("submit", "#profileFormId", function (e) {
+                e.preventDefault();
+                let isValidForm = validateProfileForm();
+                if (isValidForm) {
+                    let formData = new FormData();
+                    formData.append("Email", $("#profile-email").val())
+                    formData.append("FirstName", $("#profile-FirstName").val())
+                    formData.append("LastName", $("#profile-LastName").val())
+                    formData.append("MobileNumber", $("#profile-mobilenumber").val())
+
+                    const fileInput = document.getElementById("profile-image");
+                    const file = fileInput.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            formData.append("BusinessLogo", file)
+                            updateProfile(formData);
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        updateProfile(formData);
+                    }
+                }
+            })
+        })
+
+        function removeOpacity() {
+            let classname = document.getElementsByClassName("uploadedimage-class-profile")[0].getAttribute('src')
+            if (classname != "#") {
+                document.getElementsByClassName("image-overlay")[0].classList.remove("opacity-class")
+            }
+        }
+
+        function addOpacity() {
+            let classname = document.getElementsByClassName("uploadedimage-class-profile")[0].getAttribute('src')
+            if (classname != "#") {
+                document.getElementsByClassName("image-overlay")[0].classList.add("opacity-class")
+            }
+        }
+    </script>
+
+    <partial name="_ValidationScriptsPartial" />
+    <partial name="_Toaster" />
+}

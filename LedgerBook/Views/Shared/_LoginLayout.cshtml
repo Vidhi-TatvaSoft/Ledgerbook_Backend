@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - LedgerBook</title>
+    <link rel="icon" type="image/x-icon" href="/images/logotransparent.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/LedgerBook.styles.css" asp-append-version="true" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/additional-methods.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.dataTables.css" />
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        * {
+            box-sizing: border-box !important;
+        }
+
+        body,
+        html {}
+
+        .body-login {
+            margin: 0 !important;
+            padding: 0 !important;
+            font-family: 'Segoe UI', sans-serif !important;
+            height: 100vh !important;
+            overflow: hidden !important;
+            background: #126773 !important;
+        }
+
+        .container-temp {
+            width: 100vw !important;
+            height: 100vh !important;
+            perspective: 2000px !important;
+            position: relative !important;
+        }
+    </style>
+
+</head>
+
+<body class="body-login">
+    <div class="overlay"></div>
+    <div class="container-temp">
+        <div class="flipper" id="flipper">
+
+            <!-- FRONT SIDE -->
+            <div class="front">
+                <div class="front-left"></div>
+                <div class="front-right">
+                    <h1>Welcome to Ledger Book</h1>
+                    <p>Track your business transactions, manage expenses, and get real-time insights into your financial
+                        records effortlessly.</p>
+                    <div class="d-flex justify-content-between">
+                        <button onclick="flipToLogin()" class="me-4">Login</button>
+                        <button onclick="flipToSignup()">Sign Up</button>
+                    </div>
+
+
+
+                </div>
+            </div>
+
+            <!-- BACK SIDE -->
+            <div class="back">
+                <div class="back-left">
+                    <h2>Why Choose Ledger Book?</h2>
+                    <p><i class="fa-solid fa-square-check text-white me-2"></i> Simple, intuitive interface for small
+                        business owners.</p>
+                    <p><i class="fa-solid fa-square-check text-white me-2"></i> Secure cloud-based record storage.</p>
+                    <p><i class="fa-solid fa-square-check text-white me-2"></i> Generate reports, invoices, and balance
+                        sheets easily.</p>
+                    <p><i class="fa-solid fa-square-check text-white me-2"></i> Works seamlessly across devices.</p>
+                </div>
+                <div class="back-right">
+                    <div class="login-card">
+                        @RenderBody()
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div id="logout-modal" class="modal fade" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal-header">Logout Confirmation</h5>
+                    <button type="button" class="btn-close userdetail-confirmation-modal-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body ">
+                    <div class="delete-cat-image d-flex flex-column  align-items-center">
+                        <p>Are you sure you want to Logout?</p>
+                    </div>
+                </div>
+                <div class="modal-footer d-flex justify-content-center">
+                    <a type="submit" onclick="Logout()" class="btn btn-primary">Yes</a>
+                    <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://cdn.datatables.net/2.3.2/js/dataTables.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/cookie.js" asp-append-version="true"></script>
+    <script src="~/js/constVariables.js" asp-append-version="true"></script>
+    <script src="~/js/validations.js" asp-append-version="true"></script>
+    <script src="~/js/ajaxCall/ajaxCall.js" asp-append-version="true"></script>
+    <script src="~/js/Login/login.js" asp-append-version="true"></script>
+    <script src="~/js/User/userProfile.js" asp-append-version="true"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+    <partial name="_Toaster" />
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+
+
+<script>
+    function flipToLogin() {
+        document.title = "Login - LedgerBook";
+        RemoveValidations();
+        document.getElementById('flipper').classList.add('flipped');
+        document.getElementById("login-signup-form-id").innerHTML = document.getElementById("loginFormDivId").innerHTML;
+    }
+    function flipToSignup() {
+        RemoveValidations();
+        document.title = "Register - LedgerBook";
+        document.getElementById('flipper').classList.add('flipped');
+        document.getElementById("login-signup-form-id").innerHTML = document.getElementById("registerFormDivId").innerHTML;
+    }
+    function flipToForgotPassword() {
+        RemoveValidations();
+        document.title = "Forgot password - LedgerBook";
+        let email = $("#login-email").val();
+        document.getElementById("login-signup-form-id").innerHTML = document.getElementById("forgotPasswordFormDivId").innerHTML;
+        $("#forgotpassword-email").val(email);
+
+    }
+
+
+    $(document).ready(function () {
+        var successMessage = '@TempData["SuccessMessage"]';
+        var errorMessage = '@TempData["ErrorMessage"]';
+        toastr.options = {
+            "closeButton": true,
+            "progressBar": true,
+            "timeOut": "2000"
+        };
+        if (successMessage) {
+            toastr.success(successMessage);
+        }
+        if (errorMessage) {
+            toastr.error(errorMessage);
+        }
+    });
+
+    $(document).ready(function () {
+        // 1. Show toaster if TempData contains error (normal request)
+
+        // 2. Global AJAX error catcher
+        $(document).ajaxComplete(function (event, xhr, settings) {
+            AjaxComplete(event, xhr, settings)
+        });
+
+    });
+
+    function AjaxResponseHandle(response) {
+        var parser = new DOMParser();
+        var doc = parser.parseFromString(response, 'text/html');
+        var title = doc.title;
+        if (title === "Login - LedgerBook" || title === "Register - LedgerBook") {
+            window.location.href = '@Url.Action("Login", "Login")';
+        } else if (title === "Business - LedgerBook") {
+            window.location.href = '@Url.Action("Index", "Business")';
+        } else if (title === "View Business - LedgerBook" || "Party Report - LedgerBook") {
+            window.location.href = '@Url.Action("Dashboard", "Dashboard")';
+        } else if (title === "InternalServerError" || title === "Forbidden" || title === "Unauthorize" || title === "PageNotFoundError") {
+            var url = `/ErrorPage/${title}`;
+            window.location.href = url;
+        } else if (title === "InternalServerError - LedgerBook" || title === "Forbidden - LedgerBook" || title === "Unauthorize - LedgerBook" || title === "PageNotFoundError - LedgerBook") {
+            var url = `/ErrorPage/${title.split(" ")[0].toString().trim()}`;
+            window.location.href = url;
+        } else {
+            Toaster('Unexpected response format.', "error");
+        }
+    }
+
+    function IsHtmlDoc(response) {
+        if (response.statusCode) {
+            return;
+        }
+        if ((response.trim().indexOf('<!DOCTYPE html>') === 0) || (response.trim().indexOf('<html>') === 0)) {
+            AjaxResponseHandle(response);
+        }
+    }
+
+</script>
+
+</html>

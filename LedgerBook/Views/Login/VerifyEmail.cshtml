@@ -1,0 +1,26 @@
+@model string
+@{
+    ViewData["Title"] = "Login";
+    Layout = "~/Views/Shared/_LoginLayout.cshtml";
+}
+
+<div id="verification-token-email-id">@Model</div>
+
+
+@section Scripts {
+    <script>
+        function verifyEmail(verificationCode) {
+            let params = setParameter("/Login/VerifyEmail", POST, null, FORM_URL, { verificationCode }, verifyEmailSuccess);
+            ajaxCall(params);
+        }
+
+
+        $(document).ready(function () {
+            let verificationCode = $("#verification-token-email-id").html()
+            verifyEmail(verificationCode)
+        })
+    </script>
+
+    <partial name="_ValidationScriptsPartial" />
+    <partial name="_Toaster" />
+}

@@ -11,6 +11,8 @@ public class ConstantVariables
 
     public static string LoginLink = "http://localhost:5189";
 
+    public static string VerifyPasswordUrl = "http://127.0.0.1:5500/Ledgerbook/Login/VerifyEmail.html";
+
     public static string SenderEmail = "test.dotnet@etatvasoft.com";
 
     public static string SenderName = "Ledgerbook";
