@@ -81,40 +81,57 @@ function AjaxComplete(event, xhr, settings) {
 }
 
 function changePasswordModal() {
-    $.ajax({
-        url: "/User/RenderChangePassword",
-        type: "GET",
-        success: function (response) {
-            IsHtmlDoc(response);
-            $("#changepassword-body-id").html(response)
-            // HandleResponse(response,"#changepassword-body-id")
+    $('#change-password-modal').modal('show');
+}
+
+function changepasswordSuccess(response) {
+    if (response.isSuccess) {
+        if (response.toasterMessage != null) {
+            Toaster(response.toasterMessage);
         }
-    })
+        let userToken = response.result;
+        if (userToken != null) {
+            setCookie(User_Token, userToken, 1);
+        }
+        $(".btn-close").click();
+         emptyInputValidation();
+    } else {
+        if (response.toasterMessage != null)
+            Toaster(response.toasterMessage, "error");
+    }
 }
 
 $(document).on("submit", "#change-password-form", function (e) {
     e.preventDefault();
     let form = $("#change-password-form")
-    if (form.valid()) {
-        let formData = new FormData(this);
-
-        $.ajax({
-            url: "/User/ChangePassword",
-            type: "POST",
-            contentType: false,
-            processData: false,
-            data: formData,
-            success: function (response) {
-                IsHtmlDoc(response.toString());
-                if (response.success) {
-                    Toaster(response.message);
-                    $('.btn-close').click();
-                } else {
-                    Toaster(response.message, "error");
-                }
-            }
-        })
+    let isValidForm = validateChangePasswordForm();
+    if (isValidForm) {
+        let formData = new FormData();
+        formData.append("OldPassword", $("#changepassword-old").val())
+        formData.append("Password", $("#changepassword-new").val())
+        formData.append("ConfirmPassword", $("#changepassword-confirm").val())
+        let params = setParameter("/User/ChangePassword", POST, null, FORMDATA, formData, changepasswordSuccess);
+        ajaxCall(params);
     }
+    // if (form.valid()) {
+    //     let formData = new FormData(this);
+    //     $.ajax({
+    //         url: "/User/ChangePassword",
+    //         type: "POST",
+    //         contentType: false,
+    //         processData: false,
+    //         data: formData,
+    //         success: function (response) {
+    //             IsHtmlDoc(response.toString());
+    //             if (response.success) {
+    //                 Toaster(response.message);
+    //                 $('.btn-close').click();
+    //             } else {
+    //                 Toaster(response.message, "error");
+    //             }
+    //         }
+    //     })
+    // }
 })
 
 

@@ -35,3 +35,15 @@ function setProfileSuccess(response) {
         Toaster(response.toasterMessage, "error");
     }
 }
+
+function emptyInputValidation(formId) {
+    RemoveValidations();
+    $(`#${formId} :input`).each(function () {
+        $(this).val("");
+    });
+    $(`#${formId} i`).each(function () {
+        if($(this).hasClass("fa-eye")){
+            $(this).removeClass("fa-eye").addClass("fa-eye-slash");
+        };
+    });
+}

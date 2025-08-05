@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Org.BouncyCastle.Bcpg;
+using Org.BouncyCastle.Bcpg.Sig;
 
 namespace BusinessAcessLayer.Services;
 
@@ -22,7 +23,7 @@ public class UserService : IUserService
     private readonly IGenericRepo _genericRepository;
     private readonly IActivityLogService _activityLogService;
     private readonly UserManager<ApplicationUser> _userManager;
-
+    private readonly SignInManager<ApplicationUser> _signInManager;
 
     public UserService(
         LedgerBookDbContext context,
@@ -30,7 +31,8 @@ public class UserService : IUserService
          IAttachmentService attachmentService,
         IGenericRepo genericRepository,
         UserManager<ApplicationUser> userManager,
-        IActivityLogService activityLogService
+        IActivityLogService activityLogService,
+        SignInManager<ApplicationUser> signInManager
     )
     {
         _context = context;
@@ -39,6 +41,7 @@ public class UserService : IUserService
         _genericRepository = genericRepository;
         _userManager = userManager;
         _activityLogService = activityLogService;
+        _signInManager = signInManager;
     }
 
     public ApplicationUser GetuserByEmail(string Email)
@@ -130,7 +133,31 @@ public class UserService : IUserService
         }
     }
 
-
+    public async Task<ApiResponse<string>> ChangePasswordAsync(ApplicationUser user, ChangePasswordViewModel changePasswordViewModel)
+    {
+        SignInResult result = await _signInManager.PasswordSignInAsync(user.Email, changePasswordViewModel.OldPassword, false, lockoutOnFailure: false);
+        if (!result.Succeeded)
+        {
+            return new ApiResponse<string>(false, Messages.IncorrectOldPAssword, null, HttpStatusCode.BadRequest);
+        }
+        else
+        {
+            ResetPasswordViewModel resetPasswordViewModel = new();
+            resetPasswordViewModel.Email = user.Email;
+            resetPasswordViewModel.Password = changePasswordViewModel.Password;
+            bool ispasswordUpdated = await UpdatePassword(resetPasswordViewModel);
+            if (ispasswordUpdated)
+            {
+                _ = CommonMethods.ChangePasswordEmail(user.Email, user.FirstName + " " + user.LastName, ConstantVariables.LoginLink);
+                var userToken = _jwttokenService.GenerateToken(user.Email);
+                return new ApiResponse<string>(true, string.Format(Messages.GlobalAddUpdateMesage, "Password", "updated"), userToken, HttpStatusCode.OK);
+            }
+            else
+            {
+                return new ApiResponse<string>(false, string.Format(Messages.GlobalAddUpdateFailMessage, "update", "password"), null, HttpStatusCode.BadRequest);
+            }
+        }
+    }
 
     public async Task<bool> UpdatePassword(ResetPasswordViewModel resetPasswordViewModel)
     {

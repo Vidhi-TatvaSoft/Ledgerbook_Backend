@@ -1,5 +1,6 @@
 
 using BusinessAcessLayer.Constant;
+using BusinessAcessLayer.Helper;
 using BusinessAcessLayer.Interface;
 using DataAccessLayer.Models;
 using DataAccessLayer.ViewModels;
@@ -57,4 +58,17 @@ public class UserController : BaseController
         return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.OK));
     }
 
+    [HttpPost]
+    [Route("ChangePassword")]
+    public async Task<IActionResult> ChangePassword([FromForm] ChangePasswordViewModel changePasswordViewModel)
+    {
+        ApplicationUser user = GetCurrentUserIdentity();
+        if (user == null)
+            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Forbidden));
+        if (!ModelState.IsValid)
+        {
+            return Ok(new ApiResponse<string>(false, Messages.InvalidCredentilMessage, null, HttpStatusCode.BadRequest));
+        }
+        return Ok(await _userService.ChangePasswordAsync(user, changePasswordViewModel));
+    }
 }

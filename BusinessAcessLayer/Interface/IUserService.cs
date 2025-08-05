@@ -12,6 +12,7 @@ public interface IUserService
     bool IsUserRegistered(string email);
     Task<int> SavePersonalDetails(UserViewmodel userViewmodel, int userId);
     Task<int> UpdatePersonalDetails(UserViewmodel userViewmodel, int userId);
+    Task<ApiResponse<string>> ChangePasswordAsync(ApplicationUser user, ChangePasswordViewModel changePasswordViewModel);
     Task<bool> UpdatePassword(ResetPasswordViewModel resetPasswordViewModel);
     UserProfileViewModel GetUserProfile(int userId);
     Task<ApiResponse<CookiesViewModel>> UpdateUserProfile(UserProfileViewModel userProfileViewModel);

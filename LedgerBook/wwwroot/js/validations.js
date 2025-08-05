@@ -28,6 +28,23 @@ function passwordValidation(input) {
     }
 }
 
+function curPasswordValidation(input) {
+    let value = input.value.replace(/\s/g, '');
+    const regex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
+    if (value == "") {
+        $(".curPasswordValidationMessage").html("Current Password is required.");
+    } else if (value.length < 8) {
+        $(".curPasswordValidationMessage").html("Current Password must be at least 8 characters long.");
+    } else if (value.length > 128) {
+        $(".curPasswordValidationMessage").html("Current Password can not exceed 128 characters.");
+    } else if (!regex.test(value)) {
+        $(".curPasswordValidationMessage").html("Current Password must contain at least one uppercase letter, number, special character and should not contain whitespace.");
+    } else {
+        $(".curPasswordValidationMessage").html("");
+    }
+}
+
+
 function cnfpasswordValidation(input, passwordinputId) {
     let value = input.value.replace(/\s/g, '');
     let password = document.getElementById(`${passwordinputId}`).value.replace(/\s/g, '');
@@ -135,6 +152,21 @@ function validateProfileForm() {
     nameValidation(lastname,'Last')
     NumberValidation(mobileNumber)
     if ($(".numberValidationMessage").html() == "") {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function validateChangePasswordForm(){
+    let oldPassword = document.getElementById("changepassword-old");
+    let newPassword= document.getElementById("changepassword-new");
+    let confPassword = document.getElementById("changepassword-confirm");
+
+    curPasswordValidation(oldPassword)
+    passwordValidation(newPassword)
+    cnfpasswordValidation(confPassword,"changepassword-new")
+    if ($(".passwordValidationMessage").html() == "" && $(".cnfpasswordValidationMessage").html() == "") {
         return true;
     } else {
         return false;
