@@ -36,6 +36,7 @@ public class AttachmentService : IAttachmentService
     {
         return _genericRepository.GetAll<Attachment>(a => a.Id == attachmentId && a.DeletedAt == null).Select(a => new AttachmentViewModel
         {
+            AttachmentId = a.Id,
             FileName = a.FileName,
             FileExtension = a.FileExtensions,
             BusinesLogoPath = a.Path

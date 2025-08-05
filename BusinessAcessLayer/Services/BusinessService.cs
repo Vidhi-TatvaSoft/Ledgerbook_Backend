@@ -12,6 +12,8 @@ using System.Transactions;
 using BusinessAcessLayer.Constant;
 using System.Linq.Expressions;
 using System.Security.Claims;
+using System.Net;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace BusinessAcessLayer.Services;
 
@@ -27,6 +29,7 @@ public class BusinessService : IBusinessService
     private readonly ITransactionRepository _transactionRepository;
     private readonly IGenericRepo _genericRepository;
     private readonly IActivityLogService _activityLogService;
+    private readonly IReferenceDataEntityService _referenceDataEntityService;
 
 
     public BusinessService(LedgerBookDbContext context,
@@ -38,7 +41,8 @@ public class BusinessService : IBusinessService
      IUserBusinessMappingService userBusinessMappingService,
      ITransactionRepository transactionRepository,
      IGenericRepo genericRepository,
-     IActivityLogService activityLogService
+     IActivityLogService activityLogService,
+     IReferenceDataEntityService referenceDataEntityService
      )
     {
         _context = context;
@@ -51,6 +55,7 @@ public class BusinessService : IBusinessService
         _transactionRepository = transactionRepository;
         _genericRepository = genericRepository;
         _activityLogService = activityLogService;
+        _referenceDataEntityService = referenceDataEntityService;
     }
 
 
@@ -126,8 +131,9 @@ public class BusinessService : IBusinessService
         .ToList();
     }
 
-    public List<BusinessViewModel> GetRolewiseBusiness(List<BusinessViewModel> businessList)
+    public ApiResponse<List<BusinessViewModel>> GetRolewiseBusiness(int userId, string searchText = null)
     {
+        List<BusinessViewModel> businessList = GetBusinesses(userId, searchText);
         if (businessList != null)
         {
             foreach (BusinessViewModel business in businessList)
@@ -153,34 +159,75 @@ public class BusinessService : IBusinessService
                 }
             }
         }
-        return businessList;
+        return new ApiResponse<List<BusinessViewModel>>(true, null, businessList, HttpStatusCode.OK);
     }
 
-    public async Task<int> SaveBusiness(BusinessItem businessItem, int userId)
+    public async Task<ApiResponse<BusinessItem>> SaveBusiness(BusinessItem businessItem, int userId)
     {
         try
         {
+            if (businessItem.BusinessLogoIForm != null)
+            {
+                string[] extension = businessItem.BusinessLogoIForm.FileName.Split(".");
+                string fileNameTemp = businessItem.BusinessLogoAttachment.FileName;
+                if (extension[extension.Length - 1] == "jpg" || extension[extension.Length - 1] == "jpeg" || extension[extension.Length - 1] == "png")
+                {
+                    string path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
+                    string imageFileName = CommonMethods.UploadImage(businessItem.BusinessLogoIForm, path);
+
+                    businessItem.BusinessLogoAttachment.BusinesLogoPath = $"/uploads/{imageFileName}";
+                    businessItem.BusinessLogoAttachment.FileExtension = extension[extension.Length - 1];
+                    businessItem.BusinessLogoAttachment.FileName = fileNameTemp;
+                    businessItem.BusinessLogoIForm = null;
+                }
+                else
+                {
+                    return new ApiResponse<BusinessItem>(false, Messages.InvalidImageExtensionMessage, businessItem, HttpStatusCode.BadRequest);
+                }
+            }
+            else
+            {
+                Businesses updateBusiness = _genericRepository.Get<Businesses>(b => b.Id == businessItem.BusinessId && b.DeletedAt == null)!;
+                if (updateBusiness != null && updateBusiness.LogoAttachmentId != 0)
+                {
+                    AttachmentViewModel attachmentViewModel = _attachmentService.GetAttachmentById((int)updateBusiness.LogoAttachmentId);
+                    businessItem.BusinessLogoAttachment = attachmentViewModel;
+                }
+                else
+                {
+                    businessItem.BusinessLogoAttachment = new();
+                }
+            }
+
+
             await _transactionRepository.BeginTransactionAsync();
             int addressId = 0;
             int attachmentId = 0;
             int businessId;
-            if (businessItem.BusinessLogoAttachment != null)
+
+            if (businessItem.BusinessLogoAttachment.BusinesLogoPath != null)
             {
-                if (businessItem.BusinessLogoAttachment.BusinesLogoPath != null)
+                if (businessItem.BusinessLogoAttachment.AttachmentId != 0)
                 {
                     attachmentId = await _attachmentService.SaveAttachment(businessItem.BusinessLogoAttachment, userId);
                 }
+                else
+                {
+                    // update
+                    attachmentId = await _attachmentService.SaveAttachment(businessItem.BusinessLogoAttachment, userId);
+                }
             }
-            if (businessItem.BusinessAddress != null)
+
+            if (businessItem.AddressLine1 != null || businessItem.AddressLine2 != null || businessItem.City != null || businessItem.Pincode != null)
             {
-                if (businessItem.BusinessAddress.AddressLine1 != null || businessItem.BusinessAddress.AddressLine2 != null || businessItem.BusinessAddress.City != null || businessItem.BusinessAddress.Pincode != null)
+                AddressViewModel addressViewModel = new()
                 {
-                    addressId = await _addressService.SaveAddress(businessItem.BusinessAddress, userId);
-                }
-                else if (businessItem.BusinessAddress.AddressLine1 == null || businessItem.BusinessAddress.AddressLine2 == null || businessItem.BusinessAddress.City == null || businessItem.BusinessAddress.Pincode == null)
-                {
-                    addressId = 0;
-                }
+                    AddressLine1 = businessItem.AddressLine1,
+                    AddressLine2 = businessItem.AddressLine2,
+                    City = businessItem.City,
+                    Pincode = businessItem.Pincode
+                };
+                addressId = await _addressService.SaveAddress(addressViewModel, userId);
             }
             if (businessItem.BusinessId == 0)
             {
@@ -218,8 +265,6 @@ public class BusinessService : IBusinessService
                     FirstName = x.FirstName,
                     LastName = x.LastName,
                     MobileNumber = x.PhoneNumber == null ? 0 : long.Parse(x.PhoneNumber),
-
-
                 }).FirstOrDefault();
                 if (user != null)
                 {
@@ -262,7 +307,7 @@ public class BusinessService : IBusinessService
                 }
                 else
                 {
-                    businessId = 0;
+                    return new ApiResponse<BusinessItem>(false, Messages.ExceptionMessage, businessItem, HttpStatusCode.BadRequest);
                 }
             }
             await _transactionRepository.CommitAsync();
@@ -277,7 +322,7 @@ public class BusinessService : IBusinessService
                 string message = string.Format(Messages.BusinessActivity, "Business", "updated", userName);
                 await _activityLogService.SetActivityLog(message, EnumHelper.Actiontype.Update, EnumHelper.ActivityEntityType.Business, businessId, userId);
             }
-            return businessId;
+            return new ApiResponse<BusinessItem>(true, null, businessItem, HttpStatusCode.OK);
         }
         catch (Exception e)
         {
@@ -286,9 +331,11 @@ public class BusinessService : IBusinessService
         }
     }
 
-    public BusinessItem GetBusinessItemById(int? businessId)
+    public ApiResponse<BusinessItem> GetBusinessItemById(int? businessId)
     {
         BusinessItem businessViewModel = new();
+        businessViewModel.BusinessCategories = _referenceDataEntityService.GetReferenceValues(EnumHelper.EntityType.BusinessCategory.ToString());
+        businessViewModel.BusinessTypes = _referenceDataEntityService.GetReferenceValues(EnumHelper.EntityType.BusinessType.ToString());
         Businesses presentBusiness = _genericRepository.Get<Businesses>(b => b.Id == businessId && b.DeletedAt == null)!;
         if (presentBusiness != null)
         {
@@ -304,20 +351,23 @@ public class BusinessService : IBusinessService
             }
             if (presentBusiness.AddressId == null)
             {
-                businessViewModel.BusinessAddress = new();
-                businessViewModel.BusinessAddress.AddressLine1 = null;
-                businessViewModel.BusinessAddress.AddressLine2 = null;
-                businessViewModel.BusinessAddress.City = null;
-                businessViewModel.BusinessAddress.Pincode = null;
+                businessViewModel.AddressLine1 = null;
+                businessViewModel.AddressLine2 = null;
+                businessViewModel.City = null;
+                businessViewModel.Pincode = null;
             }
             else
             {
-                businessViewModel.BusinessAddress = _addressService.GetAddressById((int)presentBusiness.AddressId);
+                AddressViewModel addressViewModel = _addressService.GetAddressById((int)presentBusiness.AddressId);
+                businessViewModel.AddressLine1 = addressViewModel.AddressLine1;
+                businessViewModel.AddressLine2 = addressViewModel.AddressLine2;
+                businessViewModel.City = addressViewModel.City;
+                businessViewModel.Pincode = addressViewModel.Pincode;
             }
             businessViewModel.IsActive = presentBusiness.IsActive;
-            return businessViewModel;
+            return new ApiResponse<BusinessItem>(true, null, businessViewModel, HttpStatusCode.OK);
         }
-        return null;
+        return new ApiResponse<BusinessItem>(false, null, businessViewModel, HttpStatusCode.PartialContent);
     }
 
     public Businesses GetBusinessFromToken(string token)

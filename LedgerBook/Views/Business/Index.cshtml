@@ -3,12 +3,328 @@
     Layout = "~/Views/Shared/_BusinessCardLayout.cshtml";
 }
 
-<div>businesspage</div>
+<div class="" id="ledgerbook-body">
+
+    <div class="main-container px-4 mt-3">
+        <div class="d-flex justify-content-between flex-column flex-sm-row">
+            <div class="heading fs-2 fw-bold text-color mb-3">Businesses</div>
+            <span class="d-flex">
+                <input type="text" id="BusinessSearch" class="form-control mt-3 me-3"
+                    style="height:35px; width:100% !important;" placeholder="Search" oninput="RemoveWhiteSpace(this)" />
+                <span class="text-color fs-6 fw-bold btn text-nowrap btn-primary mt-3 cursor-pointer "
+                    style="height:35px; width:100% !important;" data-toggle="tooltip" data-placement="top"
+                    title="Add business" data-bs-toggle="modal" data-bs-target="#add-business-modal"
+                    onclick="displayBusinessDetails()">Add Business</span>
+            </span>
+        </div>
+
+        <!--------------------------------------------- Business cards---------------------------------------------->
+        <div class="business-cards-scroll d-flex row justify-content-center gap-3 mt-5 " id="businss-cards">
+        </div>
+    </div>
+</div>
+
+<!-------------------------------------- Modal--------------------------------------------------->
+<div id="add-business-modal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-xl" id="businessdetail-modal-body">
+
+    </div>
+</div>
+
+<div id="add-business-body-content" class="d-none">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="add-business-modal-header">Add Business</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="business-details-form-id">
+            <div class="modal-body p-0 ps-3 pb-3 " style="min-height: 500px;">
+                <div class="row " style="min-height: 500px;">
+                    <div class="col-3 col-lg-2  border-0  border-end cursor-pointer p-0 " style="max-width: 190px;">
+                        <a class="d-flex active-div p-2 w-100 mb-2 text-nowrap text-truncate" title="Business Details"
+                            id="business-details-btn" style="text-decoration: none; ">Business Details</a>
+                        @* @if (Model.BusinessDetailViewModel.BusinessItem.BusinessId != 0)
+                        { *@
+                        <a class="d-flex inactive-div cursor-pointer text-nowrap p-2 w-100 text-truncate "
+                            title="User Management" id="user-details-btn" style="text-decoration: none;"
+                            onclick="displayUserDetails()">User Management</a>
+                        @* } *@
+                    </div>
+                    <div id="add-business-body" class="col-9 col-lg-10 pe-4">
+                        <div class="fs-3 fw-bold text-color ">Business Details</div>
+                        <div>
+                            @* <form id="business-details-form-id"> *@
+                            <div class="row">
+
+                                <div class="col-12 mt-3 d-flex justify-content-center align-content-center">
+                                    <div class="position-relative rounded-circle overflow-hidden border bg-white"
+                                        style="width: 150px; height: 150px;">
+
+                                        <!-- Hidden File Input -->
+                                        <input type="file" onchange="readURL(this);" class="d-none" id="business-image"
+                                            accept=".jpeg, .jpg, .png" />
+
+                                        <!-- Label acts as both placeholder and click target -->
+                                        <label for="business-image" class="w-100 h-100 d-block position-relative"
+                                            onmouseover="removeOpacity()" onmouseout="addOpacity()"
+                                            style="cursor: pointer;">
+
+                                            <!-- Uploaded image -->
+                                            <img src="#" id="add-business-uploadedimage"
+                                                class="w-100 h-100 object-fit-cover rounded-circle d-none uploadedimage-class-business"
+                                                alt="Profile" />
+
+                                            <!-- Placeholder icon and text -->
+                                            <div id="placeholder"
+                                                class="w-100 h-100 d-flex flex-column justify-content-center align-items-center text-secondary bg-light rounded-circle"
+                                                style="cursor: pointer;">
+                                                <i class="fa-solid fa-cloud-arrow-up fs-4 mb-1"></i>
+                                                <small>Browse</small>
+                                            </div>
+
+                                            <!-- Hover overlay: visible only when image is shown -->
+                                            <div
+                                                class="image-overlay position-absolute top-0 start-0 w-100 h-100 rounded-circle d-flex flex-column  justify-content-center align-items-center text-white fw-medium opacity-class">
+
+                                                <!-- Upload icon and label -->
+                                                <div class="text-center">
+                                                    <i class="fa-solid fa-cloud-arrow-up me-2"></i>Change
+                                                </div>
+
+                                                <!-- Horizontal line -->
+                                                <div class="mt-2"
+                                                    style="width: 60%; border-bottom: 1px solid rgba(255, 255, 255, 0.5);">
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-6 col-xl-6 col-sm-12 col-12 mt-3">
+                                    <div class="form-floating ">
+                                        @* <div class="d-none" id="business-businessId"></div> *@
+                                        <input type="hidden" id="business-businessId">
+                                        <input type="text" onblur="TrimInput(this)" class="form-control"
+                                            id="business-businessName" placeholder="Business Name*">
+                                        <label for="business-businessName" class="fs-6 text-secondary">Business
+                                            Name*</label>
+                                        <span class="text-danger businessnameValidation"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-6 col-xl-6 col-sm-12 col-12 mt-3">
+                                    <div class="form-floating ">
+                                        <input type="Number" oninput="NumberValidation(this)" class="form-control"
+                                            id="business-mobileNumber" placeholder="Mobile Number*">
+                                        <label for="business-mobileNumber" class="fs-6 text-secondary">Mobile
+                                            Number*</label>
+                                        <span class="text-danger mobileNumbervalidation"></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 col-lg-6 col-xl-6 col-sm-12 col-12 mt-3">
+                                    <div class="form-floating">
+                                        <select class="form-select" id="business-categories"
+                                            aria-label="Floating label select example">
+                                        </select>
+                                        <label for="business-categories text-secondary">Business Category</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-6 col-xl-6 col-sm-12 col-12 mt-3">
+                                    <div class="form-floating">
+                                        <select class="form-select" id="business-types"
+                                            aria-label="Floating label select example">
+                                        </select>
+                                        <label for="business-types text-secondary">Business Type</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 col-lg-6 col-xl-6 col-sm-12 col-12 mt-3">
+                                    <div class="form-floating ">
+                                        <input type="text" onblur="TrimInput(this)" class="form-control"
+                                            id="business-addressLine1" placeholder="Building/House Number">
+                                        <label for="business-addressLine1" class="fs-6 text-secondary">Building/House
+                                            Number</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-6 col-xl-6 col-sm-12 col-12 mt-3">
+                                    <div class="form-floating ">
+                                        <input type="text" onblur="TrimInput(this)" class="form-control"
+                                            id="business-addressLine2" placeholder="Area">
+                                        <label for="business-addressLine2" class="fs-6 text-secondary">Area</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 col-lg-6 col-xl-6 col-sm-12 col-12 mt-3">
+                                    <div class="form-floating ">
+                                        <input type="text" onblur="TrimInput(this)" class="form-control"
+                                            id="business-city" placeholder="City">
+                                        <label for="business-city" class="fs-6 text-secondary">City</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-6 col-xl-6 col-sm-12 col-12 mt-3">
+                                    <div class="form-floating ">
+                                        <input type="Number" oninput="PincodeValidation(this)" class="form-control"
+                                            id="business-pincode" placeholder="Pincode">
+                                        <label for="business-pincode" class="fs-6 text-secondary">Pincode</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-6 col-xl-6 col-sm-12 col-12 mt-3">
+                                    <div class="form-floating ">
+                                        <input type="text" onblur="TrimInput(this)" class="form-control"
+                                            id="business-GSTIN" placeholder="GSTIN">
+                                        <label for="business-GSTIN" class="fs-6 text-secondary">GSTIN</label>
+                                        <span class="text-danger GSTINValidation"></span>
+                                    </div>
+                                </div>
+                                <div class=" col-md-6 col-lg-6 col-xl-6 col-sm-12 col-12 mt-3 mt-md-4 pt-md-2">
+                                    <div class="form-check form-switch">
+                                        <label class="form-check-label" for="business-isActive">Business Active</label>
+                                        <input class="form-check-input" type="checkbox" id="business-isActive">
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary" id="temp-id" onclick="saveBusinessDetails()">Save</button>
+                <button type="submit" class="btn btn-primary" id="saveclose-id" onclick="SaveAndCloseBusiness()">Save &
+                    Close</button>
+                <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal"
+                    onclick="displayBusinessCards()">Close</button>
+            </div>
+        </form>
+    </div>
+</div>
 
 @section Scripts {
     <script>
+        function displayBusinessCards(searchText = "") {
+            if (searchText.trim())
+                $("body").addClass("loading");
+            let params = setParameter("/Business/GetBusinesses", GET, null, FORM_URL, { searchText }, getBusinessesSuccess);
+            ajaxCall(params);
+            $("body").removeClass("loading");
+        }
+
+        //debounce function for search business
+        function debounce(func, delay) {
+            let timeoutId; // Variable to store the timer ID
+
+            return function (...args) {
+                clearTimeout(timeoutId);
+
+                timeoutId = setTimeout(() => {
+                    func.apply(this, args);
+                }, delay);
+            };
+        }
+
+        const handleSearch = (event) => {
+            console.log('Searching for:', event.target.value);
+            let searchText = event.target.value;
+            displayBusinessCards(searchText)
+        };
+
+        const debouncedSearch = debounce(handleSearch, 500);
+        const searchInput = document.getElementById('BusinessSearch');
+        searchInput.addEventListener('input', debouncedSearch);
+
+        function readURL(input) {
+            const file = input.files[0];
+            if (!file) {
+                return;
+            }
+            const validImageTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+            if (validImageTypes.includes(file.type)) {
+                $("#browseFileText").text(file.name);
+                if (input.files && input.files[0]) {
+
+                    var reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        $('#uploadedimage').attr('src', e.target.result).width(50).height(50);
+                        document.getElementById("uploadedimage").classList.remove("d-none")
+                        @* document.getElementById("cloud-icon").classList.add("d-none") *@
+                                        };
+                    reader.readAsDataURL(input.files[0]);
+                }
+                return;
+            } else {
+                Toaster("Please Upload an Image in JPEG, PNG or JPG format", "error");
+                input.value = null;
+            }
+        }
+
+        function removeOpacity() {
+            let classname = document.getElementsByClassName("uploadedimage-class-business")[0].getAttribute('src')
+            if (classname != "#") {
+                document.getElementsByClassName("image-overlay")[0].classList.remove("opacity-class")
+            }
+        }
+        function addOpacity() {
+            let classname = document.getElementsByClassName("uploadedimage-class-business")[0].getAttribute('src')
+            if (classname != "#") {
+                document.getElementsByClassName("image-overlay")[0].classList.add("opacity-class")
+            }
+        }
+
         $(document).ready(function () {
             toasterFromLocalstorage();
+            displayBusinessCards();
+
+
+            $(document).on("submit", "#business-details-form-id", function (e) {
+                e.preventDefault();
+            })
         })
+
+
+    </script>
+
+    <script>
+        //add business modal display business details
+        function displayBusinessDetails() {
+            $("#businessdetail-modal-body").html($("#add-business-body-content").html())
+            let businessId = $("#business-businessId").val() == "" ? 0 : $("#business-businessId").val();
+            let params = setParameter("/Business/GetBusinessDetails", GET, null, FORM_URL, { businessId }, getBusinessByIdSuccess);
+            console.log(params)
+            ajaxCall(params);
+        }
+
+        function saveBusinessDetails() {
+            @* let isValidForm = validateRegisterForm(); *@
+                @* if (isValidForm) { *@
+                let formData = new FormData();
+            console.log("sscs", $("#business-pincode").val() == "" ? 000000 : $("#business-pincode").val())
+            formData.append("BusinessId", $("#business-businessId").val() == "" ? 0 : $("#business-businessId").val())
+            formData.append("BusinessName", $("#business-businessname").val())
+            formData.append("BusinescategoryId", parseInt($("#business-categories").val().split("-")[2]))
+            formData.append("BusinessTypeId", parseInt($("#business-types").val().split("-")[2]))
+            formData.append("MobileNumber", $("#business-mobileNumber").val())
+            formData.append("GSTIN", $("#business-GSTIN").val() == "" ? null : $("#business-GSTIN").val())
+            formData.append("IsActive", $("#business-isActive").is(':checked'))
+            formData.append("AddressLine1", $("#business-addressLine1").val() == "" ? null : $("#business-addressLine1").val())
+            formData.append("AddressLine2", $("#business-addressLine2").val() == "" ? null : $("#business-addressLine2").val())
+            formData.append("City", $("#business-city").val() == "" ? null : $("#business-city").val())
+            formData.append("Pincode", $("#business-pincode").val() == "" ? "" : $("#business-pincode").val())
+            const fileInput = document.getElementById("business-image");
+            const file = fileInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    formData.append("BusinessLogoIForm", file)
+                };
+                reader.readAsDataURL(file);
+            }
+            let params = setParameter("/Business/SaveBusiness", POST, null, FORMDATA, formData, SaveBusinessSuccess);
+            console.log(params)
+            ajaxCall(params);
+
+            @* } *@
+                }
+
+
     </script>
 }

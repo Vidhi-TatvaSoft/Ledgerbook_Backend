@@ -132,33 +132,33 @@ public class TransactionReportService : ITransactionReportSevice
         return EntriesList;
     }
 
-    public ReportTransactionEntriesViewModel GetReportdata(string partytype, string timePeriod, int businessId, int searchPartyId = 0, string startDate = "", string endDate = "")
-    {
-        ReportTransactionEntriesViewModel reportVM = new();
-        BusinessItem business = _businessService.GetBusinessItemById(businessId);
-        reportVM.BusinessId = business.BusinessId;
-        reportVM.Businessname = business.BusinessName;
-        reportVM.TimePeriod = timePeriod;
-        reportVM.PartyId = searchPartyId;
-        if (searchPartyId != 0)
-        {
-            reportVM.PartyName = _partyService.GetPartyById(searchPartyId).PartyName;
-        }
-        else
-        {
-            reportVM.PartyName = "Account";
-        }
+    // public ReportTransactionEntriesViewModel GetReportdata(string partytype, string timePeriod, int businessId, int searchPartyId = 0, string startDate = "", string endDate = "")
+    // {
+    //     ReportTransactionEntriesViewModel reportVM = new();
+    //     BusinessItem business = _businessService.GetBusinessItemById(businessId);
+    //     reportVM.BusinessId = business.BusinessId;
+    //     reportVM.Businessname = business.BusinessName;
+    //     reportVM.TimePeriod = timePeriod;
+    //     reportVM.PartyId = searchPartyId;
+    //     if (searchPartyId != 0)
+    //     {
+    //         reportVM.PartyName = _partyService.GetPartyById(searchPartyId).PartyName;
+    //     }
+    //     else
+    //     {
+    //         reportVM.PartyName = "Account";
+    //     }
 
-        reportVM.TransactionsList = GetTransactionEntries(business.BusinessId, partytype, searchPartyId, startDate, endDate);
-        reportVM.youGave = reportVM.TransactionsList.Where(x => x.TransactionType == (byte)EnumHelper.TransactionType.GAVE).Sum(x => x.TransactionAmount);
-        reportVM.YouGot = reportVM.TransactionsList.Where(x => x.TransactionType == (byte)EnumHelper.TransactionType.GOT).Sum(x => x.TransactionAmount);
-        reportVM.NetBalance = reportVM.YouGot - reportVM.youGave;
-        DateTime startDateTemp = DateTime.Parse(startDate);
-        reportVM.Startdate = startDateTemp.ToString("dd MMMM yyyy");
-        DateTime endDateTemp = DateTime.Parse(endDate);
-        reportVM.EndDate = endDateTemp.ToString("dd MMMM yyyy");
-        return reportVM;
-    }
+    //     reportVM.TransactionsList = GetTransactionEntries(business.BusinessId, partytype, searchPartyId, startDate, endDate);
+    //     reportVM.youGave = reportVM.TransactionsList.Where(x => x.TransactionType == (byte)EnumHelper.TransactionType.GAVE).Sum(x => x.TransactionAmount);
+    //     reportVM.YouGot = reportVM.TransactionsList.Where(x => x.TransactionType == (byte)EnumHelper.TransactionType.GOT).Sum(x => x.TransactionAmount);
+    //     reportVM.NetBalance = reportVM.YouGot - reportVM.youGave;
+    //     DateTime startDateTemp = DateTime.Parse(startDate);
+    //     reportVM.Startdate = startDateTemp.ToString("dd MMMM yyyy");
+    //     DateTime endDateTemp = DateTime.Parse(endDate);
+    //     reportVM.EndDate = endDateTemp.ToString("dd MMMM yyyy");
+    //     return reportVM;
+    // }
 
     public Task<byte[]> ExportData(ReportTransactionEntriesViewModel reportExcel)
     {

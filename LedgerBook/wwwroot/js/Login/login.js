@@ -35,7 +35,8 @@ function registerSuccess(response) {
         RemoveValidations();
         window.location = "/Login/Login"
     } else {
-        Toaster(response.toasterMessage, "error");
+        if (response.toasterMessage != null)
+            Toaster(response.toasterMessage, "error");
     }
 }
 
