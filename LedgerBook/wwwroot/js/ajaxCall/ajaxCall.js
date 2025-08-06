@@ -58,6 +58,12 @@ function ajaxCall(params) {
         case NODATA:
             ajaxcallObj.contentType = false;
             ajaxcallObj.processData = false;
+            break;
+        case APPLICATION_JSON :
+            ajaxcallObj.contentType = APPLICATION_JSON;
+            ajaxcallObj.processData = false;
+            ajaxcallObj.data = params.data;
+            break;
         default:
             break;
     }

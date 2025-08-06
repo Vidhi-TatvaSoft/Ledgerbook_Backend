@@ -30,17 +30,18 @@ public class BusinessItem
     public List<ReferenceDataValues> BusinessCategories { get; set; }
 
     public List<ReferenceDataValues> BusinessTypes { get; set; }
-    // public int AddressId { get; set; }
+
     public string? AddressLine1 { get; set; }
 
     public string? AddressLine2 { get; set; }
 
     public string? City { get; set; }
 
-    // [Required(ErrorMessage = MessageHelper.PincodeRequire)]
     [Range(100000, 999999, ErrorMessage = MessageHelper.Pincodelength)]
-    public int? Pincode { get; set; } 
+    public int? Pincode { get; set; }
 
     public AttachmentViewModel? BusinessLogoAttachment { get; set; }
+
+    public bool? IsNewbusiness { get; set; } = false;
 
 }

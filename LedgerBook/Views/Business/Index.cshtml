@@ -26,10 +26,101 @@
 
 <!-------------------------------------- Modal--------------------------------------------------->
 <div id="add-business-modal" class="modal fade" tabindex="-1">
+    <input type="hidden" name="" id="business-businessId">
     <div class="modal-dialog modal-dialog-centered modal-xl" id="businessdetail-modal-body">
 
     </div>
 </div>
+
+<div id="add-user-modal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered " id="craete-user-modal-content">
+        <div class="modal-content bg-light shadow-lg border-2">
+            <div class="modal-header">
+                <h5 class="modal-title" id="add-user-modal-title">Add User</h5>
+                <button type="button" class="btn-close usermodal-close-btn" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <form id="add-newuser-form-id">
+                <div class="modal-body row">
+                    <div class="col-md-6 col-lg-6 col-xl-6 col-sm-12 col-12 mt-3">
+                        <div class="form-floating ">
+                            <input type="hidden" id="user-details-userId">
+                            <input type="hidden" id="user-details-personalId">
+                            <input type="text" oninput="RemoveWhiteSpace(this);nameValidation(this,'First')"
+                                onblur="nameValidation(this,'First')" class="form-control" id="user-details-firstName"
+                                placeholder="First Name*">
+                            <label for="user-details-firstName" class="fs-6 text-secondary">First Name*</label>
+                            <span class="text-danger FirstNameValidationMessage validationMessage"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-6 col-xl-6 col-sm-12 col-12 mt-3">
+                        <div class="form-floating ">
+                            <input type="text" oninput="RemoveWhiteSpace(this);nameValidation(this,'Last')"
+                                onblur="nameValidation(this,'First')" id="user-details-lastName" class="form-control"
+                                placeholder="Last Name*">
+                            <label for="user-details-lastName" class="fs-6 text-secondary">Last Name*</label>
+                            <span class="text-danger LastNameValidationMessage validationMessage"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-lg-6 col-xl-6 col-sm-12 col-12 mt-3">
+                        <div class="form-floating ">
+                            <input type="text" oninput="RemoveWhiteSpace(this);emailValidation(this)"
+                                onblur="emailValidation(this)" class="form-control" id="user-details-email"
+                                placeholder="Email*">
+                            <label for="user-details-email" class="fs-6 text-secondary">Email*</label>
+                            <span class="text-danger emailValidationMessage validationMessage"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-6 col-xl-6 col-sm-12 col-12 mt-3">
+                        <div class="form-floating ">
+                            <input type="Number" oninput="numberValidationReq(this)" onblur="numberValidationReq(this)"
+                                class="form-control" id="user-details-mobileNumber" placeholder="Mobile Number*">
+                            <label for="user-details-mobileNumber" class="fs-6 text-secondary">Mobile Number*</label>
+                            <span class="text-danger numberValidationMessage validationMessage"></span>
+                        </div>
+                    </div>
+                    <div class="col-12 mt-3">
+                        <div>Roles </div>
+                        <div class="form-floating d-flex" id="user-details-roleList">
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="user-details-confirmation-modal" class="modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-header">Add User Confirmation</h5>
+                <button type="button" class="btn-close userdetail-confirmation-modal-close" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body ">
+                <div class="delete-cat-image d-flex flex-column  align-items-center">
+                    <p>Business created successfully.</p>
+                    <p>Do you want to add users in this business?</p>
+                </div>
+            </div>
+            <div class="modal-footer d-flex justify-content-center">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                    onclick="displayUserDetails()">Yes</button>
+                <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <div id="add-business-body-content" class="d-none">
     <div class="modal-content">
@@ -43,12 +134,9 @@
                     <div class="col-3 col-lg-2  border-0  border-end cursor-pointer p-0 " style="max-width: 190px;">
                         <a class="d-flex active-div p-2 w-100 mb-2 text-nowrap text-truncate" title="Business Details"
                             id="business-details-btn" style="text-decoration: none; ">Business Details</a>
-                        @* @if (Model.BusinessDetailViewModel.BusinessItem.BusinessId != 0)
-                        { *@
-                        <a class="d-flex inactive-div cursor-pointer text-nowrap p-2 w-100 text-truncate "
+                        <a class="d-flex inactive-div cursor-pointer text-nowrap p-2 w-100 text-truncate d-none"
                             title="User Management" id="user-details-btn" style="text-decoration: none;"
                             onclick="displayUserDetails()">User Management</a>
-                        @* } *@
                     </div>
                     <div id="add-business-body" class="col-9 col-lg-10 pe-4">
                         <div class="fs-3 fw-bold text-color ">Business Details</div>
@@ -101,22 +189,23 @@
                                 </div>
                                 <div class="col-md-6 col-lg-6 col-xl-6 col-sm-12 col-12 mt-3">
                                     <div class="form-floating ">
-                                        @* <div class="d-none" id="business-businessId"></div> *@
-                                        <input type="hidden" id="business-businessId">
-                                        <input type="text" onblur="TrimInput(this)" class="form-control"
+                                        <input type="text" onblur="TrimInput(this);buisnessNameValidation(this)"
+                                            oninput="buisnessNameValidation(this)" class="form-control"
                                             id="business-businessName" placeholder="Business Name*">
                                         <label for="business-businessName" class="fs-6 text-secondary">Business
                                             Name*</label>
-                                        <span class="text-danger businessnameValidation"></span>
+                                        <span
+                                            class="text-danger businessNameValidationMessage validationMessage"></span>
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-lg-6 col-xl-6 col-sm-12 col-12 mt-3">
                                     <div class="form-floating ">
-                                        <input type="Number" oninput="NumberValidation(this)" class="form-control"
+                                        <input type="Number" oninput="numberValidationReq(this)"
+                                            onblur="numberValidationReq(this)" class="form-control"
                                             id="business-mobileNumber" placeholder="Mobile Number*">
                                         <label for="business-mobileNumber" class="fs-6 text-secondary">Mobile
                                             Number*</label>
-                                        <span class="text-danger mobileNumbervalidation"></span>
+                                        <span class="text-danger numberValidationMessage validationMessage"></span>
                                     </div>
                                 </div>
 
@@ -141,8 +230,8 @@
                                     <div class="form-floating ">
                                         <input type="text" onblur="TrimInput(this)" class="form-control"
                                             id="business-addressLine1" placeholder="Building/House Number">
-                                        <label for="business-addressLine1" class="fs-6 text-secondary">Building/House
-                                            Number</label>
+                                        <label for="business-addressLine1"
+                                            class="fs-6 text-secondary text-nowrap">Building/House Number</label>
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-lg-6 col-xl-6 col-sm-12 col-12 mt-3">
@@ -162,17 +251,18 @@
                                 </div>
                                 <div class="col-md-6 col-lg-6 col-xl-6 col-sm-12 col-12 mt-3">
                                     <div class="form-floating ">
-                                        <input type="Number" oninput="PincodeValidation(this)" class="form-control"
-                                            id="business-pincode" placeholder="Pincode">
+                                        <input type="Number" oninput="PincodeValidation(this);pincodeValidation(this)"
+                                            class="form-control" id="business-pincode" placeholder="Pincode">
                                         <label for="business-pincode" class="fs-6 text-secondary">Pincode</label>
+                                        <span class="text-danger pincodeValidationMessage validationMessage"></span>
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-lg-6 col-xl-6 col-sm-12 col-12 mt-3">
                                     <div class="form-floating ">
-                                        <input type="text" onblur="TrimInput(this)" class="form-control"
-                                            id="business-GSTIN" placeholder="GSTIN">
+                                        <input type="text" onblur="TrimInput(this)" oninput="GSTINValidation(this)"
+                                            class="form-control" id="business-GSTIN" placeholder="GSTIN">
                                         <label for="business-GSTIN" class="fs-6 text-secondary">GSTIN</label>
-                                        <span class="text-danger GSTINValidation"></span>
+                                        <span class="text-danger GSTINValidationMessage validationMessage"></span>
                                     </div>
                                 </div>
                                 <div class=" col-md-6 col-lg-6 col-xl-6 col-sm-12 col-12 mt-3 mt-md-4 pt-md-2">
@@ -198,11 +288,63 @@
     </div>
 </div>
 
+<div id="user-details-body-content" class="d-none">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="modal-header">Update Business</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                onclick="displayBusinessCards()"></button>
+        </div>
+        <div class="modal-body p-0 ps-3  " style="min-height: 500px;">
+            <div class="row " style="min-height: 500px;">
+                <div class="col-3 col-lg-2 border-0  border-end cursor-pointer p-0 ">
+                    <a class="d-flex inactive-div p-2 w-100 mb-2 text-nowrap" id="business-details-btn"
+                        style="text-decoration: none;" onclick="displayBusinessDetails()">Business Details</a>
+                    <a class="d-flex active-div p-2 w-100 text-nowrap" id="user-details-btn"
+                        style="text-decoration: none;">User Management</a>
+                </div>
+                <div id="user-details-body" class="col-9 col-lg-10 pe-4">
+                    <div class="d-flex justify-content-between uer-detail-div">
+                        <div class="fs-3 fw-bold text-color mt-2">User Details</div>
+                        <span class="text-color fs-2 fw-bold btn" data-toggle="tooltip" data-placement="top"
+                            data-bs-toggle="modal" data-bs-target="#add-user-modal" onclick="addUserInBusiness()"
+                            title="Add User" id="add-user-icon">
+                            <i class="bi bi-plus-square fw-bold"></i>
+                        </span>
+                    </div>
+
+                    <div class="row p-0 table-responsive ">
+                        <table id="example" class="table display">
+                            <thead>
+                                <th class="text-nowrap">Name</th>
+                                <th class="text-nowrap">Email</th>
+                                <th class="text-nowrap">Mobile Number</th>
+                                <th class="text-center text-nowrap">Role</th>
+                                <th class="text-nowrap">Action</th>
+                            </thead>
+                            <tbody id="user-details-table-body">
+
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer d-flex justify-content-center">
+            <a type="submit" class="btn btn-primary" onclick="closeModal()">Save</a>
+            <a type="submit" class="btn btn-primary" onclick="closeModal()">Save & Close</a>
+            <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal"
+                onclick="displayBusinessCards()">Close</button>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
+    <script type="module" src="~/js/constant.js"></script>
     <script>
         function displayBusinessCards(searchText = "") {
-            if (searchText.trim())
-                $("body").addClass("loading");
+            $("body").addClass("loading");
             let params = setParameter("/Business/GetBusinesses", GET, null, FORM_URL, { searchText }, getBusinessesSuccess);
             ajaxCall(params);
             $("body").removeClass("loading");
@@ -244,10 +386,10 @@
                     var reader = new FileReader();
 
                     reader.onload = function (e) {
-                        $('#uploadedimage').attr('src', e.target.result).width(50).height(50);
-                        document.getElementById("uploadedimage").classList.remove("d-none")
+                        $('#add-business-uploadedimage').attr('src', e.target.result).width(50).height(50);
+                        document.getElementById("add-business-uploadedimage").classList.remove("d-none")
                         @* document.getElementById("cloud-icon").classList.add("d-none") *@
-                                        };
+                                                                            };
                     reader.readAsDataURL(input.files[0]);
                 }
                 return;
@@ -263,6 +405,7 @@
                 document.getElementsByClassName("image-overlay")[0].classList.remove("opacity-class")
             }
         }
+        
         function addOpacity() {
             let classname = document.getElementsByClassName("uploadedimage-class-business")[0].getAttribute('src')
             if (classname != "#") {
@@ -278,6 +421,11 @@
             $(document).on("submit", "#business-details-form-id", function (e) {
                 e.preventDefault();
             })
+
+            $(document).on("submit", "#add-newuser-form-id", function (e) {
+                e.preventDefault();
+                saveUserDetails();
+            })
         })
 
 
@@ -289,41 +437,54 @@
             $("#businessdetail-modal-body").html($("#add-business-body-content").html())
             let businessId = $("#business-businessId").val() == "" ? 0 : $("#business-businessId").val();
             let params = setParameter("/Business/GetBusinessDetails", GET, null, FORM_URL, { businessId }, getBusinessByIdSuccess);
-            console.log(params)
+            $("body").addClass("loading");
             ajaxCall(params);
+            $("body").removeClass("loading");
+        }
+
+        function displayUserDetails() {
+            $("#businessdetail-modal-body").html($("#user-details-body-content").html())
+            let businessId = $("#business-businessId").val() == "" ? 0 : $("#business-businessId").val();
+            let params = setParameter("/Business/GetAllUsersOfBusiness", GET, null, FORM_URL, { businessId }, getAllUserDetailsSuccess);
+            $("body").addClass("loading");
+            ajaxCall(params);
+            $("body").removeClass("loading");
         }
 
         function saveBusinessDetails() {
-            @* let isValidForm = validateRegisterForm(); *@
-                @* if (isValidForm) { *@
+            let isValidForm = validateSaveBusinessForm();
+            if (isValidForm) {
                 let formData = new FormData();
-            console.log("sscs", $("#business-pincode").val() == "" ? 000000 : $("#business-pincode").val())
-            formData.append("BusinessId", $("#business-businessId").val() == "" ? 0 : $("#business-businessId").val())
-            formData.append("BusinessName", $("#business-businessname").val())
-            formData.append("BusinescategoryId", parseInt($("#business-categories").val().split("-")[2]))
-            formData.append("BusinessTypeId", parseInt($("#business-types").val().split("-")[2]))
-            formData.append("MobileNumber", $("#business-mobileNumber").val())
-            formData.append("GSTIN", $("#business-GSTIN").val() == "" ? null : $("#business-GSTIN").val())
-            formData.append("IsActive", $("#business-isActive").is(':checked'))
-            formData.append("AddressLine1", $("#business-addressLine1").val() == "" ? null : $("#business-addressLine1").val())
-            formData.append("AddressLine2", $("#business-addressLine2").val() == "" ? null : $("#business-addressLine2").val())
-            formData.append("City", $("#business-city").val() == "" ? null : $("#business-city").val())
-            formData.append("Pincode", $("#business-pincode").val() == "" ? "" : $("#business-pincode").val())
-            const fileInput = document.getElementById("business-image");
-            const file = fileInput.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
+                formData.append("BusinessId", $("#business-businessId").val() == "" ? 0 : $("#business-businessId").val())
+                formData.append("BusinessName", $("#business-businessName").val())
+                formData.append("BusinescategoryId", parseInt($("#business-categories").val().split("-")[2]))
+                formData.append("BusinessTypeId", parseInt($("#business-types").val().split("-")[2]))
+                formData.append("MobileNumber", $("#business-mobileNumber").val())
+                formData.append("GSTIN", $("#business-GSTIN").val())
+                formData.append("IsActive", $("#business-isActive").is(':checked'))
+                formData.append("AddressLine1", $("#business-addressLine1").val())
+                formData.append("AddressLine2", $("#business-addressLine2").val())
+                formData.append("City", $("#business-city").val())
+                formData.append("Pincode", $("#business-pincode").val())
+                const fileInput = document.getElementById("business-image");
+                const file = fileInput.files[0];
+                console.log(file)
+                if (file) {
                     formData.append("BusinessLogoIForm", file)
-                };
-                reader.readAsDataURL(file);
-            }
-            let params = setParameter("/Business/SaveBusiness", POST, null, FORMDATA, formData, SaveBusinessSuccess);
-            console.log(params)
-            ajaxCall(params);
+                    @* const reader = new FileReader();
+                    reader.onload = function (e) {
+                        formData.append("BusinessLogoIForm", file)
+                    };
+                    reader.readAsDataURL(file); *@
+                                }
+                let params = setParameter("/Business/SaveBusiness", POST, null, FORMDATA, formData, SaveBusinessSuccess);
+                console.log(params)
+                ajaxCall(params);
 
-            @* } *@
-                }
+            }
+        }
+
+       
 
 
     </script>

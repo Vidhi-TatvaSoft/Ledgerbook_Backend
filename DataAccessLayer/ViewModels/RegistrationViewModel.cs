@@ -20,13 +20,13 @@ public class RegistrationViewModel
               ErrorMessage = MessageHelper.InvalidPasswordMessage)]
     public string Password { get; set; }
 
-    // [Required(ErrorMessage = MessageHelper.ConfirmPasswordRequireMessage)]
-    // [DataType(DataType.Password)]
-    // [MinLength(8, ErrorMessage = MessageHelper.minLengthConfirmPasswordMessage)]
-    // [MaxLength(128, ErrorMessage = MessageHelper.maxLengthConfirmPasswordMessage)]
-    // [RegularExpression(@"^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$",
-    //           ErrorMessage = MessageHelper.InvalidConfirmPasswordMessage)]
-    // [Compare("Password", ErrorMessage = MessageHelper.comparePasswords)]
+    [Required(ErrorMessage = MessageHelper.ConfirmPasswordRequireMessage)]
+    [DataType(DataType.Password)]
+    [MinLength(8, ErrorMessage = MessageHelper.minLengthConfirmPasswordMessage)]
+    [MaxLength(128, ErrorMessage = MessageHelper.maxLengthConfirmPasswordMessage)]
+    [RegularExpression(@"^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$",
+              ErrorMessage = MessageHelper.InvalidConfirmPasswordMessage)]
+    [Compare("Password", ErrorMessage = MessageHelper.comparePasswords)]
     public string ConfirmPassword { get; set; }
 
     [Required(AllowEmptyStrings = false, ErrorMessage = MessageHelper.FirstNameRequireMessage)]

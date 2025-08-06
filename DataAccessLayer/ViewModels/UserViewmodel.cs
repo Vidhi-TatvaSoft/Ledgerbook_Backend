@@ -7,7 +7,7 @@ public class UserViewmodel
 {
     public int UserId { get; set; }
 
-    public int? PersonalDetailId{ get; set; }
+    public int? PersonalDetailId { get; set; }
 
     [Required(AllowEmptyStrings = false, ErrorMessage = MessageHelper.FirstNameRequireMessage)]
     [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = MessageHelper.InvalidFirstNameMessage)]
@@ -33,7 +33,7 @@ public class UserViewmodel
 
     public bool CanEdit { get; set; }
     public bool CanAddOwner { get; set; }
-    public bool IsActive{ get; set; }
+    public bool IsActive { get; set; }
 
     public string Pasword { get; set; }
 
@@ -43,5 +43,6 @@ public class UserViewmodel
 
     public List<RoleViewModel> Roles { get; set; }
 
-    public bool? IsUserRegistered { get; set; }
+    public List<RoleViewModel> AllRoles { get; set; }
+    public bool IsUserRegistered { get; set; } = false;
 }

@@ -13,5 +13,7 @@ public interface IBusinessService
     Task<bool> DeleteBusiness(int businessId, int userId);
     string GetBusinessNameById(int businessId);
     List<BusinessViewModel> GetAllBusinesses(int userId);
-
+    Task<ApiResponse<List<UserViewmodel>>> GetUsersOfBusiness(int businessId, int userId);
+    Task<ApiResponse<UserViewmodel>> GetUserById(int businessId, int curentUserId, int? userId);
+    Task<ApiResponse<List<UserViewmodel>>> SaveUserDetails(UserViewmodel userViewmodel, List<int> selectedRole, int businessId, int userId);
 }

@@ -30,7 +30,7 @@ function passwordValidation(input) {
 
 function curPasswordValidation(input) {
     let value = input.value.replace(/\s/g, '');
-    const regex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
+    const regex = /^^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
     if (value == "") {
         $(".curPasswordValidationMessage").html("Current Password is required.");
     } else if (value.length < 8) {
@@ -43,7 +43,6 @@ function curPasswordValidation(input) {
         $(".curPasswordValidationMessage").html("");
     }
 }
-
 
 function cnfpasswordValidation(input, passwordinputId) {
     let value = input.value.replace(/\s/g, '');
@@ -87,7 +86,58 @@ function NumberValidation(input) {
     }
 }
 
+///////////business page validations///////////////////
+function buisnessNameValidation(input) {
+    let value = input.value;
+    if (value == "") {
+        $(`.businessNameValidationMessage`).html(`Business Name is required.`);
+    } else if (value.length > 100) {
+        $(`.businessNameValidationMessage`).html(`Business Name can not exceed 100 characters.`);
+    } else {
+        $(`.businessNameValidationMessage`).html("");
+    }
+}
 
+function numberValidationReq(input) {
+    let value = input.value.replace(/\D/g, '');
+    console.log(value)
+    if (value == "") {
+        $(".numberValidationMessage").html("Mobile Number is required.");
+    } else if (value.length < 10) {
+        $(".numberValidationMessage").html("Mobile Number must be 10 digits long.");
+    } else if (value.length > 10) {
+        value = value.slice(0, 10);
+        input.value = value;
+    } else {
+        $(".numberValidationMessage").html("");
+    }
+}
+
+function GSTINValidation(input) {
+    let value = input.value.replace(/\s/g, '');
+    const regex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+    if (value == "") {
+        $(".GSTINValidationMessage").html("");
+    } else if (!regex.test(value)) {
+        $(".GSTINValidationMessage").html("Enter valid GST Number.");
+    } else {
+        $(".GSTINValidationMessage").html("");
+    }
+}
+
+function pincodeValidation(input) {
+    let value = input.value.replace(/\D/g, '');
+    if (value == "") {
+        $(".pincodeValidationMessage").html("");
+    } else if (value.length < 6) {
+        $(".pincodeValidationMessage").html("Pincode must be 6 digits long.");
+    } else if (value.length > 6) {
+        value = value.slice(0, 6);
+        input.value = value;
+    } else {
+        $(".pincodeValidationMessage").html("");
+    }
+}
 
 function validateLoginForm() {
     let email = document.getElementById("login-email")
@@ -148,8 +198,8 @@ function validateProfileForm() {
     let lastname = document.getElementById("profile-LastName");
     let mobileNumber = document.getElementById("profile-mobilenumber");
 
-    nameValidation(firstName,'First')
-    nameValidation(lastname,'Last')
+    nameValidation(firstName, 'First')
+    nameValidation(lastname, 'Last')
     NumberValidation(mobileNumber)
     if ($(".numberValidationMessage").html() == "") {
         return true;
@@ -158,19 +208,57 @@ function validateProfileForm() {
     }
 }
 
-function validateChangePasswordForm(){
+function validateChangePasswordForm() {
     let oldPassword = document.getElementById("changepassword-old");
-    let newPassword= document.getElementById("changepassword-new");
+    let newPassword = document.getElementById("changepassword-new");
     let confPassword = document.getElementById("changepassword-confirm");
 
     curPasswordValidation(oldPassword)
     passwordValidation(newPassword)
-    cnfpasswordValidation(confPassword,"changepassword-new")
+    cnfpasswordValidation(confPassword, "changepassword-new")
     if ($(".passwordValidationMessage").html() == "" && $(".cnfpasswordValidationMessage").html() == "") {
         return true;
     } else {
         return false;
     }
+}
+
+function validateSaveBusinessForm() {
+    let businessName = document.getElementById("business-businessName");
+    let number = document.getElementById("business-mobileNumber");
+    let GSTIN = document.getElementById("business-GSTIN");
+    let pincode = document.getElementById("business-pincode");
+
+    buisnessNameValidation(businessName)
+    numberValidationReq(number)
+    GSTINValidation(GSTIN);
+    pincodeValidation(pincode);
+
+    if ($(".emailValidationMessage").html() == "" && $(".numberValidationMessage").html() == "" && $(".FirstNameValidationMessage").html() == "" && $(".LastNameValidationMessage").html() == "") {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function validateSaveUserForm() {
+    let email = document.getElementById("user-details-email")
+    let firstname = document.getElementById("user-details-firstName")
+    let lastname = document.getElementById("user-details-lastName")
+    let mobile = document.getElementById("user-details-mobileNumber")
+    console.log("mobile",mobile)
+
+    emailValidation(email)
+    nameValidation(firstname, 'First');
+    nameValidation(lastname, 'Last')
+    numberValidationReq(mobile);
+
+    if ($(".businessNameValidationMessage").html() == "" && $(".numberValidationMessage").html() == "" && $(".GSTINValidationMessage").html() == "" && $(".pincodeValidationMessage").html() == "") {
+        return true;
+    } else {
+        return false;
+    }
+    
 }
 
 function RemoveValidations() {

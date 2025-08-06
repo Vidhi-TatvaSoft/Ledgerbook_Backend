@@ -14,6 +14,7 @@ using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Net;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Newtonsoft.Json;
 
 namespace BusinessAcessLayer.Services;
 
@@ -168,8 +169,9 @@ public class BusinessService : IBusinessService
         {
             if (businessItem.BusinessLogoIForm != null)
             {
+                businessItem.BusinessLogoAttachment = new();
                 string[] extension = businessItem.BusinessLogoIForm.FileName.Split(".");
-                string fileNameTemp = businessItem.BusinessLogoAttachment.FileName;
+                string fileNameTemp = businessItem.BusinessLogoIForm.FileName;
                 if (extension[extension.Length - 1] == "jpg" || extension[extension.Length - 1] == "jpeg" || extension[extension.Length - 1] == "png")
                 {
                     string path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
@@ -256,6 +258,7 @@ public class BusinessService : IBusinessService
                 business.CreatedById = userId;
                 business.IsActive = businessItem.IsActive;
                 business.GSTIN = businessItem.GSTIN;
+                businessItem.IsNewbusiness = true;
                 await _genericRepository.AddAsync<Businesses>(business);
                 businessId = business.Id;
                 int roleId = _genericRepository.Get<Role>(r => r.RoleName == ConstantVariables.OwnerRole && !r.DeletedAt.HasValue)!.Id;
@@ -302,6 +305,7 @@ public class BusinessService : IBusinessService
                     updateBusiness.UpdatedAt = DateTime.UtcNow;
                     updateBusiness.UpdatedById = userId;
                     updateBusiness.IsActive = businessItem.IsActive;
+                    businessItem.IsNewbusiness = false;
                     await _genericRepository.UpdateAsync<Businesses>(updateBusiness);
                     businessId = updateBusiness.Id;
                 }
@@ -316,13 +320,14 @@ public class BusinessService : IBusinessService
             {
                 string message = string.Format(Messages.BusinessActivity, "Business", "created", userName);
                 await _activityLogService.SetActivityLog(message, EnumHelper.Actiontype.Add, EnumHelper.ActivityEntityType.Business, businessId, userId);
+                return new ApiResponse<BusinessItem>(true, string.Format(Messages.GlobalAddUpdateMesage, "Business", "added"), businessItem, HttpStatusCode.OK);
             }
             else
             {
                 string message = string.Format(Messages.BusinessActivity, "Business", "updated", userName);
                 await _activityLogService.SetActivityLog(message, EnumHelper.Actiontype.Update, EnumHelper.ActivityEntityType.Business, businessId, userId);
+                return new ApiResponse<BusinessItem>(true, string.Format(Messages.GlobalAddUpdateMesage, "Business", "updated"), businessItem, HttpStatusCode.OK);
             }
-            return new ApiResponse<BusinessItem>(true, null, businessItem, HttpStatusCode.OK);
         }
         catch (Exception e)
         {
@@ -474,5 +479,168 @@ public class BusinessService : IBusinessService
                     };
                 })
                 .ToList();
+    }
+
+    //get all users of business
+    public async Task<ApiResponse<List<UserViewmodel>>> GetUsersOfBusiness(int businessId, int userId)
+    {
+        if (businessId == 0)
+        {
+            return new ApiResponse<List<UserViewmodel>>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
+        }
+        else
+        {
+            List<UserViewmodel> users = await _userBusinessMappingService.GetUsersByBusiness((int)businessId, userId);
+            users = _userBusinessMappingService.SetPermissions(users, userId, (int)businessId);
+            return new ApiResponse<List<UserViewmodel>>(true, null, users, HttpStatusCode.OK);
+        }
+    }
+
+    //get user by id
+    public async Task<ApiResponse<UserViewmodel>> GetUserById(int businessId, int curentUserId, int? userId)
+    {
+        if (businessId == 0)
+        {
+            return new ApiResponse<UserViewmodel>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
+        }
+        UserViewmodel userDetail = new();
+        if (userId != 0 || userId == null)
+        {
+            List<UserViewmodel> users = await _userBusinessMappingService.GetUsersByBusiness((int)businessId, curentUserId);
+            users = _userBusinessMappingService.SetPermissions(users, curentUserId, (int)businessId);
+            userDetail = users.FirstOrDefault(x => x.UserId == userId) == null ? new UserViewmodel() : users.FirstOrDefault(x => x.UserId == userId);
+        }
+        bool isMainOwner = _userBusinessMappingService.IsMainOwner((int)businessId, curentUserId);
+        if (isMainOwner)
+        {
+            userDetail.CanAddOwner = true;
+            userDetail.AllRoles = _roleService.GetAllRoles();
+        }
+        else
+        {
+            userDetail.AllRoles = _roleService.GetRolesExceptOwner();
+        }
+        return new ApiResponse<UserViewmodel>(true, null, userDetail, HttpStatusCode.OK);
+    }
+
+    //Save user details in business
+    public async Task<ApiResponse<List<UserViewmodel>>> SaveUserDetails(UserViewmodel userViewmodel, List<int> selectedRole, int businessId, int userId)
+    {
+        bool isUserPresent = false;
+        string businessName = GetBusinessNameById(businessId);
+        UserViewmodel user = _userService.GetuserById(userId, businessId);
+        int createdUserId;
+        int createdPersonaldetailId;
+
+        //update user
+        if (userViewmodel.UserId != 0)
+        {
+            createdUserId = userViewmodel.UserId;
+            if (userViewmodel.PersonalDetailId != null)
+            {
+                createdPersonaldetailId = await _userService.UpdatePersonalDetails(userViewmodel, userId);
+            }
+            else
+            {
+                createdPersonaldetailId = await _userService.SavePersonalDetails(userViewmodel, userId);
+            }
+            bool isMappingUpdated = await _userBusinessMappingService.UpdateUserBusinessMapping(createdUserId, businessId, selectedRole, createdPersonaldetailId, userId);
+            for (int i = 0; i < selectedRole.Count; i++)
+            {
+                if (i == selectedRole.Count - 1)
+                {
+                    userViewmodel.RoleName += _roleService.GetRoleById(selectedRole[i]).RoleName;
+                }
+                else
+                {
+                    userViewmodel.RoleName += _roleService.GetRoleById(selectedRole[i]).RoleName + ", ";
+                }
+            }
+            Task.Run(async () =>
+            {
+                await CommonMethods.UpdateRoleEmail(userViewmodel.Email, userViewmodel.RoleName, businessName, ConstantVariables.LoginLink);
+            });
+
+            string message = string.Format(Messages.UserInBusinessActivity, userViewmodel.FirstName + " " + userViewmodel.LastName, "updated", user.FirstName + " " + user.LastName);
+            isUserPresent = true;
+            await _activityLogService.SetActivityLog(message, EnumHelper.Actiontype.Update, EnumHelper.ActivityEntityType.Business, businessId, userId, EnumHelper.ActivityEntityType.Role, userViewmodel.UserId);
+        }
+        else
+        {
+            //add user
+            if (_userService.IsUserRegistered(userViewmodel.Email))
+            {
+                userViewmodel.IsUserRegistered = true;
+            }
+            else
+            {
+                userViewmodel.IsUserRegistered = false;
+            }
+            int personalDetailsId = await _userService.SavePersonalDetails(userViewmodel, userId);
+            if (personalDetailsId == 0)
+            {
+                return new ApiResponse<List<UserViewmodel>>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
+            }
+
+            ApplicationUser userPresent = _userService.GetuserByEmail(userViewmodel.Email);
+
+            if (userPresent == null)
+            {
+                createdUserId = await _userService.SaveUser(userViewmodel);
+                if (createdUserId == 0)
+                {
+                    return new ApiResponse<List<UserViewmodel>>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
+                }
+            }
+            else
+            {
+                userViewmodel.UserId = userPresent.Id;
+                userViewmodel.PersonalDetailId = personalDetailsId;
+                createdUserId = userPresent.Id;
+            }
+            for (int i = 0; i < selectedRole.Count; i++)
+            {
+                int userBusinessMappingId = await _userBusinessMappingService.SaveUserBusinessMapping(createdUserId, businessId, selectedRole[i], personalDetailsId, userId);
+                if (userBusinessMappingId == 0)
+                {
+                    return new ApiResponse<List<UserViewmodel>>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
+                }
+                if (i == selectedRole.Count - 1)
+                {
+                    userViewmodel.RoleName += _roleService.GetRoleById(selectedRole[i]).RoleName;
+                }
+                else
+                {
+                    userViewmodel.RoleName += _roleService.GetRoleById(selectedRole[i]).RoleName + ", ";
+                }
+            }
+            if (userPresent == null)
+            {
+                Task.Run(async () =>
+                {
+                    CommonMethods.CreateUserAndRoleEmail(userViewmodel.Email, userViewmodel.RoleName, businessName, ConstantVariables.LoginLink);
+                });
+            }
+            else
+            {
+                Task.Run(async () =>
+                {
+                    CommonMethods.CreateRoleEmail(userViewmodel.Email, userViewmodel.RoleName, businessName, ConstantVariables.LoginLink);
+                });
+            }
+            string message = string.Format(Messages.AddUserInBusinessActivity, userViewmodel.FirstName + " " + userViewmodel.LastName, user.FirstName + " " + user.LastName);
+            isUserPresent = false;
+            await _activityLogService.SetActivityLog(message, EnumHelper.Actiontype.Add, EnumHelper.ActivityEntityType.Business, businessId, userId, EnumHelper.ActivityEntityType.Role, createdUserId);
+            userViewmodel.UserId = createdUserId;
+        }
+
+        List<UserViewmodel> users = await _userBusinessMappingService.GetUsersByBusiness(businessId, userId);
+        users = _userBusinessMappingService.SetPermissions(users, userId, businessId);
+        if (isUserPresent)
+        {
+            return new ApiResponse<List<UserViewmodel>>(true, string.Format(Messages.GlobalAddUpdateMesage, "User", "updated"), users, HttpStatusCode.OK);
+        }
+        return new ApiResponse<List<UserViewmodel>>(true, string.Format(Messages.GlobalAddUpdateMesage, "User", "added"), users, HttpStatusCode.OK);
+
     }
 }
