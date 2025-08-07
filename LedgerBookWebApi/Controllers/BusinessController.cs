@@ -77,7 +77,7 @@ public class BusinessController : BaseController
 
     [HttpPost]
     [Route("SaveUserDetails")]
-    public IActionResult SaveUserDetails([FromBody]UserDetailsViewModel userDetailsViewModel)
+    public async Task<IActionResult> SaveUserDetails([FromBody] UserDetailsViewModel userDetailsViewModel)
     {
         ApplicationUser user = GetCurrentUserIdentity();
         if (user == null)
@@ -86,6 +86,42 @@ public class BusinessController : BaseController
         {
             return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.BadRequest));
         }
-        return Ok(_businessService.SaveUserDetails(userDetailsViewModel.UserDetails, userDetailsViewModel.SelectedRoles,userDetailsViewModel.BusinessId, user.Id));
+        return Ok(await _businessService.SaveUserDetails(userDetailsViewModel.UserDetails, userDetailsViewModel.SelectedRoles, userDetailsViewModel.BusinessId, user.Id));
     }
+
+    #region Delete user from business
+    [HttpGet]
+    [Route("DeleteUserFromBusiness")]
+    public async Task<IActionResult> DeleteUserFromBusiness(int userId, int businessId)
+    {
+        ApplicationUser user = GetCurrentUserIdentity();
+        if (user == null)
+            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Forbidden));
+        return Ok(await _businessService.DeleteUserFromBusiness(userId, businessId, user));
+    }
+    #endregion
+
+    #region inactive / active use
+    [HttpGet]
+    [Route("ActiveInactiveUser")]
+    public async Task<IActionResult> ActiveInactiveUser(int userId, bool isActive, int businessId)
+    {
+        ApplicationUser user = GetCurrentUserIdentity();
+        if (user == null)
+            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Forbidden));
+        return Ok(await _businessService.ActiveInactiveUser(userId, isActive, businessId, user));
+    }
+    #endregion
+
+    #region delete business
+    [HttpPost]
+    [Route("DeleteBusiness")]
+    public async Task<IActionResult> DeleteBusiness([FromForm]int businessId)
+    {
+        ApplicationUser user = GetCurrentUserIdentity();
+        if (user == null)
+            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Forbidden));
+        return Ok(await _businessService.DeleteBusiness(businessId, user.Id));
+    }
+    #endregion
 }

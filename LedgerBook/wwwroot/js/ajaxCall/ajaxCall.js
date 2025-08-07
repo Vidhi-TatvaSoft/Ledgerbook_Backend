@@ -35,7 +35,12 @@ function ajaxCall(params) {
         contentType: params.contentType,
         processData: false,
         success: function (response) {
-            params.successFunction(response);
+                if(response.httpStatusCode == 403){
+                    deleteAllCookies();
+                    window.location = "/Login/Login";
+                }else{
+                    params.successFunction(response);
+                }
         },
         error: function (response) {
             if (response.toasterMessage != null) {
@@ -74,7 +79,12 @@ function ajaxCall(params) {
             type: params.type,
             headers: params.headers,
             success: function (response) {
-                params.successFunction(response);
+                if(response.httpStatusCode == 403){
+                    deleteAllCookies();
+                    window.location = "/Login/Login";
+                }else{
+                    params.successFunction(response);
+                }
             },
             error: function (response) {
                 if (response.toasterMessage != null) {
@@ -83,7 +93,7 @@ function ajaxCall(params) {
             }
         }
     }
-
+console.log(ajaxcallObj)
 
     $.ajax(ajaxcallObj);
 }

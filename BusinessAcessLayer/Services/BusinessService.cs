@@ -382,7 +382,7 @@ public class BusinessService : IBusinessService
         return _genericRepository.Get<Businesses>(b => b.Id == businessId && b.DeletedAt == null);
     }
 
-    public async Task<bool> DeleteBusiness(int businessId, int userId)
+    public async Task<ApiResponse<string>> DeleteBusiness(int businessId, int userId)
     {
         try
         {
@@ -428,13 +428,12 @@ public class BusinessService : IBusinessService
                 string userName = _userService.GetuserNameById(userId);
                 string message = string.Format(Messages.BusinessActivity, "Business", "deleted", userName);
                 await _activityLogService.SetActivityLog(message, EnumHelper.Actiontype.Delete, EnumHelper.ActivityEntityType.Business, businessId, userId);
-                return true;
+                return new ApiResponse<string>(true,string.Format(Messages.GlobalAddUpdateMesage, "Business", "deleted"),null,HttpStatusCode.OK);
             }
             else
             {
-                return false;
+                return new ApiResponse<string>(false,string.Format(Messages.GlobalAddUpdateMesage, "business", "delete"),null,HttpStatusCode.BadRequest);
             }
-
         }
         catch (Exception e)
         {
@@ -642,5 +641,69 @@ public class BusinessService : IBusinessService
         }
         return new ApiResponse<List<UserViewmodel>>(true, string.Format(Messages.GlobalAddUpdateMesage, "User", "added"), users, HttpStatusCode.OK);
 
+    }
+
+    public async Task<ApiResponse<string>> DeleteUserFromBusiness(int userId, int businessId, ApplicationUser logedinUser)
+    {
+        if (userId == 0 || businessId == 0)
+        {
+            return new ApiResponse<string>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
+        }
+        UserViewmodel user = _userService.GetuserById(userId, businessId);
+        bool isDeletedMapping = await _userBusinessMappingService.DeleteUserBusinessMappingByBusinessId(userId, businessId, logedinUser.Id);
+        if (isDeletedMapping)
+        {
+            string busienssName = GetBusinessNameById(businessId);
+            Task.Run(async () =>
+                      {
+                          CommonMethods.DeleteUserEmail(user.Email, busienssName, ConstantVariables.LoginLink);
+                      });
+            string message = string.Format(Messages.UserInBusinessActivity, user.FirstName + " " + user.LastName, "deleted", logedinUser.FirstName + " " + logedinUser.LastName);
+
+            await _activityLogService.SetActivityLog(message, EnumHelper.Actiontype.Delete, EnumHelper.ActivityEntityType.Business, businessId, logedinUser.Id, EnumHelper.ActivityEntityType.Role, user.UserId);
+            return new ApiResponse<string>(true, string.Format(Messages.GlobalAddUpdateMesage, "User", "deleted"));
+        }
+        else
+        {
+            return new ApiResponse<string>(false, string.Format(Messages.GlobalAddUpdateFailMessage, "user", "delete"));
+        }
+    }
+
+    public async Task<ApiResponse<string>> ActiveInactiveUser(int userId, bool isActive, int businessId, ApplicationUser logedinUser)
+    {
+        if (userId == 0 || businessId == 0)
+        {
+            return new ApiResponse<string>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
+        }
+
+        bool isUserUpdated = await _userBusinessMappingService.ActiveInactiveUser(userId, businessId, isActive, logedinUser.Id);
+        if (isUserUpdated)
+        {
+            string message;
+            UserViewmodel userUpdated = _userService.GetuserById(userId, businessId);
+            if (isActive)
+            {
+                message = string.Format(Messages.UserInBusinessActivity, userUpdated.FirstName + " " + userUpdated.LastName, "activated", logedinUser.FirstName + " " + logedinUser.LastName);
+                await _activityLogService.SetActivityLog(message, EnumHelper.Actiontype.Update, EnumHelper.ActivityEntityType.Business, businessId, logedinUser.Id, EnumHelper.ActivityEntityType.Role, userId);
+                return new ApiResponse<string>(true, string.Format(Messages.GlobalAddUpdateMesage, "User", "activated"), null, HttpStatusCode.OK);
+            }
+            else
+            {
+                message = string.Format(Messages.UserInBusinessActivity, userUpdated.FirstName + " " + userUpdated.LastName, "inactivated", logedinUser.FirstName + " " + logedinUser.LastName);
+                await _activityLogService.SetActivityLog(message, EnumHelper.Actiontype.Update, EnumHelper.ActivityEntityType.Business, businessId, logedinUser.Id, EnumHelper.ActivityEntityType.Role, userId);
+                return new ApiResponse<string>(true, string.Format(Messages.GlobalAddUpdateMesage, "User", "inactivated"), null, HttpStatusCode.OK);
+            }
+        }
+        else
+        {
+            if (isActive)
+            {
+                return new ApiResponse<string>(false, string.Format(Messages.GlobalAddUpdateFailMessage, "activate", "user"), null, HttpStatusCode.BadRequest);
+            }
+            else
+            {
+                return new ApiResponse<string>(false, string.Format(Messages.GlobalAddUpdateFailMessage, "inactivated", "user"), null, HttpStatusCode.BadRequest);
+            }
+        }
     }
 }

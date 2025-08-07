@@ -88,8 +88,11 @@ function getBusinessByIdSuccess(response) {
             }
             $("#business-categories").val(`business-category-${business.businescategoryId}`);
             $("#business-types").val(`business-type-${business.businessTypeId}`);
-            $('#add-business-uploadedimage').attr('src', BASE_URL.replace("api", response.result.businessLogoAttachment.businesLogoPath)).width(50).height(50);
-            document.getElementById("add-business-uploadedimage").classList.remove("d-none");
+            if (response.result.businessLogoAttachment != null && response.result.businessLogoAttachment.businesLogoPath != null) {
+                $('#add-business-uploadedimage').attr('src', BASE_URL.replace("api", response.result.businessLogoAttachment.businesLogoPath)).width(50).height(50);
+                document.getElementById("add-business-uploadedimage").classList.remove("d-none");
+            }
+
         }
     }
 }
@@ -132,40 +135,46 @@ function getAllUserDetailsSuccess(response) {
             } else {
                 let userTableBody = document.getElementById("user-details-table-body");
                 userTableBody.innerHTML = "";
+                let innerHTML = "";
                 response.result.forEach(element => {
-                    let innerHTML = "";
                     innerHTML += `<tr class="">
                                             <td class="text-nowrap">${element.firstName} ${element.lastName}</td>
                                             <td class="text-nowrap">${element.email}</td>
                                             <td class="text-nowrap">${element.mobileNumber}</td>
                                             <td class="text-nowrap text-center">${element.roleName}
                                             </td>
-                                            <td class="text-nowrap">
-                                                
-                                            </td>
+                                            <td class="text-nowrap">`
+
+                    if (element.canEdit) {
+                        if (element.isActive) {
+                            innerHTML += `<i class="fa-solid fa-circle-check text-green me-3 fs-5 cursor-pointer" data-bs-toggle="modal" data-bs-target="#inactive-user-modal" onclick="toggleActive(${element.userId})" id="active-user-${element.userId}" title="Inactivate user" ></i>`
+                        } else {
+                            innerHTML += `<i class="fa-solid fa-circle-xmark text-danger me-3 fs-5 cursor-pointer" data-bs-toggle="modal" data-bs-target="#inactive-user-modal" onclick="toggleActive(${element.userId})" id="active-user-${element.userId}" title="Activate user" ></i>`
+                        }
+                        innerHTML += ` 
+                                        <i class="fa-solid fa-pen text-black me-3 mt-2 cursor-pointer" id="update-user-icon" data-bs-toggle="modal" data-bs-target="#add-user-modal" title="Update user" onclick="addEditUserInBusiness(${element.userId})" data-userId="${element.userId}"></i>
+                                        <i class="fa-solid fa-trash-can text-danger cursor-pointer" data-bs-toggle="modal"
+                                            title="Delete user" data-bs-target="#delete-user-modal"
+                                            onclick="delteUserModal(${element.userId})"></i>`
+                    } else {
+                        if (element.isActive) {
+                            innerHTML += `<i class="fa-solid fa-circle-check text-green-50 me-3 fs-5 cursor-pointer" title="You dont have permission to edit this user"></i>`
+                        } else {
+                            innerHTML += `<i class="fa-solid fa-circle-xmark text-danger-50 me-3 fs-5 cursor-pointer" title="You dont have permission to edit this user"></i>`
+                        }
+                        innerHTML += `<i class="fa-solid fa-pen text-black-50 me-3 mt-2 cursor-pointer" title="You dont have permission to edit this user"></i>
+                            <i class="fa-solid fa-trash-can text-danger-50 cursor-pointer" title="You dont have permission to delete this user"></i>`
+                    }
+                    innerHTML += `</td>
                                         </tr>`
+
                 })
+                userTableBody.innerHTML += innerHTML;
+
             }
         }
     }
 }
-// @if (user.CanEdit)
-// {
-//     <i class="fa-solid @(user.IsActive ? "fa-circle-check text-green" : "fa-circle-xmark text-danger") me-3 fs-5 cursor-pointer" data-bs-toggle="modal" data-bs-target="#inactive-user-modal" onclick="toggleActive(@user.UserId)" id="active-user-@user.UserId" title="@(user.IsActive ? "Inactivate user" : "Activate user")" ></i>
-//     <i class="fa-solid fa-pen text-black me-3 mt-2 cursor-pointer" id="update-user-icon"
-//         title="Update user"
-//         onclick="updateUser(@user.UserId)" data-userId="@user.UserId"></i>
-//     <i class="fa-solid fa-trash-can text-danger cursor-pointer" data-bs-toggle="modal"
-//         title="Delete user" data-bs-target="#delete-user-modal"
-//         onclick="delteUserModal(@user.UserId, @user.RoleId)"></i>
-// }
-// else
-// {
-//     <i class="fa-solid @(user.IsActive ? "fa-circle-check text-green-50" : "fa-circle-xmark text-danger-50") me-3 fs-5 cursor-pointer"  title="You dont have permission to edit this user"></i>
-//     <i class="fa-solid fa-pen text-black-50 me-3 mt-2 cursor-pointer" title="You dont have permission to edit this user"></i>
-//     <i class="fa-solid fa-trash-can text-danger-50 cursor-pointer" title="You dont have permission to delete this user"></i>
-// }
-
 
 //when user click on update business button
 function updateBusiness(businessId) {
@@ -176,9 +185,9 @@ function updateBusiness(businessId) {
 }
 
 //function add user in business
-function addUserInBusiness(userId) {
+function addEditUserInBusiness(userId) {
+    emptyInputValidation('add-newuser-form-id');
     let businessId = $("#business-businessId").val();
-    console.log(businessId)
     let params = setParameter("/Business/GetuserDetailById", GET, null, FORM_URL, { businessId: businessId, userId: userId }, getUserByIdSuccess);
     $("body").addClass("loading");
     ajaxCall(params);
@@ -192,26 +201,33 @@ function getUserByIdSuccess(response) {
             let userdetail = response.result;
             $("#user-details-userId").val(userdetail.userId);
             $("#user-details-personalId").val(userdetail.personalDetailId == null ? 0 : userdetail.personalDetailId);
-            $("user-details-lastName").val(userdetail.lastName);
-            $("user-details-firstname").val(userdetail.firstName);
-            $("user-details-email").val(userdetail.email);
-            $("user-details-mobileNumber").val(userdetail.mobileNumber);
-            if (userdetail.userId != 0) {
-
-            } else {
-                document.getElementById("user-details-roleList").innerHTML = "";
-                userdetail.allRoles.forEach(element => {
-                    let innerHTML = "";
-                    innerHTML += `<div class="form-check me-2">
-                            <input class="form-check-input role-checkbox" type="checkbox" id="user-details-role-${element.roleId}"
+            $("#user-details-lastName").val(userdetail.lastName);
+            $("#user-details-firstName").val(userdetail.firstName);
+            $("#user-details-email").val(userdetail.email);
+            $("#user-details-mobileNumber").val(userdetail.mobileNumber == 0 ? "" : userdetail.mobileNumber);
+            document.getElementById("user-details-roleList").innerHTML = "";
+            userdetail.allRoles.forEach(element => {
+                let innerHTML = "";
+                innerHTML += `<div class="form-check me-2">
+                            <input class="form-check-input user-detail-role-checkbox" type="checkbox" id="user-details-role-${element.roleId}"
                                 data-roleId="${element.roleId}">
                             <label class="form-check-label" for="user-details-role-${element.roleId}">
                                 ${element.roleName}
                             </label>
                         </div>`
-                    document.getElementById("user-details-roleList").innerHTML += innerHTML;
-                })
+                document.getElementById("user-details-roleList").innerHTML += innerHTML;
+            })
+            if (userdetail.userId != 0) {
+                $("#user-details-email").prop("disabled", true);
+                let selectedRoles = []
+                for (j = 0; j < userdetail.roles.length; j++) {
+                    selectedRoles.push(userdetail.roles[j].roleId);
+                    $(`#user-details-role-${userdetail.roles[j].roleId}`).prop("checked", true);
+                }
+            } else {
+                $("#user-details-email").prop("disabled", false);
             }
+
         }
     } else {
         if (response.toasterMessage != null) {
@@ -220,13 +236,12 @@ function getUserByIdSuccess(response) {
     }
 }
 
-
 function saveUserDetails() {
     let isValidForm = validateSaveUserForm();
     console.log(isValidForm)
     if (isValidForm) {
         console.log("valid")
-        let roles = $(".role-checkbox");
+        let roles = $(".user-detail-role-checkbox");
         console.log(roles)
         let selectedRoles = [];
         for (i = 0; i < roles.length; i++) {
@@ -249,9 +264,9 @@ function saveUserDetails() {
         }
         let businessId = $("#business-businessId").val();
         let userDetailsViewModel = {
-            UserDetails : UserDetails,
-            SelectedRoles : selectedRoles,
-            BusinessId : businessId
+            UserDetails: UserDetails,
+            SelectedRoles: selectedRoles,
+            BusinessId: businessId
         }
         let params = setParameter("/Business/SaveUserDetails", POST, null, APPLICATION_JSON, JSON.stringify(userDetailsViewModel), saveUserDetailsSuccess);
         $("body").addClass("loading");
@@ -261,21 +276,118 @@ function saveUserDetails() {
     }
 }
 
-function saveUserDetailsSuccess(response){
+function saveUserDetailsSuccess(response) {
     console.log(response);
-    if(response.isSuccess){
-        if(response.toasterMessage != null){
+    if (response.isSuccess) {
+        if (response.toasterMessage != null) {
             Toaster(response.toasterMessage);
             $(".usermodal-close-btn").click();
             RemoveValidations();
             displayUserDetails();
         }
-    }else{
-        if(response.toasterMessage != null){
-            Toaster(response.toasterMessage,"error");
+    } else {
+        if (response.toasterMessage != null) {
+            Toaster(response.toasterMessage, "error");
             $(".usermodal-close-btn").click();
             $(".btn-close").click();
             RemoveValidations();
         }
     }
+}
+
+//delete user modal display
+function delteUserModal(userId) {
+    $("#delete-user-modal-userId").val(userId);
+}
+
+//delete user submit
+function deleteUser() {
+    let userId = $("#delete-user-modal-userId").val();
+    let businessId = $("#business-businessId").val();
+    let params = setParameter("/Business/DeleteUserFromBusiness", GET, null, FORM_URL, { userId: userId, businessId: businessId }, deleteUserSuccess);
+    console.log(params)
+    $("body").addClass("loading");
+    ajaxCall(params);
+    $("body").removeClass("loading");
+}
+
+function deleteUserSuccess(response) {
+    if (response.isSuccess) {
+        if (response.toasterMessage != null) {
+            Toaster(response.toasterMessage);
+        }
+    } else {
+        if (response.toasterMessage != null) {
+            Toaster(response.toasterMessage, "error");
+        }
+    }
+    $(".user-delete-modal-close-btn").click();
+    displayUserDetails();
+}
+
+function toggleActive(userId) {
+    let userActiveIcon = document.getElementById(`active-user-${userId}`);
+    if (userActiveIcon.classList.contains("fa-circle-check")) {
+        let modalbody = document.getElementById("inactive-user-modal").innerHTML.toString().replace("{{status}}", "Inactive").replace("{{statusbody}}", "inactivate");
+        document.getElementById("inactive-user-modal").innerHTML = modalbody
+    } else {
+        let modalbody = document.getElementById("inactive-user-modal").innerHTML.toString().replace("{{status}}", "Active").replace("{{statusbody}}", "activate");
+        document.getElementById("inactive-user-modal").innerHTML = modalbody
+    }
+    $("#userId-active").val(userId);
+}
+
+function ActiveInactiveUser() {
+    $("body").addClass("loading");
+    let userId = $("#userId-active").val()
+    let businessId = $("#business-businessId").val();
+    console.log(userId)
+    let isActive = document.getElementById(`active-user-${userId}`).classList.contains("fa-circle-check") ? false : true
+    let params = setParameter("/Business/ActiveInactiveUser", GET, null, FORM_URL, { userId: userId, isActive: isActive, businessId: businessId }, activeInactiveUserSuccess);
+    console.log(params)
+    $("body").addClass("loading");
+    ajaxCall(params);
+    $("body").removeClass("loading");
+}
+
+function activeInactiveUserSuccess(response) {
+    if (response.isSuccess) {
+        if (response.toasterMessage != null) {
+            Toaster(response.toasterMessage);
+        }
+    } else {
+        if (response.toasterMessage != null) {
+            Toaster(response.toasterMessage, "error");
+        }
+    }
+    displayUserDetails();
+    $(".user-inactive-modal-close-btn").click();
+
+}
+
+function deleteBusinessmodal(businessId) {
+    $("#businessId-delete").val(businessId);
+}
+
+//delete business submit
+function deleteBusinessYes() {
+    let businessId = $("#businessId-delete").val();
+    let params = setParameter("/Business/DeleteBusiness", POST, null, FORM_URL, { businessId: businessId }, deleteBusinessSuccess);
+    $("body").addClass("loading");
+    ajaxCall(params);
+    $("body").removeClass("loading");
+}
+
+function deleteBusinessSuccess(response) {
+    if (response.isSuccess) {
+        if (response.toasterMessage != null) {
+            Toaster(response.message);
+        }
+    } else {
+        if (response.toasterMessage != null) {
+            Toaster(response.message, "error");
+        }
+    }
+    $(".btn-close").click();
+    displayBusinessCards();
 }

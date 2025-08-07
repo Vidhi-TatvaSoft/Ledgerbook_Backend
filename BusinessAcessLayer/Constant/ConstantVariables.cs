@@ -3,7 +3,7 @@ namespace BusinessAcessLayer.Constant;
 
 public class ConstantVariables
 {
-    public static string BasicPassword = "Vvv@123";
+    public static string BasicPassword = "Vvv@1234";
 
     public static string SmtpServer = "mail.etatvasoft.com";
 

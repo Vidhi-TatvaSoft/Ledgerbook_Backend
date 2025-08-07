@@ -10,10 +10,12 @@ public interface IBusinessService
     Task<ApiResponse<BusinessItem>> SaveBusiness(BusinessItem businessItem, int userId);
     ApiResponse<BusinessItem> GetBusinessItemById(int? businessId);
     Businesses GetBusinessFromToken(string token);
-    Task<bool> DeleteBusiness(int businessId, int userId);
+    Task<ApiResponse<string>> DeleteBusiness(int businessId, int userId);
     string GetBusinessNameById(int businessId);
     List<BusinessViewModel> GetAllBusinesses(int userId);
     Task<ApiResponse<List<UserViewmodel>>> GetUsersOfBusiness(int businessId, int userId);
     Task<ApiResponse<UserViewmodel>> GetUserById(int businessId, int curentUserId, int? userId);
     Task<ApiResponse<List<UserViewmodel>>> SaveUserDetails(UserViewmodel userViewmodel, List<int> selectedRole, int businessId, int userId);
+    Task<ApiResponse<string>> DeleteUserFromBusiness(int userId, int businessId, ApplicationUser logedinUser);
+    Task<ApiResponse<string>> ActiveInactiveUser(int userId, bool isActive, int businessId, ApplicationUser logedinUser);
 }

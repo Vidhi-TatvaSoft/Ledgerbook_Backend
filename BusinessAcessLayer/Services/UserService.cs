@@ -57,22 +57,31 @@ public class UserService : IUserService
 
     public async Task<int> SaveUser(UserViewmodel userViewmodel)
     {
-        ApplicationUser user = new();
-        user.FirstName = userViewmodel.FirstName;
-        user.LastName = userViewmodel.LastName;
-        user.Email = userViewmodel.Email;
-        user.UserName = userViewmodel.Email;
-        user.PhoneNumber = userViewmodel.MobileNumber.ToString();
-        user.IsUserRegistered = false;
-        user.CreatedAt = DateTime.UtcNow;
-        userViewmodel.Pasword = ConstantVariables.BasicPassword;
-        IdentityResult result = await _userManager.CreateAsync(user, userViewmodel.Pasword);
-
-        if (result.Succeeded)
+        try
         {
-            return user.Id;
+            ApplicationUser user = new();
+            user.FirstName = userViewmodel.FirstName;
+            user.LastName = userViewmodel.LastName;
+            user.Email = userViewmodel.Email;
+            user.UserName = userViewmodel.Email;
+            user.PhoneNumber = userViewmodel.MobileNumber.ToString();
+            user.IsUserRegistered = false;
+            user.CreatedAt = DateTime.UtcNow;
+            user.IsEmailVerified = false;
+            userViewmodel.Pasword = ConstantVariables.BasicPassword;
+            IdentityResult result = await _userManager.CreateAsync(user, userViewmodel.Pasword);
+
+            if (result.Succeeded)
+            {
+                return user.Id;
+            }
+            return 0;
         }
-        return 0;
+        catch (Exception e)
+        {
+            return 0;
+        }
+        
     }
 
     public UserViewmodel GetuserById(int userId, int businessId)
