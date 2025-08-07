@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@using LedgerBook.Constant
+@using Microsoft.AspNetCore.Authorization
+@inject Microsoft.AspNetCore.Authorization.IAuthorizationService AuthorizationService;
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor;
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -24,39 +28,226 @@
 </head>
 
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">LedgerBook</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
-                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home"
-                                asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+    <div class="overlay"></div>
+    <div class="container-fluid">
+        <div class="row">
+
+            <!-- rightside  -->
+            <div class="right-side-main-div ">
+                <div class="row ">
+                    <!-- navbar -->
+
+                    <div class="header-line bg-color d-flex shadow justify-content-between align-items-center"
+                        style="z-index: 6; height: 70px;">
+                        <div class="left-elements d-flex">
+                            <div class="d-sm-block d-none"></div>
+                            <div class="left-elements d-flex">
+                                <!-- toggele btn -->
+                                <button class="btn d-sm-none" type="button" data-bs-toggle="offcanvas"
+                                    data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling">
+                                    <i class="fa-regular fa-square-caret-down"></i></button>
+
+
+                                <!-- offcanvas -->
+                                <div class="offcanvas d-sm-none offcanvas-start offcanvas-class bg-color"
+                                    data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasScrolling"
+                                    aria-labelledby="offcanvasScrollingLabel">
+                                    <div class="offcanvas-header">
+
+                                        <h5 class="offcanvas-title" id="offcanvasExampleLabel">Offcanvas</h5>
+                                        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="offcanvas-body">
+                                        <div class="navbar-nav sidebar-options-menu  d-flex flex-column ">
+
+                                            <!-- dashboard -->
+                                            <div class=" d-flex ps-3 @((ViewData["sidebar-active"] as string) == "Dashboard" ? "active-div" : "")"
+                                                style="text-decoration: none;" asp-action="Dashboard"
+                                                asp-controller="User">
+                                                @* <img src="~/images/dashboard-default.svg" width="20px" class=" " alt> *@
+                                                <p class="dashboard-text-active text-size-set mt-3 ms-3 fs-6">Dashboard
+                                                </p>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- logo text-->
+                            <div class="logo-main-div d-flex  mt-2 mb-2 ">
+                                <a asp-action="Index" asp-controller="Business" title="Go back">
+                                    <div class="logo-image me-2 d-flex">
+                                        <img src="~/images/logo.jpg" width="50px" style="border-radius: 50%;">
+
+                                    </div>
+                                </a>
+                                <div class="logo-text text-white fs-3 mt-2 fw-bold d-none d-sm-block">Ledgerbook
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        <!-- profile -->
+                        <div class="profilepic-div d-flex  mt-2 mb-2 ">
+
+                            <!-- profile-->
+                            <div class="dropdown mt-1">
+                                <div class=" dropdown-toggle cursor-pointer" type="button" id="dropdownMenuButton1"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span
+                                        class="text-white fs-5 fw-bold me-1" id="layout-userName">@HttpContextAccessor.HttpContext.Request.Cookies["userName"]</span>
+                                    <img  id="layout-profilePhoto"
+                                        style="border-radius: 50%;" width="40px" height="35px" alt="">
+                                </div>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+
+                                    <li><a class="dropdown-item text-dark cursor-pointer" asp-action="Profile"
+                                            asp-controller="User" style="text-decoration: none;">My
+                                            Profile</a></li>
+                                    <li><a class="dropdown-item text-dark cursor-pointer" data-bs-toggle="modal"
+                                            data-bs-target="#change-password-modal" onclick="changePasswordModal()"
+                                            style="text-decoration: none;">Change
+                                            Password</a>
+                                    </li>
+                                    <li><a class="dropdown-item cursor-pointer" asp-action="ActivityLog"
+                                            asp-controller="ActivityLog">Activity Logs</a></li>
+                                    <li><a class="dropdown-item text-dark" asp-action="Index" asp-controller="Business"
+                                            style="text-decoration: none;">Go Back</a>
+                                    </li>
+                                    <li><a class="dropdown-item text-dark cursor-pointer" data-bs-toggle="modal"
+                                            data-bs-target="#logout-modal" style="text-decoration: none;">Logout</a>
+                                    </li>
+
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container-fluid p-0 row" style="height: calc(100vh - 70px);">
+                        <div
+                            class="left-sidebar-main-div pt-0 col-sm-4 col-md-3 col-lg-3 col-xl-2 col-4 bg-color d-none d-sm-flex justify-content-start ps-3 border">
+
+                            <div class="row vw-100">
+                                <div class="p-0 d-flex flex-column">
+                                    <!-- logo -->
+                                    <div class="d-none" id="ListOfAllBusiness">
+                                        @(HttpContextAccessor.HttpContext.Request.Cookies[TokenKey.AllBusinesses])</div>
+                                    <div class="d-none" id="currentBusinessId">
+                                        @(HttpContextAccessor.HttpContext.Request.Cookies[TokenKey.BusinessId])</div>
+                                    <!-- business dropdown-->
+                                    <div
+                                        class=" fs-5 fw-bold  sidebar-menu-parent text-color btn-light text-center position-relative">
+                                        <select id="businessNameDropdown" onclick="click()" title="Select business"
+                                            class="form-control h-100 w-100 fs-5 fw-bold business-label sidebar-menu-parent text-color btn-light text-center  cursor-pointer"></select>
+                                        <i id="businessNameDropDownIcon"
+                                            class="fa-solid fa-caret-down position-absolute translate-middle-y fs-4 me-3 cursor-pointer "
+                                            onclick="openDropDown()" style="top:48%; right :0px;"></i>
+                                    </div>
+
+                                    <div class="fs-5 fw-bold sidebar-menu-parent">
+                                        <a class=" d-flex sidebar-menu-item @((ViewData["sidebar"] as string) == "Dashboard" ? "sidebar-active-div" : "")"
+                                            asp-action="Dashboard" asp-controller="Dashboard"
+                                            style="text-decoration: none;" style="max-width: 210px;">
+                                            <i class="fa-solid fa-table-cells-large text-white mt-1 ms-1 position-absolute"
+                                                style="margin-left: 7px !important;"></i>
+                                            <span
+                                                class="text-white fs-4 font-weight-100 ms-2 sidebar-menu-item-slash">|</span>
+                                            <div class="dashboard-text-active text-size-set ms-2 fs-5 fw-bold text-truncate text-white sidebar-menu-item-text"
+                                                title="Dashboard">Dashboard</div>
+                                        </a>
+                                    </div>
+
+                                    <!-- 0sidebar -->
+                                    @* @if ((await AuthorizationService.AuthorizeAsync(User, "SalesManager")).Succeeded)
+                                    { *@
+                                        <div class="fs-5 fw-bold sidebar-menu-parent">
+                                            <a class=" d-flex sidebar-menu-item @((ViewData["sidebar"] as string) == "Customer" ? "sidebar-active-div" : "")"
+                                                asp-action="DisplayCustomers" asp-controller="Party"
+                                                style="text-decoration: none;" style="max-width: 210px;">
+                                                <i class="fa-solid fa-user text-white mt-1 ms-1 position-absolute"
+                                                    style="margin-left: 8px !important;"></i>
+                                                <span
+                                                    class="text-white fs-4 font-weight-100 ms-2 sidebar-menu-item-slash">|</span>
+                                                <div class="dashboard-text-active text-size-set ms-2 fs-5 fw-bold text-truncate text-white sidebar-menu-item-text"
+                                                    title="Customers">Customers</div>
+                                            </a>
+                                        </div>
+
+                                    @* }
+                                    @if ((await AuthorizationService.AuthorizeAsync(User, "PurchaseManager")).Succeeded)
+                                    { *@
+                                        <div class="fs-5 fw-bold sidebar-menu-parent">
+                                            <a class=" d-flex sidebar-menu-item @((ViewData["sidebar"] as string) == "Supplier" ? "sidebar-active-div" : "")"
+                                                asp-action="DisplaySuppliers" asp-controller="Party"
+                                                style="text-decoration: none;" style="max-width: 210px;">
+                                                <i class="fa-solid fa-truck text-white mt-1 position-absolute"
+                                                    style="margin-left: 2px !important;"></i>
+                                                <span
+                                                    class="text-white fs-4 font-weight-100 ms-2 sidebar-menu-item-slash">|</span>
+                                                <div class="dashboard-text-active text-size-set ms-2 fs-5 fw-bold text-truncate text-white sidebar-menu-item-text"
+                                                    title="Suppliers">Suppliers</div>
+                                            </a>
+                                        </div>
+                                    @* } *@
+
+                                    <div class="fs-5 fw-bold sidebar-menu-parent">
+                                        <a class=" d-flex sidebar-menu-item @((ViewData["sidebar"] as string) == "Reports" ? "sidebar-active-div" : "")"
+                                            asp-action="Reports" asp-controller="Reports" style="text-decoration: none;"
+                                            style="max-width: 210px;">
+                                            <i class="fa-solid fa-clipboard-list text-white mt-1 position-absolute"
+                                                style="margin-left: 8px !important;"></i>
+                                            <span
+                                                class="text-white fs-4 font-weight-100 ms-3 sidebar-menu-item-slash">|</span>
+                                            <div class="dashboard-text-active text-size-set ms-2 fs-5 fw-bold text-truncate text-white sidebar-menu-item-text"
+                                                title="Reports">Reports</div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="right-side-main-div col-sm-8 col-md-9 col-lg-9 col-xl-10 col-12">
+                            <div class="row p-0">
+                                @RenderBody()
+                            </div>
+                        </div>
+
+
+                    </div>
                 </div>
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+        </div>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - LedgerBook - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+
+    <div id="logout-modal" class="modal fade" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal-header">Logout Confirmation</h5>
+                    <button type="button" class="btn-close userdetail-confirmation-modal-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body ">
+                    <div class="delete-cat-image d-flex flex-column  align-items-center">
+                        <p>Are you sure you want to Logout?</p>
+                    </div>
+                </div>
+                <div class="modal-footer d-flex justify-content-center">
+                    <a type="submit" asp-action="Logout" asp-controller="Login" class="btn btn-primary">Yes</a>
+                    <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">No</button>
+                </div>
+            </div>
         </div>
-    </footer>
+    </div>
+
+    <div id="change-password-modal" class="modal fade" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered" id="changepassword-body-id">
+
+        </div>
+    </div>
+
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -75,5 +266,18 @@
     <partial name="_Toaster" />
     @await RenderSectionAsync("Scripts", required: false)
 </body>
+<script>
+    function SetuserNameImage() {
+        let userName = getCookie(User_Name);
+        let profilePhoto = getCookie(Profile_Photo) == "" ? "/images/user.png" : BASE_URL.replace("api", getCookie(Profile_Photo));
+        $("#layout-userName").html(userName);
+        $("#layout-profilePhoto").attr("src", profilePhoto);
+    }
+
+    $(document).ready(function () {
+        SetuserNameImage();
+    });
+
+</script>
 
 </html>

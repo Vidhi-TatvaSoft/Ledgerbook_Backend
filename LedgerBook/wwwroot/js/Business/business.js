@@ -396,3 +396,7 @@ function deleteBusinessSuccess(response) {
 function closeBusinessModal() {
     $("#add-business-modal").modal("hide");
 }
+
+function ManageBusinessDetails(businessId){
+    window.location = "/Dashboard/Dashboard"
+}

@@ -498,6 +498,7 @@
             $(document).on('hidden.bs.modal', "#add-business-modal", function (e) {
                 $("#business-businessId").val("")
                 emptyInputValidation("business-details-form-id")
+                $("#user-details-confirmation-modal").modal("hide")
                 displayBusinessCards()
             })
         })

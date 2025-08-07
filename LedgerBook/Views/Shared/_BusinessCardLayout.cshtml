@@ -215,13 +215,6 @@
 
     $(document).ready(function () {
         SetuserNameImage();
-
-        // 2. Global AJAX error catcher
-        $(document).ajaxComplete(function (event, xhr, settings) {
-            AjaxComplete(event, xhr, settings);
-        });
-
-        $(document)
     });
 
     function AjaxResponseHandle(response) {
