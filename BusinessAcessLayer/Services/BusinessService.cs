@@ -190,7 +190,7 @@ public class BusinessService : IBusinessService
             else
             {
                 Businesses updateBusiness = _genericRepository.Get<Businesses>(b => b.Id == businessItem.BusinessId && b.DeletedAt == null)!;
-                if (updateBusiness != null && updateBusiness.LogoAttachmentId != 0)
+                if (updateBusiness != null && (updateBusiness.LogoAttachmentId != null))
                 {
                     AttachmentViewModel attachmentViewModel = _attachmentService.GetAttachmentById((int)updateBusiness.LogoAttachmentId);
                     businessItem.BusinessLogoAttachment = attachmentViewModel;
@@ -320,6 +320,7 @@ public class BusinessService : IBusinessService
             {
                 string message = string.Format(Messages.BusinessActivity, "Business", "created", userName);
                 await _activityLogService.SetActivityLog(message, EnumHelper.Actiontype.Add, EnumHelper.ActivityEntityType.Business, businessId, userId);
+                businessItem.BusinessId = businessId;
                 return new ApiResponse<BusinessItem>(true, string.Format(Messages.GlobalAddUpdateMesage, "Business", "added"), businessItem, HttpStatusCode.OK);
             }
             else

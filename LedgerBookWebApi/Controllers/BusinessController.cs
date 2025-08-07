@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using BusinessAcessLayer.Interface;
 using DataAccessLayer.Models;
 using DataAccessLayer.ViewModels;
+using LedgerBook.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -29,7 +30,7 @@ public class BusinessController : BaseController
     {
         ApplicationUser user = GetCurrentUserIdentity();
         if (user == null)
-            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Forbidden));
+            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Unauthorized));
         return Ok(_businessService.GetRolewiseBusiness(user.Id, searchText));
     }
     #endregion
@@ -40,7 +41,7 @@ public class BusinessController : BaseController
     {
         ApplicationUser user = GetCurrentUserIdentity();
         if (user == null)
-            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Forbidden));
+            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Unauthorized));
         return Ok(_businessService.GetBusinessItemById(businessId));
     }
 
@@ -51,7 +52,7 @@ public class BusinessController : BaseController
         // return Ok(false);
         ApplicationUser user = GetCurrentUserIdentity();
         if (user == null)
-            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Forbidden));
+            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Unauthorized));
         return Ok(await _businessService.SaveBusiness(businessItem, user.Id));
     }
 
@@ -61,7 +62,7 @@ public class BusinessController : BaseController
     {
         ApplicationUser user = GetCurrentUserIdentity();
         if (user == null)
-            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Forbidden));
+            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Unauthorized));
         return Ok(await _businessService.GetUsersOfBusiness(businessId, user.Id));
     }
 
@@ -71,7 +72,7 @@ public class BusinessController : BaseController
     {
         ApplicationUser user = GetCurrentUserIdentity();
         if (user == null)
-            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Forbidden));
+            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Unauthorized));
         return Ok(await _businessService.GetUserById(businessId, user.Id, userId));
     }
 
@@ -81,7 +82,7 @@ public class BusinessController : BaseController
     {
         ApplicationUser user = GetCurrentUserIdentity();
         if (user == null)
-            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Forbidden));
+            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Unauthorized));
         if (!ModelState.IsValid)
         {
             return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.BadRequest));
@@ -96,7 +97,7 @@ public class BusinessController : BaseController
     {
         ApplicationUser user = GetCurrentUserIdentity();
         if (user == null)
-            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Forbidden));
+            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Unauthorized));
         return Ok(await _businessService.DeleteUserFromBusiness(userId, businessId, user));
     }
     #endregion
@@ -108,7 +109,7 @@ public class BusinessController : BaseController
     {
         ApplicationUser user = GetCurrentUserIdentity();
         if (user == null)
-            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Forbidden));
+            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Unauthorized));
         return Ok(await _businessService.ActiveInactiveUser(userId, isActive, businessId, user));
     }
     #endregion
@@ -120,7 +121,7 @@ public class BusinessController : BaseController
     {
         ApplicationUser user = GetCurrentUserIdentity();
         if (user == null)
-            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Forbidden));
+            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Unauthorized));
         return Ok(await _businessService.DeleteBusiness(businessId, user.Id));
     }
     #endregion

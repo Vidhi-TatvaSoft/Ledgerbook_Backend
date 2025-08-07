@@ -31,7 +31,7 @@ public class UserController : BaseController
     {
         ApplicationUser user = GetCurrentUserIdentity();
         if (user == null)
-            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Forbidden));
+            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Unauthorized));
         UserProfileViewModel userProfileViewModel = _userService.GetUserProfile(user.Id);
         return Ok(new ApiResponse<UserProfileViewModel>(true, null, userProfileViewModel, HttpStatusCode.OK));
     }
@@ -42,7 +42,7 @@ public class UserController : BaseController
     {
         ApplicationUser user = GetCurrentUserIdentity();
         if (user == null)
-            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Forbidden));
+            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Unauthorized));
         if (!ModelState.IsValid)
         {
             return Ok(new ApiResponse<string>(false, Messages.InvalidCredentilMessage, null, HttpStatusCode.BadRequest));
@@ -64,7 +64,7 @@ public class UserController : BaseController
     {
         ApplicationUser user = GetCurrentUserIdentity();
         if (user == null)
-            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Forbidden));
+            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Unauthorized));
         if (!ModelState.IsValid)
         {
             return Ok(new ApiResponse<string>(false, Messages.InvalidCredentilMessage, null, HttpStatusCode.BadRequest));

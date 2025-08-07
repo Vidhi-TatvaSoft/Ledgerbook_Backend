@@ -31,28 +31,21 @@ public class PermissionHandler : AuthorizationHandler<PermissionRequirement>
     protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, PermissionRequirement requirement)
     {
         HttpContext httpContext = _httpContextAccessor.HttpContext;
-        string cookieSavedToken = httpContext.Request.Cookies[TokenKey.UserToken];
+        string cookieSavedToken = httpContext.Request.Headers[TokenKey.UserToken];
 
+        if (string.IsNullOrEmpty(cookieSavedToken))
+        {
+            throw new UnauthorizedAccessException();
+            // throw new Exception("User token not Found");
+            // context.Result
+        }
         ApplicationUser user = _loginService.GetUserFromTokenIdentity(cookieSavedToken);
-        if (string.IsNullOrEmpty(cookieSavedToken))
-        {
-            throw new Exception("User token not Found");
-        }
-        if (string.IsNullOrEmpty(cookieSavedToken))
-        {
-            httpContext.Response.Redirect("/Login/Login");
-            return Task.CompletedTask;
-        }
 
-        string businessToken = httpContext.Request.Cookies[TokenKey.BusinessToken];
+        string businessToken = httpContext.Request.Headers[TokenKey.BusinessToken];
         if (string.IsNullOrEmpty(businessToken))
         {
-            throw new Exception("Business token not Found");
-        }
-        if (string.IsNullOrEmpty(businessToken))
-        {
-            httpContext.Response.Redirect("/Business/Index");
-            return Task.CompletedTask;
+            throw new UnauthorizedAccessException();
+            // throw new Exception("Business token not Found");
         }
         Businesses business = _businessService.GetBusinessFromToken(businessToken);
         List<RoleViewModel> rolesByUser = _userBusinessMappingService.GetRolesByBusinessId(business.Id, user.Id);

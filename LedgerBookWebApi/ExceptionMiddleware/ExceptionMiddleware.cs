@@ -44,6 +44,7 @@ public class ExceptionMiddleware
         {
             400 => HttpStatusCode.BadRequest,
             401 => HttpStatusCode.Unauthorized,
+            403 => HttpStatusCode.Forbidden,
             404 => HttpStatusCode.NotFound,
             500 => HttpStatusCode.InternalServerError,
             _ => HttpStatusCode.InternalServerError

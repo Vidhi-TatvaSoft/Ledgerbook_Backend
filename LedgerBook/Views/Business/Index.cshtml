@@ -14,7 +14,8 @@
                 <span class="text-color fs-6 fw-bold btn text-nowrap btn-primary mt-3 cursor-pointer "
                     style="height:35px; width:100% !important;" data-toggle="tooltip" data-placement="top"
                     title="Add business" data-bs-toggle="modal" data-bs-target="#add-business-modal"
-                    onclick="displayBusinessDetails()">Add Business</span>
+                    onclick="emptyInputValidation('business-details-form-id');displayBusinessDetails()">Add
+                    Business</span>
             </span>
         </div>
 
@@ -37,7 +38,8 @@
         <div class="modal-content bg-light shadow-lg border-2">
             <div class="modal-header">
                 <h5 class="modal-title" id="add-user-modal-title">Add User</h5>
-                <button type="button" class="btn-close usermodal-close-btn" onclick="emptyInputValidation('add-newuser-form-id')" data-bs-dismiss="modal"
+                <button type="button" class="btn-close usermodal-close-btn"
+                    onclick="emptyInputValidation('add-newuser-form-id')" data-bs-dismiss="modal"
                     aria-label="Close"></button>
             </div>
             <form id="add-newuser-form-id">
@@ -56,7 +58,7 @@
                     <div class="col-md-6 col-lg-6 col-xl-6 col-sm-12 col-12 mt-3">
                         <div class="form-floating ">
                             <input type="text" oninput="RemoveWhiteSpace(this);nameValidation(this,'Last')"
-                                onblur="nameValidation(this,'First')" id="user-details-lastName" class="form-control"
+                                onblur="nameValidation(this,'Last')" id="user-details-lastName" class="form-control"
                                 placeholder="Last Name*">
                             <label for="user-details-lastName" class="fs-6 text-secondary">Last Name*</label>
                             <span class="text-danger LastNameValidationMessage validationMessage"></span>
@@ -91,7 +93,8 @@
 
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">Save</button>
-                    <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal" onclick="emptyInputValidation('add-newuser-form-id')">Cancel</button>
+                    <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal"
+                        onclick="emptyInputValidation('add-newuser-form-id')">Cancel</button>
                 </div>
             </form>
         </div>
@@ -103,8 +106,8 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="modal-header">Add User Confirmation</h5>
-                <button type="button" class="btn-close userdetail-confirmation-modal-close" data-bs-dismiss="modal" 
-                    aria-label="Close" ></button>
+                <button type="button" class="btn-close userdetail-confirmation-modal-close" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
             </div>
             <div class="modal-body ">
                 <div class="delete-cat-image d-flex flex-column  align-items-center">
@@ -125,7 +128,7 @@
     <div class="modal-content">
         <div class="modal-header">
             <h5 class="modal-title" id="add-business-modal-header">Add Business</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="emptyInputValidation('business-details-form-id')"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <form id="business-details-form-id">
             <div class="modal-body p-0 ps-3 pb-3 " style="min-height: 500px;">
@@ -277,11 +280,10 @@
                 </div>
             </div>
             <div class="modal-footer d-flex justify-content-center">
-                <button type="submit" class="btn btn-primary" id="temp-id" onclick="saveBusinessDetails()">Save</button>
-                <button type="submit" class="btn btn-primary" id="saveclose-id" onclick="SaveAndCloseBusiness()">Save &
-                    Close</button>
-                <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal" 
-                    onclick="emptyInputValidation('business-details-form-id');displayBusinessCards()">Close</button>
+                <button type="submit" class="btn btn-primary" id="temp-id"
+                    onclick="saveBusinessDetails(false)">Save</button>
+                <button type="submit" class="btn btn-primary" id="saveclose-id" onclick="saveBusinessDetails(true)">Save & Close</button>
+                <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Close</button>
             </div>
         </form>
     </div>
@@ -291,8 +293,7 @@
     <div class="modal-content">
         <div class="modal-header">
             <h5 class="modal-title" id="modal-header">Update Business</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-                onclick="emptyInputValidation('business-details-form-id');displayBusinessCards()"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" button>
         </div>
         <div class="modal-body p-0 ps-3  " style="min-height: 500px;">
             <div class="row " style="min-height: 500px;">
@@ -331,10 +332,11 @@
             </div>
         </div>
         <div class="modal-footer d-flex justify-content-center">
-            <a type="submit" class="btn btn-primary" onclick="closeModal()">Save</a>
-            <a type="submit" class="btn btn-primary" onclick="closeModal()">Save & Close</a>
+            <a type="submit" class="btn btn-primary" data-bs-dismiss="modal">Save</a>
+            <a type="submit"  class="btn btn-primary" onclick="closeBusinessModal()">Save &
+                Close</a>
             <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal"
-                onclick="emptyInputValidation('business-details-form-id');displayBusinessCards()">Close</button>
+                onclick="displayBusinessCards()">Close</button>
         </div>
     </div>
 </div>
@@ -344,7 +346,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="add-user-modal-title">Delete User Confirmation</h5>
-                <button type="button" class="btn-close user-delete-modal-close-btn" data-bs-dismiss="modal" 
+                <button type="button" class="btn-close user-delete-modal-close-btn" data-bs-dismiss="modal"
                     aria-label="Close"></button>
             </div>
             <div class="modal-body ">
@@ -413,7 +415,6 @@
             $("body").addClass("loading");
             let params = setParameter("/Business/GetBusinesses", GET, null, FORM_URL, { searchText }, getBusinessesSuccess);
             ajaxCall(params);
-            $("body").removeClass("loading");
         }
 
         //debounce function for search business
@@ -430,7 +431,6 @@
         }
 
         const handleSearch = (event) => {
-            console.log('Searching for:', event.target.value);
             let searchText = event.target.value;
             displayBusinessCards(searchText)
         };
@@ -453,9 +453,9 @@
 
                     reader.onload = function (e) {
                         $('#add-business-uploadedimage').attr('src', e.target.result).width(50).height(50);
+                        console.log("readurl",document.getElementById("add-business-uploadedimage"))
                         document.getElementById("add-business-uploadedimage").classList.remove("d-none")
-                        @* document.getElementById("cloud-icon").classList.add("d-none") *@
-                                                                                };
+                    };
                     reader.readAsDataURL(input.files[0]);
                 }
                 return;
@@ -468,6 +468,7 @@
         function removeOpacity() {
             let classname = document.getElementsByClassName("uploadedimage-class-business")[0].getAttribute('src')
             if (classname != "#") {
+                console.log("opar",document.getElementsByClassName("image-overlay")[0])
                 document.getElementsByClassName("image-overlay")[0].classList.remove("opacity-class")
             }
         }
@@ -475,6 +476,7 @@
         function addOpacity() {
             let classname = document.getElementsByClassName("uploadedimage-class-business")[0].getAttribute('src')
             if (classname != "#") {
+                console.log("addo",document.getElementsByClassName("image-overlay")[0])
                 document.getElementsByClassName("image-overlay")[0].classList.add("opacity-class")
             }
         }
@@ -492,6 +494,12 @@
                 e.preventDefault();
                 saveUserDetails();
             })
+
+            $(document).on('hidden.bs.modal', "#add-business-modal", function (e) {
+                $("#business-businessId").val("")
+                emptyInputValidation("business-details-form-id")
+                displayBusinessCards()
+            })
         })
 
 
@@ -500,24 +508,32 @@
     <script>
         //add business modal display business details
         function displayBusinessDetails() {
+            emptyInputValidation("business-details-form-id");
+            emptyInputValidation("add-newuser-form-id");
             $("#businessdetail-modal-body").html($("#add-business-body-content").html())
             let businessId = $("#business-businessId").val() == "" ? 0 : $("#business-businessId").val();
+
+            if (businessId != 0) {
+                $("#add-business-modal-header").html("Update Business")
+                $("#user-details-btn").removeClass("d-none")
+            }
             let params = setParameter("/Business/GetBusinessDetails", GET, null, FORM_URL, { businessId }, getBusinessByIdSuccess);
             $("body").addClass("loading");
             ajaxCall(params);
-            $("body").removeClass("loading");
+
         }
 
         function displayUserDetails() {
+            emptyInputValidation("business-details-form-id");
+            emptyInputValidation("add-newuser-form-id");
             $("#businessdetail-modal-body").html($("#user-details-body-content").html())
             let businessId = $("#business-businessId").val() == "" ? 0 : $("#business-businessId").val();
             let params = setParameter("/Business/GetAllUsersOfBusiness", GET, null, FORM_URL, { businessId }, getAllUserDetailsSuccess);
             $("body").addClass("loading");
             ajaxCall(params);
-            $("body").removeClass("loading");
         }
 
-        function saveBusinessDetails() {
+        function saveBusinessDetails(close) {
             let isValidForm = validateSaveBusinessForm();
             if (isValidForm) {
                 let formData = new FormData();
@@ -534,24 +550,18 @@
                 formData.append("Pincode", $("#business-pincode").val())
                 const fileInput = document.getElementById("business-image");
                 const file = fileInput.files[0];
-                console.log(file)
                 if (file) {
                     formData.append("BusinessLogoIForm", file)
-                    @* const reader = new FileReader();
-                    reader.onload = function (e) {
-                        formData.append("BusinessLogoIForm", file)
-                    };
-                    reader.readAsDataURL(file); *@
-                                    }
+                }
                 let params = setParameter("/Business/SaveBusiness", POST, null, FORMDATA, formData, SaveBusinessSuccess);
-                console.log(params)
+                $("body").addClass("loading");
                 ajaxCall(params);
-
+            }
+            if(close){
+                @* $(".btn-close").click(); *@
+                $("#add-business-modal").modal("hide");
             }
         }
-
-
-
 
     </script>
 }

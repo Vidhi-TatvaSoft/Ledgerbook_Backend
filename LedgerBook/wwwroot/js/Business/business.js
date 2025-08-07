@@ -1,5 +1,4 @@
 function getBusinessesSuccess(response) {
-    console.log(response)
     if (response.isSuccess) {
         if (response.result.length == 0) {
             document.getElementById("businss-cards").innerHTML = `<div class="d-flex flex-column justify-content-center align-items-center fs-1 text-secondary mt-4 ">
@@ -55,59 +54,74 @@ function getBusinessesSuccess(response) {
 }
 
 function getBusinessByIdSuccess(response) {
-    console.log(response);
-    if (response.result.businessCategories != null && response.result.businessTypes != null) {
-        let categories = "";
-        response.result.businessCategories.forEach(element => {
-            let option = `<option value="business-category-${element.id}"> ${element.entityValue}</option> `
-            categories += option
-        })
-        let types = "";
-        response.result.businessTypes.forEach(element => {
-            let option = `<option value="business-type-${element.id}"> ${element.entityValue}</option> `
-            types += option
-        })
-        $("#business-categories").html(categories)
-        $("#business-types").html(types)
-    }
-    if (response.isSuccess) {
-        if (response.result != null) {
-            let business = response.result;
-            $("#business-businessId").val(business.businessId);
-            $("#business-businessName").val(business.businessName);
-            $("#business-mobileNumber").val(business.mobileNumber);
-            $("#business-addressLine1").val(business.addressLine1);
-            $("#business-addressLine2").val(business.addressLine2);
-            $("#business-city").val(business.city);
-            $("#business-pincode").val(business.pincode);
-            $("#business-GSTIN").val(business.gSTIN);
-            if (business.isActive) {
-                $("#business-isActive").attr("checked", "checked")
-            } else {
-                $("#business-isActive").removeAttr("checked")
-            }
+    if (response.result != null) {
+        if (response.result.businessCategories != null && response.result.businessTypes != null) {
+            let categories = "";
+            response.result.businessCategories.forEach(element => {
+                let option = `<option value="business-category-${element.id}"> ${element.entityValue}</option> `
+                categories += option
+            })
+            let types = "";
+            response.result.businessTypes.forEach(element => {
+                let option = `<option value="business-type-${element.id}"> ${element.entityValue}</option> `
+                types += option
+            })
+            $("#business-categories").html(categories)
+            $("#business-types").html(types)
+        }
+        let business = response.result;
+        $("#business-businessId").val(business.businessId);
+        $("#business-businessName").val(business.businessName);
+        $("#business-mobileNumber").val(business.mobileNumber == 0 ? "" : business.mobileNumber);
+        $("#business-addressLine1").val(business.addressLine1);
+        $("#business-addressLine2").val(business.addressLine2);
+        $("#business-city").val(business.city);
+        $("#business-pincode").val(business.pincode);
+        $("#business-GSTIN").val(business.gstin);
+        if (business.isActive) {
+            $("#business-isActive").attr("checked", "checked")
+        } else {
+            $("#business-isActive").removeAttr("checked")
+        }
+        if (business.businescategoryId != 0) {
             $("#business-categories").val(`business-category-${business.businescategoryId}`);
+        } if (business.businessTypeId != 0) {
             $("#business-types").val(`business-type-${business.businessTypeId}`);
-            if (response.result.businessLogoAttachment != null && response.result.businessLogoAttachment.businesLogoPath != null) {
-                $('#add-business-uploadedimage').attr('src', BASE_URL.replace("api", response.result.businessLogoAttachment.businesLogoPath)).width(50).height(50);
-                document.getElementById("add-business-uploadedimage").classList.remove("d-none");
-            }
+        }
+        if (response.result.businessLogoAttachment != null && response.result.businessLogoAttachment.businesLogoPath != null) {
+            $('#add-business-uploadedimage').attr('src', BASE_URL.replace("api", response.result.businessLogoAttachment.businesLogoPath)).width(50).height(50);
+            console.log("getbusiness", document.getElementById("add-business-uploadedimage"))
+            document.getElementById("add-business-uploadedimage").classList.remove("d-none");
+        }
 
+    } else {
+        if (response.toasterMessage != null) {
+            Toaster(response.toasterMessage, "error");
         }
     }
 }
 
 //add business response success function
 function SaveBusinessSuccess(response) {
-    console.log(response)
     if (response.isSuccess) {
-        if (response.toasterMessage != null) {
-            Toaster(response.toasterMessage);
+        if (response.isSuccess) {
+            let businessId = $("#business-businessId").val() == "" ? 0 : $("#business-businessId").val();
+            console.log(businessId)
+            if (businessId == 0) {
+                $("#user-details-confirmation-modal").modal("show");
+            } else {
+                if (response.toasterMessage != null) {
+                    Toaster(response.toasterMessage);
+                }
+            }
         }
         $("#add-business-modal-header").html("Update Business")
+        console.log($("#add-business-modal-header"))
         $("#user-details-btn").removeClass("d-none")
         $("#business-image").val("");
-        $("add-business-uploadedimage").attr('src', response.result.logoPath).width(50).height(50);
+        if (response.result.businessLogoAttachment != null && response.result.businessLogoAttachment.businesLogoPath != null) {
+            $("add-business-uploadedimage").attr('src', response.result.businessLogoAttachment.businesLogoPath).width(50).height(50);
+        }
         $("#business-businessId").val(response.result.businessId);
         if (response.result.isNewBusiness) {
             $("#user-details-confirmation-modal").modal("show");
@@ -116,15 +130,14 @@ function SaveBusinessSuccess(response) {
     } else {
         if (response.toasterMessage != null) {
             Toaster(response.toasterMessage, "error");
-            $("btn-close").click();
-            displayBusinessCards();
         }
+        $("btn-close").click();
+        displayBusinessCards();
     }
 }
 
 //user details success
 function getAllUserDetailsSuccess(response) {
-    console.log(response)
     if (response.isSuccess) {
         if (response.result != null) {
             if (response.result.length == 0) {
@@ -179,9 +192,9 @@ function getAllUserDetailsSuccess(response) {
 //when user click on update business button
 function updateBusiness(businessId) {
     $("#business-businessId").val(businessId)
+    displayBusinessDetails();
     $("#add-business-modal-header").html("Update Business")
     $("#user-details-btn").removeClass("d-none")
-    displayBusinessDetails();
 }
 
 //function add user in business
@@ -191,11 +204,9 @@ function addEditUserInBusiness(userId) {
     let params = setParameter("/Business/GetuserDetailById", GET, null, FORM_URL, { businessId: businessId, userId: userId }, getUserByIdSuccess);
     $("body").addClass("loading");
     ajaxCall(params);
-    $("body").removeClass("loading");
 }
 
 function getUserByIdSuccess(response) {
-    console.log(response)
     if (response.isSuccess) {
         if (response.result != null) {
             let userdetail = response.result;
@@ -238,11 +249,8 @@ function getUserByIdSuccess(response) {
 
 function saveUserDetails() {
     let isValidForm = validateSaveUserForm();
-    console.log(isValidForm)
     if (isValidForm) {
-        console.log("valid")
         let roles = $(".user-detail-role-checkbox");
-        console.log(roles)
         let selectedRoles = [];
         for (i = 0; i < roles.length; i++) {
             if (roles[i].checked) {
@@ -250,7 +258,6 @@ function saveUserDetails() {
             }
         }
         if (selectedRoles.length == 0) {
-            console.log("no roles")
             Toaster(constant.RoleRequireMessage, "error");
             return;
         }
@@ -271,13 +278,11 @@ function saveUserDetails() {
         let params = setParameter("/Business/SaveUserDetails", POST, null, APPLICATION_JSON, JSON.stringify(userDetailsViewModel), saveUserDetailsSuccess);
         $("body").addClass("loading");
         ajaxCall(params);
-        $("body").removeClass("loading");
 
     }
 }
 
 function saveUserDetailsSuccess(response) {
-    console.log(response);
     if (response.isSuccess) {
         if (response.toasterMessage != null) {
             Toaster(response.toasterMessage);
@@ -305,10 +310,8 @@ function deleteUser() {
     let userId = $("#delete-user-modal-userId").val();
     let businessId = $("#business-businessId").val();
     let params = setParameter("/Business/DeleteUserFromBusiness", GET, null, FORM_URL, { userId: userId, businessId: businessId }, deleteUserSuccess);
-    console.log(params)
     $("body").addClass("loading");
     ajaxCall(params);
-    $("body").removeClass("loading");
 }
 
 function deleteUserSuccess(response) {
@@ -327,6 +330,7 @@ function deleteUserSuccess(response) {
 
 function toggleActive(userId) {
     let userActiveIcon = document.getElementById(`active-user-${userId}`);
+    console.log("toggle", userActiveIcon)
     if (userActiveIcon.classList.contains("fa-circle-check")) {
         let modalbody = document.getElementById("inactive-user-modal").innerHTML.toString().replace("{{status}}", "Inactive").replace("{{statusbody}}", "inactivate");
         document.getElementById("inactive-user-modal").innerHTML = modalbody
@@ -341,13 +345,11 @@ function ActiveInactiveUser() {
     $("body").addClass("loading");
     let userId = $("#userId-active").val()
     let businessId = $("#business-businessId").val();
-    console.log(userId)
+    console.log("active", document.getElementById(`active-user-${userId}`))
     let isActive = document.getElementById(`active-user-${userId}`).classList.contains("fa-circle-check") ? false : true
     let params = setParameter("/Business/ActiveInactiveUser", GET, null, FORM_URL, { userId: userId, isActive: isActive, businessId: businessId }, activeInactiveUserSuccess);
-    console.log(params)
     $("body").addClass("loading");
     ajaxCall(params);
-    $("body").removeClass("loading");
 }
 
 function activeInactiveUserSuccess(response) {
@@ -375,19 +377,22 @@ function deleteBusinessYes() {
     let params = setParameter("/Business/DeleteBusiness", POST, null, FORM_URL, { businessId: businessId }, deleteBusinessSuccess);
     $("body").addClass("loading");
     ajaxCall(params);
-    $("body").removeClass("loading");
 }
 
 function deleteBusinessSuccess(response) {
     if (response.isSuccess) {
         if (response.toasterMessage != null) {
-            Toaster(response.message);
+            Toaster(response.toasterMessage);
         }
     } else {
         if (response.toasterMessage != null) {
-            Toaster(response.message, "error");
+            Toaster(response.toasterMessage, "error");
         }
     }
-    $(".btn-close").click();
+    $(".user-delete-modal-close-btn").click();
     displayBusinessCards();
+}
+
+function closeBusinessModal() {
+    $("#add-business-modal").modal("hide");
 }

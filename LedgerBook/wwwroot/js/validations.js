@@ -100,7 +100,6 @@ function buisnessNameValidation(input) {
 
 function numberValidationReq(input) {
     let value = input.value.replace(/\D/g, '');
-    console.log(value)
     if (value == "") {
         $(".numberValidationMessage").html("Mobile Number is required.");
     } else if (value.length < 10) {
@@ -246,7 +245,6 @@ function validateSaveUserForm() {
     let firstname = document.getElementById("user-details-firstName")
     let lastname = document.getElementById("user-details-lastName")
     let mobile = document.getElementById("user-details-mobileNumber")
-    console.log("mobile",mobile)
 
     emailValidation(email)
     nameValidation(firstname, 'First');
