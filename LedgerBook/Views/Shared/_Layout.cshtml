@@ -162,9 +162,8 @@
                                     <!-- 0sidebar -->
                                     @* @if ((await AuthorizationService.AuthorizeAsync(User, "SalesManager")).Succeeded)
                                     { *@
-                                    <div class="fs-5 fw-bold sidebar-menu-parent">
+                                    <div class="fs-5 fw-bold sidebar-menu-parent d-none" id="customer-layout-div" onclick="ManageParty('Customer')">
                                         <a class=" d-flex sidebar-menu-item @((ViewData["sidebar"] as string) == "Customer" ? "sidebar-active-div" : "")"
-                                            asp-action="DisplayCustomers" asp-controller="Party"
                                             style="text-decoration: none;" style="max-width: 210px;">
                                             <i class="fa-solid fa-user text-white mt-1 ms-1 position-absolute"
                                                 style="margin-left: 8px !important;"></i>
@@ -178,9 +177,8 @@
                                     @* }
                                     @if ((await AuthorizationService.AuthorizeAsync(User, "PurchaseManager")).Succeeded)
                                     { *@
-                                    <div class="fs-5 fw-bold sidebar-menu-parent">
-                                        <a class=" d-flex sidebar-menu-item @((ViewData["sidebar"] as string) == "Supplier" ? "sidebar-active-div" : "")"
-                                            asp-action="DisplaySuppliers" asp-controller="Party"
+                                    <div class="fs-5 fw-bold sidebar-menu-parent d-none" id="supplier-layout-div" >
+                                        <a class=" d-flex sidebar-menu-item @((ViewData["sidebar"] as string) == "Supplier" ? "sidebar-active-div" : "")" onclick="ManageParty('Supplier')"
                                             style="text-decoration: none;" style="max-width: 210px;">
                                             <i class="fa-solid fa-truck text-white mt-1 position-absolute"
                                                 style="margin-left: 2px !important;"></i>
@@ -192,7 +190,7 @@
                                     </div>
                                     @* } *@
 
-                                    <div class="fs-5 fw-bold sidebar-menu-parent">
+                                    <div class="fs-5 fw-bold sidebar-menu-parent ">
                                         <a class=" d-flex sidebar-menu-item @((ViewData["sidebar"] as string) == "Reports" ? "sidebar-active-div" : "")"
                                             asp-action="Reports" asp-controller="Reports" style="text-decoration: none;"
                                             style="max-width: 210px;">
@@ -260,6 +258,10 @@
     <script src="~/js/validations.js" asp-append-version="true"></script>
     <script src="~/js/ajaxCall/ajaxCall.js" asp-append-version="true"></script>
     <script src="~/js/User/userProfile.js" asp-append-version="true"></script>
+    <script src="~/js/Party/party.js" asp-append-version="true"></script>
+    <script src="~/js/Party/partySuccess.js" asp-append-version="true"></script>
+
+
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
@@ -274,15 +276,36 @@
         $("#layout-profilePhoto").attr("src", profilePhoto);
     }
 
-    function CheckRolePermission() {
-        let businessToken = getCookie(Business_Token);
-        let params = setParameter("/Business/GetBusinessData", GET, null, FORM_URL, { businessId: businessId }, SetBusinessCookiesSuccess);
+    function checkRolePermission() {
+        let params = setBusinessParameter("/Party/CheckRolePermission", GET, null, NODATA, null, rolePermissionSuccess);
         $("body").addClass("loading");
         ajaxCall(params);
     }
 
+    function GetBusinessList(businessListString) {
+        var nameIdObject = [];
+        let currentBusinessId = document.getElementById("currentBusinessId").innerHTML.trim()
+        var businesses = businessListString.split(",")
+        for (i = 0; i < businesses.length; i++) {
+            let nameId = businesses[i].split("-");
+            var obj = {
+                text: nameId[0],
+                value: nameId[1]
+            }
+            nameIdObject.push(obj);
+        }
+        let businessNameDropdown = document.getElementById("businessNameDropdown");
+        nameIdObject.forEach(item => {
+            businessNameDropdown.innerHTML += `<option value="${item.value}" class="hover-class cursor-pointer" onclick='ChangeBusiness(${item.value})'>${item.text}</option>`
+
+        });
+        document.getElementById("businessNameDropdown").value = currentBusinessId
+    }
+
     $(document).ready(function () {
         SetuserNameImage();
+        checkRolePermission();
+        GetBusinessList(getCookie(All_Businesses))
     });
 
 </script>

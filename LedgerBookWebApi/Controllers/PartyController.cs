@@ -2,6 +2,7 @@ using System.Net;
 using BusinessAcessLayer.Interface;
 using DataAccessLayer.Models;
 using DataAccessLayer.ViewModels;
+using LedgerBook.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LedgerBookWebApi.Controllers;
@@ -10,42 +11,34 @@ namespace LedgerBookWebApi.Controllers;
 [Route("api/[Controller]")]
 public class PartyController : BaseController
 {
-    private readonly IUserBusinessMappingService _userBusinessMappingService;
+    private readonly IPartyService _partyService;
     public PartyController(
        ILoginService loginService,
        IActivityLogService activityLogService,
        IBusinessService businessService,
-       IUserBusinessMappingService userBusinessMappingService
-    ) : base(loginService, activityLogService)
+       IPartyService partyService
+    ) : base(loginService, activityLogService, businessService)
     {
-        _userBusinessMappingService = userBusinessMappingService;
+        _partyService = partyService;
     }
 
     [HttpGet]
     [Route("CheckRolePermission")]
+    [PermissionAuthorize("AnyRole")]
     public IActionResult CheckRolePermission()
     {
         ApplicationUser user = GetCurrentUserIdentity();
-        if (user == null)
-            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Unauthorized));
-
         Businesses business = GetBusinessFromToken();
-        if (business == null)
-            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.ServiceUnavailable));
+        return Ok(_partyService.CheckRolepermission(business.Id,user.Id));
+    }
 
-        List<RoleViewModel> rolesByUser = _userBusinessMappingService.GetRolesByBusinessId(business.Id, user.Id);
-        List<string> layout = new();
-        if (rolesByUser.Any(role => role.RoleName == "Owner/Admin"))
-        {
-            layout.Add("Customers");
-            layout.Add("Suppliers");
-        }
-        else if (rolesByUser.Any(role => role.RoleName == "Purchase Manager"))
-            layout.Add("Suppliers");
-        else if (rolesByUser.Any(role => role.RoleName == "Sales Manager"))
-            layout.Add("Customers");
-        else
-            layout = new();
-        return Ok();
+    [HttpGet]
+    [Route("GetAllParties")]
+    [PermissionAuthorize("AnyRole")]
+    public IActionResult GetAllParties(string partyType, string searchText = "", string filter = "-1", string sort = "-1")
+    {
+        ApplicationUser user = GetCurrentUserIdentity();
+        Businesses business = GetBusinessFromToken();
+        return Ok(_partyService.GetParties(partyType, business.Id,user.Id, searchText, filter, sort));
     }
 }

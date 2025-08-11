@@ -378,9 +378,17 @@ public class BusinessService : IBusinessService
 
     public Businesses GetBusinessFromToken(string token)
     {
-        ClaimsPrincipal claims = _jwttokenService.GetClaimsFromToken(token);
-        int businessId = int.Parse(_jwttokenService.GetClaimValue(token, "id"));
-        return _genericRepository.Get<Businesses>(b => b.Id == businessId && b.DeletedAt == null);
+        try
+        {
+            ClaimsPrincipal claims = _jwttokenService.GetClaimsFromToken(token);
+            int businessId = int.Parse(_jwttokenService.GetClaimValue(token, "id"));
+            return _genericRepository.Get<Businesses>(b => b.Id == businessId && b.DeletedAt == null);
+        }
+        catch (Exception e)
+        {
+            throw new HttpRequestException("Business Token Not found.", null, HttpStatusCode.ServiceUnavailable);
+        }
+
     }
 
     public async Task<ApiResponse<string>> DeleteBusiness(int businessId, int userId)

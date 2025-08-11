@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net;
 using System.Threading.Tasks;
 using System.Transactions;
 using BusinessAcessLayer.Constant;
@@ -21,6 +22,7 @@ public class PartyService : IPartyService
     private readonly IActivityLogService _activityLogService;
     private readonly IBusinessService _businessService;
     private readonly IUserService _userService;
+    private readonly IUserBusinessMappingService _userBusinessMappingService;
 
 
     public PartyService(LedgerBookDbContext context,
@@ -29,7 +31,8 @@ public class PartyService : IPartyService
     IGenericRepo genericRepository,
     IActivityLogService activityLogService,
     IBusinessService businessService,
-    IUserService userService
+    IUserService userService,
+    IUserBusinessMappingService userBusinessMappingService
     )
     {
         _context = context;
@@ -39,6 +42,23 @@ public class PartyService : IPartyService
         _activityLogService = activityLogService;
         _businessService = businessService;
         _userService = userService;
+        _userBusinessMappingService = userBusinessMappingService;
+    }
+
+
+    public ApiResponse<List<PartyViewModel>> GetParties(string partyType, int businessId, int userId, string searchText, string? filter = "-1", string? sort = "-1")
+    {
+        if (partyType == null || businessId == 0 || userId == 0)
+        {
+            return new ApiResponse<List<PartyViewModel>>(false, Messages.ExceptionMessage, null, HttpStatusCode.ServiceUnavailable);
+        }
+        if (_userBusinessMappingService.HasPermission(businessId, userId, partyType))
+        {
+            List<PartyViewModel> parties = GetPartiesByType(partyType, businessId, searchText, filter, sort);
+            return new ApiResponse<List<PartyViewModel>>(true, null, parties, HttpStatusCode.OK);
+        }
+        return new ApiResponse<List<PartyViewModel>>(false, null, null, HttpStatusCode.Forbidden);
+
     }
 
     public List<PartyViewModel> GetPartiesByType(string partyType, int businessId, string searchText, string? filter = "-1", string? sort = "-1")
@@ -530,20 +550,28 @@ public class PartyService : IPartyService
         return partyRevenue;
     }
 
-    // public ApiResponse<List<string>> GetRolesWiseParty(int businessId, int userId)
-    // {
-    //     List<RoleViewModel> rolesByUser = _userBusinessMappingService.GetRolesByBusinessId(business.Id, user.Id);
-    //     List<string> layout = new();
-    //     if (rolesByUser.Any(role => role.RoleName == "Owner/Admin"))
-    //     {
-    //         layout.Add("Customers");
-    //         layout.Add("Suppliers");
-    //     }
-    //     else if (rolesByUser.Any(role => role.RoleName == "Purchase Manager"))
-    //         layout.Add("Suppliers");
-    //     else if (rolesByUser.Any(role => role.RoleName == "Sales Manager"))
-    //         layout.Add("Customers");
-    //     else
-    //         layout = new();
-    // }
+    public ApiResponse<CookiesViewModel> CheckRolepermission(int businessId, int userId)
+    {
+        if (businessId == 0 || userId == 0)
+        {
+            return new ApiResponse<CookiesViewModel>(false, null, null, HttpStatusCode.ServiceUnavailable);
+        }
+        CookiesViewModel cookiesViewModel = new();
+        List<RoleViewModel> rolesByUser = _userBusinessMappingService.GetRolesByBusinessId(businessId, userId);
+        if (rolesByUser.Any(role => role.RoleName == "Owner/Admin"))
+        {
+            cookiesViewModel.CustomerPermission = true;
+            cookiesViewModel.SupplierPermission = true;
+        }
+        else if (rolesByUser.Any(role => role.RoleName == "Purchase Manager"))
+            cookiesViewModel.SupplierPermission = true;
+        else if (rolesByUser.Any(role => role.RoleName == "Sales Manager"))
+            cookiesViewModel.CustomerPermission = true;
+        else
+        {
+            cookiesViewModel.CustomerPermission = false;
+            cookiesViewModel.SupplierPermission = false;
+        }
+        return new ApiResponse<CookiesViewModel>(true, null, cookiesViewModel, HttpStatusCode.OK);
+    }
 }

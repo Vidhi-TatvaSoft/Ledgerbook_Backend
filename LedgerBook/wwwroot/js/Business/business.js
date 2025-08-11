@@ -397,7 +397,7 @@ function closeBusinessModal() {
     $("#add-business-modal").modal("hide");
 }
 
-function SetBusinessCookiesSuccess(response){
+function SetBusinessCookiesSuccess(response) {
     if (response.isSuccess) {
         if (response.toasterMessage != null) {
             Toaster(response.toasterMessage);
@@ -413,7 +413,7 @@ function SetBusinessCookiesSuccess(response){
         }
         RemoveValidations();
         window.location = "/Dashboard/Dashboard";
-    } else {
+           } else {
         if (response.toasterMessage != null)
             Toaster(response.toasterMessage, "error");
     }

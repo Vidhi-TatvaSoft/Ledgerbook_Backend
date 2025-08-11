@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using DataAccessLayer.Models;
 using DataAccessLayer.ViewModels;
 using BusinessAcessLayer.Constant;
+using System.Net;
 namespace LedgerBook.Authorization;
 
 public class PermissionHandler : AuthorizationHandler<PermissionRequirement>
@@ -53,9 +54,13 @@ public class PermissionHandler : AuthorizationHandler<PermissionRequirement>
         {
             if (string.IsNullOrEmpty(businessToken))
             {
-                throw new UnauthorizedAccessException();
+                throw new  HttpRequestException("Business Token Not found.", null, HttpStatusCode.ServiceUnavailable);
             }
             Businesses business = _businessService.GetBusinessFromToken(businessToken);
+            if (business == null)
+            {
+                throw new  HttpRequestException("Business Token Not found.", null, HttpStatusCode.ServiceUnavailable);
+            }
             List<RoleViewModel> rolesByUser = _userBusinessMappingService.GetRolesByBusinessId(business.Id, user.Id);
             switch (requirement.Permission)
             {

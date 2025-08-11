@@ -1,3 +1,4 @@
+using LedgerBook.Constant;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LedgerBook.Controllers;
@@ -7,19 +8,9 @@ public class PartyController : Controller
     [HttpGet]
     public IActionResult ManageBusiness()
     {
-        // ViewData["sidebar"] = "Dashboard";
+        string partyType = Request.Cookies[TokenKey.PartyType]!;
+        ViewData["sidebar"] = partyType;
         return View();
     }
-
-    public IActionResult Customers()
-    {
-        ViewData["sidebar"] = "Customers";
-        return View();
-    }
-
-    public IActionResult Suppliers()
-    {
-        ViewData["sidebar"] = "Suppliers";
-        return View();
-    }
+    
 }

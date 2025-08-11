@@ -203,14 +203,6 @@ public class UserBusinessMappingService : IUserBusinessMappingService
             RoleName = x.Role.RoleName,
             RoleDescription = x.Role.Description
         }).ToList();
-        //  _context.UserBusinessMappings.Include(a => a.Role)
-        //     .Where(ubm => ubm.BusinessId == businessId && ubm.UserId == userId && ubm.DeletedAt == null)
-        //     .Select(x => new RoleViewModel
-        //     {
-        //         RoleId = x.Role.Id,
-        //         RoleName = x.Role.RoleName,
-        //         RoleDescription = x.Role.Description
-        //     }).ToList();
     }
 
     public PersonalDetails GetPersonalDetalsByMapping(int businessId, int userId)
@@ -252,5 +244,24 @@ public class UserBusinessMappingService : IUserBusinessMappingService
             await _transactionRepository.RollbackAsync();
             throw;
         }
+    }
+
+    public bool HasPermission(int businessId, int userId, string partyType)
+    {
+        List<RoleViewModel> rolesByUser = GetRolesByBusinessId(businessId, userId);
+        if (partyType == PartyType.Customer)
+        {
+            if (rolesByUser.Any(role => role.RoleName == "Sales Manager" || role.RoleName == "Owner/Admin"))
+            {
+                return true;
+            }
+        }else if (partyType == PartyType.Supplier)
+        {
+            if (rolesByUser.Any(role => role.RoleName == "Purchase Manager" || role.RoleName == "Owner/Admin"))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -1,3 +1,4 @@
+using BusinessAcessLayer.Constant;
 using DataAccessLayer.Models;
 using DataAccessLayer.ViewModels;
 
@@ -15,4 +16,5 @@ public interface IUserBusinessMappingService
     List<RoleViewModel> GetRolesByBusinessId(int businessId, int userId);
     public PersonalDetails GetPersonalDetalsByMapping(int businessId, int userId);
     Task<bool> ActiveInactiveUser(int userId, int businessId, bool isActive, int updatedById);
+    bool HasPermission(int businessId, int userId, string partyType);
 }

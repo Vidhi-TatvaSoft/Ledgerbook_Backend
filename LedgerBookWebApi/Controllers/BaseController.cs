@@ -22,7 +22,7 @@ public class BaseController : ControllerBase
         _loginService = loginService;
         _activityLogService = activityLogService;
     }
-    protected BaseController(IBusinessService businessService, IActivityLogService activityLogService, ILoginService loginService)
+    protected BaseController(ILoginService loginService, IActivityLogService activityLogService, IBusinessService businessService)
     {
         _loginService = loginService;
         _activityLogService = activityLogService;
@@ -74,7 +74,7 @@ public class BaseController : ControllerBase
         {
             return null!;
         }
-         Businesses business = _businessService!.GetBusinessFromToken(token);
+         Businesses business = _businessService.GetBusinessFromToken(token);
         if (business == null)
         {
             return null!;

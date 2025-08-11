@@ -5,6 +5,7 @@ namespace BusinessAcessLayer.Interface;
 
 public interface IPartyService
 {
+    ApiResponse<List<PartyViewModel>> GetParties(string partyType, int businessId, int userId, string searchText, string? filter = "-1", string? sort = "-1");
     Task<int> SavePartyDetails(PartyViewModel partyViewModel, int userId, string partyType);
     string GetEmailVerifiactionTokenForParty(int partyId);
     Task<bool> PartyEmailVerification(PartyVerifiedViewModel partyVerifiedViewModel);
@@ -20,4 +21,5 @@ public interface IPartyService
     List<TransactionEntryViewModel> GetAllTransaction(int businessId);
     List<TransactionEntryViewModel> GetUpcomingDues(int businessId);
     List<decimal> GetPartyRevenue(int businessId, string year = null);
+    ApiResponse<CookiesViewModel> CheckRolepermission(int businessId, int userId);
 }

@@ -33,3 +33,15 @@ function setCookie(cname, cvalue, exdays) {
     }
   }
   
+  function deleteCookie(name) {
+    document.cookie = name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+  }
+
+  function deleteBusinessCookies(){
+    deleteCookie(Business_Token);
+    deleteCookie(Business_Name)
+    deleteCookie(Business_Id)
+    deleteCookie(Party_Type)
+    deleteCookie(All_Businesses)
+
+  }

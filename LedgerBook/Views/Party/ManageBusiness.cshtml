@@ -14,7 +14,8 @@
 
     <div class="row border mx-0 p-3">
         <div class="d-flex flex-column col-xl-4 col-md-12">
-            <div class="fs-5 text-secondary ">Search For @HttpContextAccessor.HttpContext.Request.Cookies[TokenKey.PartyType]</div>
+            <div class="fs-5 text-secondary ">Search For
+                @HttpContextAccessor.HttpContext.Request.Cookies[TokenKey.PartyType]</div>
             <div class=""><input type="text" id="partySearch" class="form-control text-dark"
                     style="height:35px; width:100% !important;" placeholder="Search" />
             </div>
@@ -46,9 +47,9 @@
             </div>
         </div>
     </div>
-    <input type="hidden" id="party-businessId" >
-    <input type="hidden" id="party-businessName" >
-    <input type="hidden" id="party-partyType" >
+    <input type="hidden" id="party-businessId">
+    <input type="hidden" id="party-businessName">
+    <input type="hidden" id="party-partyType">
 
     <div class="d-flex justify-content-between bg-light border mx-0 p-1 px-3">
         <div class="text-secondary fw-bold">Name</div>
@@ -60,8 +61,9 @@
     </div>
 
     <div class="d-flex justify-content-center p-3 w-100">
-        <div class="btn d-flex btn-primary add-party-button" data-bs-toggle="modal" data-bs-target="#party-modal"
-            onclick="displayPartyModal()"><i class="fa-solid fa-plus mt-1"></i>&nbsp; &nbsp; Add @HttpContextAccessor.HttpContext.Request.Cookies[TokenKey.PartyType]
+        <div class="btn d-flex btn-primary add-party-button" data-bs-toggle="modal" data-bs-target="#save-party-modal"
+            onclick="addPartyModal()"><i class="fa-solid fa-plus mt-1"></i>&nbsp; &nbsp; Add
+            @HttpContextAccessor.HttpContext.Request.Cookies[TokenKey.PartyType]
         </div>
     </div>
     <input type="hidden" id="businessName">
@@ -78,3 +80,139 @@
     </div>
 </div>
 
+<!------------------------modal----------------------------------------------->
+<div id="save-party-modal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered " id="save-party-modal-content">
+
+    </div>
+</div>
+
+<div id="save-party-modal-innercontent" class="d-none">
+    <div class="modal-content bg-light shadow-lg border-2">
+        <div class="modal-header">
+            <h5 class="modal-title" id="add-party-modal-title">Add Party</h5>
+            <button type="button" class="btn-close usermodal-close-btn" data-bs-dismiss="modal"
+                aria-label="Close"></button>
+        </div>
+        <form id="save-party-form-id">
+            <div class="modal-body row">
+                <div class="col-md-6 col-lg-6 col-xl-6 col-sm-12 col-12 mt-3">
+                    <div class="form-floating ">
+                        <input type="text" oninput="RemoveWhiteSpace(this);partyNameValidation(this)" onblur="TrimInput(this);partyNameValidation(this)"
+                            class="form-control" id="party-name" placeholder="Party Name">
+                        <label for="party-name" class="fs-6 text-secondary">Party Name*</label>
+                        <span class="text-danger partyNameValidationMessage"></span>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-6 col-xl-6 col-sm-12 col-12 mt-3">
+                    <div class="form-floating ">
+                        <input type="text" oninput="RemoveWhiteSpace(this);emailValidation(this)" onblur="TrimInput(this);emailValidation(this)"
+                            class="form-control" id="party-email" placeholder="Email">
+                        <label for="party-email" class="fs-6 text-secondary">Email*</label>
+                        <span class="text-danger emailValidationMessage"></span>
+                    </div>
+                </div>
+                    <div class=" col-8 mt-3 pe-0 d-none party-amount-div">
+                        <div class="form-floating ">
+
+                            <input type="Number" oninput="RemoveWhiteSpace(this);MinAmount(this)"
+                                onblur="TrimInput(this);MinAmount(this)" class="form-control" id="party-amount"
+                                placeholder="Opening Amount">
+                            <label for="party-amount" class="fs-6 text-secondary">Opening Amount</label>
+                            <span class="text-danger amountValidationMessage"></span>
+                        </div>
+                    </div>
+                    <div class=" col-4 mt-3 ps-0 d-none party-amount-div">
+                        <div class="form-floating">
+                            <select id="party-transactionType" class=" form-control">
+                                <option value="@EnumHelper.TransactionType.GOT">You Got
+                                </option>
+                                <option value="@EnumHelper.TransactionType.GAVE">You Gave
+                                </option>
+                            </select>
+                            <label for="party-transactionType">Type</label>
+                        </div>
+                    </div>
+                <div class="mt-3">
+                    <div class="fs-5"> Who are they?</div>
+                    <div class="d-flex justify-content-start p-2">
+                        <div class="form-check  me-3">
+                            <input class="form-check-input" type="radio" name="flexRadioDefault" id="customer-radio"
+                                checked>
+                            <label class="form-check-label" for="customer-radio">
+                                Customer
+                            </label>
+                        </div>
+
+                        <div class="form-check ">
+                            <input class="form-check-input" type="radio" name="flexRadioDefault" id="supplier-radio">
+                            <label class="form-check-label" for="supplier-radio">
+                                Supplier
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" onclick="saveParty()">Save </button>
+                <button type="submit" class="btn btn-primary" onclick="saveAndCloseParty()">Save & Close</button>
+                <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            displayPartyList();
+
+            $(document).on("submit", "#save-party-form-id", function (e) {
+                e.preventDefault();
+            })
+        })
+
+
+        function debounce(func, delay) {
+            let timeoutId; // Variable to store the timer ID
+
+            return function (...args) {
+                clearTimeout(timeoutId);
+
+                timeoutId = setTimeout(() => {
+                    func.apply(this, args);
+                }, delay);
+            };
+        }
+
+        const handleSearch = (event) => {
+            let searchText = event.target.value;
+            displayPartyList(searchText, filter, sort)
+        };
+
+        const debouncedSearch = debounce(handleSearch, 500);
+        const searchInput = document.getElementById('partySearch');
+        searchInput.addEventListener('input', debouncedSearch);
+
+        //to displat list off all parties by partytype
+        function displayPartyList(searchText = "", filter, sort) {
+            let partyType = getCookie(Party_Type);
+            let params = setBusinessParameter("/Party/GetAllParties", GET, null, FORM_URL, { partyType: partyType, searchText: searchText, filter: filter, sort: sort }, getAllPartiesSuccess);
+            $("body").addClass("loading");
+            ajaxCall(params);
+            @* $.ajax({
+                url: "/Party/GetAllParties",
+                type: "GET",
+                data: { partyType, searchText, filter, sort },
+                success: function (response) {
+                    IsHtmlDoc(response.toString());
+                    $("#partyList-partial").html(response);
+                }
+            }) *@
+                            // displayTotalAmounts();
+                        }
+    </script>
+}

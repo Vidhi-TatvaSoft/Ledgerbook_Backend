@@ -59,7 +59,11 @@ function ajaxCall(params) {
                 if(response.httpStatusCode == 401){
                     deleteAllCookies();
                     window.location = "/Login/Login";
-                }else{
+                }else if(response.httpStatusCode == 403 || response.httpStatusCode == 503){
+                    deleteBusinessCookies();
+                    window.location = "/Business/Index"
+                }
+                else{
                     params.successFunction(response);
                 }
             $("body").removeClass("loading");
@@ -106,6 +110,9 @@ function ajaxCall(params) {
                 if(response.httpStatusCode == 401){
                     deleteAllCookies();
                     window.location = "/Login/Login";
+                }else if(response.httpStatusCode == 403 || response.httpStatusCode == 503){
+                    deleteBusinessCookies();
+                    window.location = "/Business/Index"
                 }else{
                     params.successFunction(response);
                 }

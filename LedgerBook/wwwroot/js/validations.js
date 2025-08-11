@@ -138,6 +138,31 @@ function pincodeValidation(input) {
     }
 }
 
+///////////party  validations///////////////////
+function partyNameValidation(input) {
+    let value = input.value;
+    if (value == "") {
+        $(`.partyNameValidationMessage`).html(`Party Name is required.`);
+    } else if (value.length > 100) {
+        $(`.partyNameValidationMessage`).html(`Party Name can not exceed 100 characters.`);
+    } else {
+        $(`.partyNameValidationMessage`).html("");
+    }
+} 
+
+function MinAmount(input) {
+    let value = parseFloat(input.value);
+    if (value <= 0.0) {
+        $(".amountValidationMessage").text("Amount should be greater than 0")
+    }
+    else if (value > 10000) {
+        $(".amountValidationMessage").text("Amount should be greater than 0")
+    }else{
+        $(".amountValidationMessage").text("")
+    }
+}
+
+
 function validateLoginForm() {
     let email = document.getElementById("login-email")
     let password = document.getElementById("login-password")
@@ -254,6 +279,24 @@ function validateSaveUserForm() {
     if ($(".businessNameValidationMessage").html() == "" && $(".numberValidationMessage").html() == "" && $(".GSTINValidationMessage").html() == "" && $(".pincodeValidationMessage").html() == "") {
         return true;
     } else {
+        return false;
+    }
+    
+}
+
+//////////validate party forms//////////
+function validateSavePartyForm(){
+    let email = document.getElementById("party-email")
+    let name= document.getElementById("party-name")
+    let amount = document.getElementById("party-amount")
+
+    emailValidation(email)
+    partyNameValidation(name);
+    MinAmount(amount)
+
+    if($(".amountValidationMessage").html() == "" && $(".emailValidationMessage").html() == "" && $(".partyNameValidationMessage").html() == ""){
+        return true;
+    }else{
         return false;
     }
     
