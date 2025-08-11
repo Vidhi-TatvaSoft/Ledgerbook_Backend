@@ -429,11 +429,11 @@ public class BusinessService : IBusinessService
                 string userName = _userService.GetuserNameById(userId);
                 string message = string.Format(Messages.BusinessActivity, "Business", "deleted", userName);
                 await _activityLogService.SetActivityLog(message, EnumHelper.Actiontype.Delete, EnumHelper.ActivityEntityType.Business, businessId, userId);
-                return new ApiResponse<string>(true,string.Format(Messages.GlobalAddUpdateMesage, "Business", "deleted"),null,HttpStatusCode.OK);
+                return new ApiResponse<string>(true, string.Format(Messages.GlobalAddUpdateMesage, "Business", "deleted"), null, HttpStatusCode.OK);
             }
             else
             {
-                return new ApiResponse<string>(false,string.Format(Messages.GlobalAddUpdateMesage, "business", "delete"),null,HttpStatusCode.BadRequest);
+                return new ApiResponse<string>(false, string.Format(Messages.GlobalAddUpdateMesage, "business", "delete"), null, HttpStatusCode.BadRequest);
             }
         }
         catch (Exception e)
@@ -707,4 +707,30 @@ public class BusinessService : IBusinessService
             }
         }
     }
+
+    public ApiResponse<CookiesViewModel> GetBusinessData(int businessId, ApplicationUser user)
+    {
+        if (businessId == 0)
+        {
+            return new ApiResponse<CookiesViewModel>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
+        }
+        string businessToken = _jwttokenService.GenerateBusinessToken(businessId);
+        List<BusinessViewModel> businessList = GetBusinesses(user.Id);
+        List<string> businessNamesList = new();
+        foreach (BusinessViewModel business in businessList)
+        {
+            string businessName = business.BusienssName + "-" + business.BusinessId;
+            businessNamesList.Add(businessName);
+        }
+        string businessNamesMerged = string.Join(",", businessNamesList);
+
+        CookiesViewModel cookiesViewModel = new()
+        {
+            BusinessId = businessId.ToString(),
+            BusinessToken = businessToken,
+            AllBusinesses = businessNamesMerged
+        };
+        return new ApiResponse<CookiesViewModel>(true, null, cookiesViewModel, HttpStatusCode.OK);
+    }
+
 }

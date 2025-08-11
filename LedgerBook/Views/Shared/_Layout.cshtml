@@ -97,10 +97,10 @@
                             <div class="dropdown mt-1">
                                 <div class=" dropdown-toggle cursor-pointer" type="button" id="dropdownMenuButton1"
                                     data-bs-toggle="dropdown" aria-expanded="false">
-                                    <span
-                                        class="text-white fs-5 fw-bold me-1" id="layout-userName">@HttpContextAccessor.HttpContext.Request.Cookies["userName"]</span>
-                                    <img  id="layout-profilePhoto"
-                                        style="border-radius: 50%;" width="40px" height="35px" alt="">
+                                    <span class="text-white fs-5 fw-bold me-1"
+                                        id="layout-userName">@HttpContextAccessor.HttpContext.Request.Cookies["userName"]</span>
+                                    <img id="layout-profilePhoto" style="border-radius: 50%;" width="40px" height="35px"
+                                        alt="">
                                 </div>
                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
 
@@ -162,34 +162,34 @@
                                     <!-- 0sidebar -->
                                     @* @if ((await AuthorizationService.AuthorizeAsync(User, "SalesManager")).Succeeded)
                                     { *@
-                                        <div class="fs-5 fw-bold sidebar-menu-parent">
-                                            <a class=" d-flex sidebar-menu-item @((ViewData["sidebar"] as string) == "Customer" ? "sidebar-active-div" : "")"
-                                                asp-action="DisplayCustomers" asp-controller="Party"
-                                                style="text-decoration: none;" style="max-width: 210px;">
-                                                <i class="fa-solid fa-user text-white mt-1 ms-1 position-absolute"
-                                                    style="margin-left: 8px !important;"></i>
-                                                <span
-                                                    class="text-white fs-4 font-weight-100 ms-2 sidebar-menu-item-slash">|</span>
-                                                <div class="dashboard-text-active text-size-set ms-2 fs-5 fw-bold text-truncate text-white sidebar-menu-item-text"
-                                                    title="Customers">Customers</div>
-                                            </a>
-                                        </div>
+                                    <div class="fs-5 fw-bold sidebar-menu-parent">
+                                        <a class=" d-flex sidebar-menu-item @((ViewData["sidebar"] as string) == "Customer" ? "sidebar-active-div" : "")"
+                                            asp-action="DisplayCustomers" asp-controller="Party"
+                                            style="text-decoration: none;" style="max-width: 210px;">
+                                            <i class="fa-solid fa-user text-white mt-1 ms-1 position-absolute"
+                                                style="margin-left: 8px !important;"></i>
+                                            <span
+                                                class="text-white fs-4 font-weight-100 ms-2 sidebar-menu-item-slash">|</span>
+                                            <div class="dashboard-text-active text-size-set ms-2 fs-5 fw-bold text-truncate text-white sidebar-menu-item-text"
+                                                title="Customers">Customers</div>
+                                        </a>
+                                    </div>
 
                                     @* }
                                     @if ((await AuthorizationService.AuthorizeAsync(User, "PurchaseManager")).Succeeded)
                                     { *@
-                                        <div class="fs-5 fw-bold sidebar-menu-parent">
-                                            <a class=" d-flex sidebar-menu-item @((ViewData["sidebar"] as string) == "Supplier" ? "sidebar-active-div" : "")"
-                                                asp-action="DisplaySuppliers" asp-controller="Party"
-                                                style="text-decoration: none;" style="max-width: 210px;">
-                                                <i class="fa-solid fa-truck text-white mt-1 position-absolute"
-                                                    style="margin-left: 2px !important;"></i>
-                                                <span
-                                                    class="text-white fs-4 font-weight-100 ms-2 sidebar-menu-item-slash">|</span>
-                                                <div class="dashboard-text-active text-size-set ms-2 fs-5 fw-bold text-truncate text-white sidebar-menu-item-text"
-                                                    title="Suppliers">Suppliers</div>
-                                            </a>
-                                        </div>
+                                    <div class="fs-5 fw-bold sidebar-menu-parent">
+                                        <a class=" d-flex sidebar-menu-item @((ViewData["sidebar"] as string) == "Supplier" ? "sidebar-active-div" : "")"
+                                            asp-action="DisplaySuppliers" asp-controller="Party"
+                                            style="text-decoration: none;" style="max-width: 210px;">
+                                            <i class="fa-solid fa-truck text-white mt-1 position-absolute"
+                                                style="margin-left: 2px !important;"></i>
+                                            <span
+                                                class="text-white fs-4 font-weight-100 ms-2 sidebar-menu-item-slash">|</span>
+                                            <div class="dashboard-text-active text-size-set ms-2 fs-5 fw-bold text-truncate text-white sidebar-menu-item-text"
+                                                title="Suppliers">Suppliers</div>
+                                        </a>
+                                    </div>
                                     @* } *@
 
                                     <div class="fs-5 fw-bold sidebar-menu-parent">
@@ -272,6 +272,13 @@
         let profilePhoto = getCookie(Profile_Photo) == "" ? "/images/user.png" : BASE_URL.replace("api", getCookie(Profile_Photo));
         $("#layout-userName").html(userName);
         $("#layout-profilePhoto").attr("src", profilePhoto);
+    }
+
+    function CheckRolePermission() {
+        let businessToken = getCookie(Business_Token);
+        let params = setParameter("/Business/GetBusinessData", GET, null, FORM_URL, { businessId: businessId }, SetBusinessCookiesSuccess);
+        $("body").addClass("loading");
+        ajaxCall(params);
     }
 
     $(document).ready(function () {

@@ -5,6 +5,7 @@ namespace BusinessAcessLayer.Interface;
 public interface IJWTTokenService
 {
     string GenerateToken(string email);
+    string GenerateCombineToken(string userToken, string? businessToken = null);
     string GenerateTokenEmailVerificationToken(string email, string password);
     string GenerateTokenEmailPassword(string email, string password);
     string GenerateBusinessToken(int businessId);

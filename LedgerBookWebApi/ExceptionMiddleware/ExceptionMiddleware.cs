@@ -37,20 +37,29 @@ public class ExceptionMiddleware
 
     private async Task HandleExceptions(HttpContext context, Exception exception)
     {
-        HttpStatusCode code;
+         HttpStatusCode code;
         string message;
 
-        code = context.Response.StatusCode switch
+        switch (exception)
         {
-            400 => HttpStatusCode.BadRequest,
-            401 => HttpStatusCode.Unauthorized,
-            403 => HttpStatusCode.Forbidden,
-            404 => HttpStatusCode.NotFound,
-            500 => HttpStatusCode.InternalServerError,
-            _ => HttpStatusCode.InternalServerError
-        };
-        message = Messages.ExceptionMessage;
-
+            case UnauthorizedAccessException:
+                code = HttpStatusCode.Unauthorized;
+                message = null!;
+                break;
+            default:
+                code = context.Response.StatusCode switch
+                {
+                    400 => HttpStatusCode.BadRequest,
+                    401 => HttpStatusCode.Unauthorized,
+                    403 => HttpStatusCode.Forbidden,
+                    404 => HttpStatusCode.NotFound,
+                    500 => HttpStatusCode.InternalServerError,
+                    _ => HttpStatusCode.InternalServerError
+                };
+                message = Messages.ExceptionMessage;
+                break;  
+        }
+       
         //add exception in db
         using IServiceScope scope = _serviceScopeFactory.CreateAsyncScope();
         IExceptionService exceptionserive = scope.ServiceProvider.GetRequiredService<IExceptionService>();

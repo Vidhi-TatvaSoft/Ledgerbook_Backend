@@ -15,11 +15,19 @@ public class BaseController : ControllerBase
 {
     protected readonly ILoginService _loginService;
     private readonly IActivityLogService _activityLogService;
+    private readonly IBusinessService? _businessService;
 
     protected BaseController(ILoginService loginService, IActivityLogService activityLogService)
     {
         _loginService = loginService;
         _activityLogService = activityLogService;
+    }
+    protected BaseController(IBusinessService businessService, IActivityLogService activityLogService, ILoginService loginService)
+    {
+        _loginService = loginService;
+        _activityLogService = activityLogService;
+        _businessService = businessService;
+
     }
 
     #region get data from ajax header
@@ -30,7 +38,7 @@ public class BaseController : ControllerBase
         {
             if (Request.Headers.TryGetValue(tokenKey, out StringValues _headerValues))
             {
-                string customHeaderValue = _headerValues.FirstOrDefault()!;
+                string customHeaderValue = _headerValues.FirstOrDefault()!.Replace("Bearer ","");
                 return customHeaderValue;
             }
             return null;
@@ -46,7 +54,7 @@ public class BaseController : ControllerBase
     #region get current user from token
     protected ApplicationUser GetCurrentUserIdentity()
     {
-        string token = GetData(TokenKey.UserToken)!;
+        string token = GetData("Authorization")!;
         if (string.IsNullOrEmpty(token))
         {
             return null;
@@ -57,6 +65,21 @@ public class BaseController : ControllerBase
             return null;
         }
         return user;
+    }
+
+    protected Businesses GetBusinessFromToken()
+    {
+        string token = GetData(TokenKey.BusinessToken)!;
+        if (string.IsNullOrEmpty(token))
+        {
+            return null!;
+        }
+         Businesses business = _businessService!.GetBusinessFromToken(token);
+        if (business == null)
+        {
+            return null!;
+        }
+        return business;
     }
     #endregion
 

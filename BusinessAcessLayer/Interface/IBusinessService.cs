@@ -18,4 +18,5 @@ public interface IBusinessService
     Task<ApiResponse<List<UserViewmodel>>> SaveUserDetails(UserViewmodel userViewmodel, List<int> selectedRole, int businessId, int userId);
     Task<ApiResponse<string>> DeleteUserFromBusiness(int userId, int businessId, ApplicationUser logedinUser);
     Task<ApiResponse<string>> ActiveInactiveUser(int userId, bool isActive, int businessId, ApplicationUser logedinUser);
+    ApiResponse<CookiesViewModel> GetBusinessData(int businessId, ApplicationUser user);
 }

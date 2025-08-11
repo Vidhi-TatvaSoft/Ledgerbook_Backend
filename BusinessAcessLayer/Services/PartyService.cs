@@ -22,6 +22,7 @@ public class PartyService : IPartyService
     private readonly IBusinessService _businessService;
     private readonly IUserService _userService;
 
+
     public PartyService(LedgerBookDbContext context,
     IAddressService addressService,
     IReferenceDataEntityService referenceDataEntityService,
@@ -60,7 +61,7 @@ public class PartyService : IPartyService
             partyViewModel.PartyTypId = party.PartyTypId;
             partyViewModel.PartyTypeString = partyType;
             partyViewModel.CreatedAt = party.CreatedAt;
-            partyViewModel.CreateMonth = party.UpdatedAt != null ? party.UpdatedAt.Value.Month :  party.CreatedAt.Month;
+            partyViewModel.CreateMonth = party.UpdatedAt != null ? party.UpdatedAt.Value.Month : party.CreatedAt.Month;
             partyViewModel.UpdatedAt = party.UpdatedAt;
             partyViewModel.Amount = _genericRepository.GetAll<LedgerTransactions>(x => x.PartyId == party.Id && x.DeletedAt == null && x.TransactionType == (byte)EnumHelper.TransactionType.GAVE).Sum(x => x.Amount) - _genericRepository.GetAll<LedgerTransactions>(x => x.PartyId == party.Id && x.DeletedAt == null && x.TransactionType == (byte)EnumHelper.TransactionType.GOT).Sum(x => x.Amount);
 
@@ -529,4 +530,20 @@ public class PartyService : IPartyService
         return partyRevenue;
     }
 
+    // public ApiResponse<List<string>> GetRolesWiseParty(int businessId, int userId)
+    // {
+    //     List<RoleViewModel> rolesByUser = _userBusinessMappingService.GetRolesByBusinessId(business.Id, user.Id);
+    //     List<string> layout = new();
+    //     if (rolesByUser.Any(role => role.RoleName == "Owner/Admin"))
+    //     {
+    //         layout.Add("Customers");
+    //         layout.Add("Suppliers");
+    //     }
+    //     else if (rolesByUser.Any(role => role.RoleName == "Purchase Manager"))
+    //         layout.Add("Suppliers");
+    //     else if (rolesByUser.Any(role => role.RoleName == "Sales Manager"))
+    //         layout.Add("Customers");
+    //     else
+    //         layout = new();
+    // }
 }

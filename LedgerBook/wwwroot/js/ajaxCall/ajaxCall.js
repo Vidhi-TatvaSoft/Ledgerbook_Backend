@@ -11,7 +11,27 @@ function setParameter(url, type, headers, contentType, data, successFunction) {
     url = `${BASE_URL}${url}`
     if (headers == null) {
         headers = {
-            "UserToken": getCookie(User_Token)
+            "Authorization": getCookie(User_Token)
+        }
+    }
+
+    return {
+        url: url,
+        type: type,
+        data: data,
+        headers: headers,
+        contentType: contentType,
+        successFunction: successFunction
+    }
+}
+
+function setBusinessParameter(url, type, headers, contentType, data, successFunction) {
+    data = data == null ? null : data;
+    url = `${BASE_URL}${url}`
+    if (headers == null) {
+        headers = {
+            "Authorization": getCookie(User_Token),
+            "BusinessToken":getCookie(Business_Token)
         }
     }
 

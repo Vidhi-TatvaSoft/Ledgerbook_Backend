@@ -59,6 +59,26 @@ public class JWTTokenService : IJWTTokenService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
+    public string GenerateCombineToken(string userToken, string? businessToken= null)
+    {
+        SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
+        SigningCredentials credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        Claim[] claims = new[]
+       {
+                new Claim("UserToken", userToken),
+                new Claim("BusinessToken", businessToken)
+        };
+        JwtSecurityToken token = new JwtSecurityToken(
+                    issuer: _issuer,
+                    audience: _audiance,
+                    claims: claims,
+                    expires: DateTime.Now.AddHours(_tokenDuration),
+                    signingCredentials: credentials
+                );
+
+        return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
     public string GenerateTokenEmailVerificationToken(string email, string verificationToken)
     {
         SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));

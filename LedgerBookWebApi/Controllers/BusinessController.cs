@@ -1,5 +1,6 @@
 using System.Net;
 using System.Threading.Tasks;
+using BusinessAcessLayer.Constant;
 using BusinessAcessLayer.Interface;
 using DataAccessLayer.Models;
 using DataAccessLayer.ViewModels;
@@ -14,75 +15,72 @@ namespace LedgerBookWebApi.Controllers;
 public class BusinessController : BaseController
 {
     private readonly IBusinessService _businessService;
+    private readonly IJWTTokenService _jwttokenService;
     public BusinessController(
         ILoginService loginService,
         IActivityLogService activityLogService,
-        IBusinessService businessService
+        IBusinessService businessService,
+        IJWTTokenService jWTTokenService
     ) : base(loginService, activityLogService)
     {
         _businessService = businessService;
+        _jwttokenService = jWTTokenService;
     }
 
     #region get all businesses
     [HttpGet]
     [Route("GetBusinesses")]
+    [PermissionAuthorize("User")]
     public IActionResult GetBusinesses(string searchText = null)
     {
         ApplicationUser user = GetCurrentUserIdentity();
-        if (user == null)
-            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Unauthorized));
         return Ok(_businessService.GetRolewiseBusiness(user.Id, searchText));
     }
     #endregion
 
     [HttpGet]
     [Route("GetBusinessDetails")]
+    [PermissionAuthorize("User")]
     public IActionResult GetBusinessDetails(int businessId)
     {
         ApplicationUser user = GetCurrentUserIdentity();
-        if (user == null)
-            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Unauthorized));
         return Ok(_businessService.GetBusinessItemById(businessId));
     }
 
     [HttpPost]
     [Route("SaveBusiness")]
+    [PermissionAuthorize("User")]
     public async Task<IActionResult> SaveBusiness([FromForm] BusinessItem businessItem)
     {
         // return Ok(false);
         ApplicationUser user = GetCurrentUserIdentity();
-        if (user == null)
-            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Unauthorized));
         return Ok(await _businessService.SaveBusiness(businessItem, user.Id));
     }
 
     [HttpGet]
     [Route("GetAllUsersOfBusiness")]
+    [PermissionAuthorize("User")]
     public async Task<IActionResult> GetAllUsersOfBusiness(int businessId)
     {
         ApplicationUser user = GetCurrentUserIdentity();
-        if (user == null)
-            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Unauthorized));
         return Ok(await _businessService.GetUsersOfBusiness(businessId, user.Id));
     }
 
     [HttpGet]
     [Route("GetuserDetailById")]
+    [PermissionAuthorize("User")]
     public async Task<IActionResult> GetuserDetailById(int businessId, int? userId)
     {
         ApplicationUser user = GetCurrentUserIdentity();
-        if (user == null)
-            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Unauthorized));
         return Ok(await _businessService.GetUserById(businessId, user.Id, userId));
     }
 
     [HttpPost]
     [Route("SaveUserDetails")]
+    [PermissionAuthorize("User")]
     public async Task<IActionResult> SaveUserDetails([FromBody] UserDetailsViewModel userDetailsViewModel)
     {
         ApplicationUser user = GetCurrentUserIdentity();
-        if (user == null)
-            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Unauthorized));
         if (!ModelState.IsValid)
         {
             return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.BadRequest));
@@ -93,11 +91,10 @@ public class BusinessController : BaseController
     #region Delete user from business
     [HttpGet]
     [Route("DeleteUserFromBusiness")]
+    [PermissionAuthorize("User")]
     public async Task<IActionResult> DeleteUserFromBusiness(int userId, int businessId)
     {
         ApplicationUser user = GetCurrentUserIdentity();
-        if (user == null)
-            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Unauthorized));
         return Ok(await _businessService.DeleteUserFromBusiness(userId, businessId, user));
     }
     #endregion
@@ -105,11 +102,10 @@ public class BusinessController : BaseController
     #region inactive / active use
     [HttpGet]
     [Route("ActiveInactiveUser")]
+    [PermissionAuthorize("User")]
     public async Task<IActionResult> ActiveInactiveUser(int userId, bool isActive, int businessId)
     {
         ApplicationUser user = GetCurrentUserIdentity();
-        if (user == null)
-            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Unauthorized));
         return Ok(await _businessService.ActiveInactiveUser(userId, isActive, businessId, user));
     }
     #endregion
@@ -117,12 +113,22 @@ public class BusinessController : BaseController
     #region delete business
     [HttpPost]
     [Route("DeleteBusiness")]
-    public async Task<IActionResult> DeleteBusiness([FromForm]int businessId)
+    [PermissionAuthorize("User")]
+    public async Task<IActionResult> DeleteBusiness([FromForm] int businessId)
     {
         ApplicationUser user = GetCurrentUserIdentity();
-        if (user == null)
-            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Unauthorized));
         return Ok(await _businessService.DeleteBusiness(businessId, user.Id));
+    }
+    #endregion
+
+    #region getBusinessCookies
+    [HttpGet]
+    [Route("GetBusinessData")]
+    [PermissionAuthorize("User")]
+    public IActionResult GetBusinessData(int businessId)
+    {
+        ApplicationUser user = GetCurrentUserIdentity();
+        return Ok(_businessService.GetBusinessData(businessId, user));
     }
     #endregion
 }

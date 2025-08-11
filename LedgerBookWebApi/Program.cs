@@ -9,7 +9,9 @@ using LedgerBook.ExceptionMiddleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Rotativa.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -65,12 +67,13 @@ builder.Services.AddScoped<ITransactionReportSevice, TransactionReportService>()
 builder.Services.AddScoped<IExceptionService, ExceptionService>();
 builder.Services.AddScoped<IActivityLogService, ActivityLogService>();
 builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddAuthentication(x =>
 {
     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options =>
+}).AddJwtBearer("UserToken", options =>
 {
     options.RequireHttpsMetadata = false;
     options.SaveToken = true;
@@ -85,42 +88,23 @@ builder.Services.AddAuthentication(x =>
         RoleClaimType = ClaimTypes.Role,
         NameClaimType = ClaimTypes.Name
     };
-
-    options.Events = new JwtBearerEvents
-    {
-        OnMessageReceived = context =>
-        {
-            // Check for the token in cookies
-            var token = context.Request.Cookies[TokenKey.UserToken];
-            if (!string.IsNullOrEmpty(token))
-            {
-                context.Request.Headers["Authorization"] = "Bearer " + token;
-            }
-            if (!string.IsNullOrEmpty(token))
-            {
-                context.Token = token;
-            }
-            return Task.CompletedTask;
-        },
-        OnChallenge = context =>
-        {
-            // Redirect to login page when unauthorized 
-            context.HandleResponse();
-            context.Response.Redirect("/Login/Login");
-            return Task.CompletedTask;
-        },
-        OnForbidden = context =>
-        {
-            if (!context.Response.HasStarted)
-            {
-                // Redirect to unauthorize when access is forbidden (403)
-                context.Response.Redirect("/Login/Login");
-            }
-            return Task.CompletedTask;
-        }
-    };
 }
-);
+).AddJwtBearer("BusinessToken", options =>
+{
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["JwtConfig:Issuer"],  // The issuer of the token (e.g., your app's URL)
+        ValidAudience = builder.Configuration["JwtConfig:Audience"], // The audience for the token (e.g., your API)
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtConfig:Key"] ?? "")), // The key to validate the JWT's signature
+        RoleClaimType = ClaimTypes.Role,
+        NameClaimType = ClaimTypes.Name
+    };
+});
 
 
 builder.Services.AddScoped<IAuthorizationHandler, PermissionHandler>();
@@ -128,7 +112,7 @@ builder.Services.AddAuthorization(options =>
 {
     var permissions = new[]
     {
-        "User","Owner/Admin", "PurchaseManager", "SalesManager","AnyRole"
+        "User","Owner/Admin", "PurchaseManager", "SalesManager","AnyRole","User"
     };
 
     foreach (var permission in permissions)
@@ -137,6 +121,41 @@ builder.Services.AddAuthorization(options =>
     }
 });
 
+builder.Services.AddSwaggerGen(c =>
+    {
+        c.AddSecurityDefinition("Authorization", new OpenApiSecurityScheme
+        {
+            Description = "JWT Authorization header using the Bearer scheme (Token 1)",
+            Name = "Authorization",
+            In = ParameterLocation.Header,
+            Type = SecuritySchemeType.Http,
+            Scheme = "bearer"
+        });
+        c.AddSecurityDefinition("BusinessToken", new OpenApiSecurityScheme
+        {
+            Description = "JWT Authorization header using the Bearer scheme (Token 2)",
+            Name = "BusinessToken", // Example for a second token in a different header
+            In = ParameterLocation.Header,
+            Type = SecuritySchemeType.ApiKey
+        });
+        c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "UserToken" }
+            },
+            new string[] { }
+        },
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "BusinessToken" }
+            },
+            new string[] { }
+        }
+    });
+    });
 
 builder.Services.AddSession(
     options =>

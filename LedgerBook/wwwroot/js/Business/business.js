@@ -397,6 +397,30 @@ function closeBusinessModal() {
     $("#add-business-modal").modal("hide");
 }
 
-function ManageBusinessDetails(businessId){
-    window.location = "/Dashboard/Dashboard"
+function SetBusinessCookiesSuccess(response){
+    if (response.isSuccess) {
+        if (response.toasterMessage != null) {
+            Toaster(response.toasterMessage);
+        }
+        let cookies = response.result;
+        if (cookies.businessId != null) {
+            setCookie(Business_Id, cookies.businessId, 1);
+        }
+        if (cookies.businessToken != null) {
+            setCookie(Business_Token, cookies.businessToken, 1);
+        } if (cookies.allBusinesses != null) {
+            setCookie(All_Businesses, cookies.allBusinesses, 1);
+        }
+        RemoveValidations();
+        window.location = "/Dashboard/Dashboard";
+    } else {
+        if (response.toasterMessage != null)
+            Toaster(response.toasterMessage, "error");
+    }
+}
+
+function ManageBusinessDetails(businessId) {
+    let params = setParameter("/Business/GetBusinessData", GET, null, FORM_URL, { businessId: businessId }, SetBusinessCookiesSuccess);
+    $("body").addClass("loading");
+    ajaxCall(params);
 }

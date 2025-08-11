@@ -319,6 +319,7 @@ public class LoginService : ILoginService
                 var result = await _signInManager.PasswordSignInAsync(user.Email, loginViewModel.Password, isPersistent:true, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
+                    // string usertoken = _jwttokenService.GenerateToken(loginViewModel.Email);
                     string token = _jwttokenService.GenerateToken(loginViewModel.Email);
                     return token;
                 }
@@ -349,9 +350,17 @@ public class LoginService : ILoginService
 
     public ApplicationUser GetUserFromTokenIdentity(string token)
     {
-        ClaimsPrincipal claims = _jwttokenService.GetClaimsFromToken(token);
-        string Email = _jwttokenService.GetClaimValue(token, "email");
-        return _genericRepository.Get<ApplicationUser>(x => x.Email.ToLower().Trim() == Email.ToLower().Trim())!;
+        try
+        {
+            ClaimsPrincipal claims = _jwttokenService.GetClaimsFromToken(token);
+            string Email = _jwttokenService.GetClaimValue(token, "email");
+            return _genericRepository.Get<ApplicationUser>(x => x.Email.ToLower().Trim() == Email.ToLower().Trim())!;
+        }
+        catch (Exception e)
+        {
+            throw new UnauthorizedAccessException();
+        }
+        
     }
     // public User GetUserFromToken(string token)
     // {
