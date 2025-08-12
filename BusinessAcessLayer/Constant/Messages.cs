@@ -10,7 +10,6 @@ public class Messages
     public static string EmailExistMessage = "An account with this email already exists. Please sign in or use a different email.";
     public static string EmailDoesNotExistMessage = "Email does not Exist. Please register your email.";
     public static string SamePasswordsMessage = "Password and Confirm password should be same.";
-    public static string ExceptionMessage = "Something went wrong. Please try again later.";
     public static string UnhandledExceptionMessage = "An unhandled exception occurred.";
     public static string ResponseStartedLogWarning = "Response already started, cannot Redirect.";
     public static string SendResetPasswordMailSuccess = "Check your email to reset the password of your account.";
@@ -18,6 +17,8 @@ public class Messages
     public static string InvalidTokenBusinessNotFound = "Invalid token or business not found.";
 
     //global messages
+    public static string ExceptionMessage = "Something went wrong. Please try again later.";
+    public static string ForbiddenMessage = "You don't have permission to access this resource.";
     public static string GlobalAddUpdateMesage = "{0} {1} successfully.";
     public static string GlobalAddUpdateFailMessage = "Failed to {0} {1}. Try again!";
     public static string VerificationSuccessMessage = "Email has been verified successfully.";

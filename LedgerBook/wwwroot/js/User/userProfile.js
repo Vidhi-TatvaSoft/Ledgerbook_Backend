@@ -45,6 +45,5 @@ function emptyInputValidation(formId) {
         if($(this).hasClass("fa-eye")){
             $(this).removeClass("fa-eye").addClass("fa-eye-slash");
         };
-    });
-    
+    });  
 }

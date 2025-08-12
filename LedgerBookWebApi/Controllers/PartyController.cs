@@ -1,5 +1,7 @@
 using System.Net;
+using BusinessAcessLayer.Constant;
 using BusinessAcessLayer.Interface;
+using DataAccessLayer.Constant;
 using DataAccessLayer.Models;
 using DataAccessLayer.ViewModels;
 using LedgerBook.Authorization;
@@ -29,7 +31,7 @@ public class PartyController : BaseController
     {
         ApplicationUser user = GetCurrentUserIdentity();
         Businesses business = GetBusinessFromToken();
-        return Ok(_partyService.CheckRolepermission(business.Id,user.Id));
+        return Ok(_partyService.CheckRolepermission(business.Id, user.Id));
     }
 
     [HttpGet]
@@ -39,6 +41,43 @@ public class PartyController : BaseController
     {
         ApplicationUser user = GetCurrentUserIdentity();
         Businesses business = GetBusinessFromToken();
-        return Ok(_partyService.GetParties(partyType, business.Id,user.Id, searchText, filter, sort));
+        return Ok(_partyService.GetParties(partyType, business.Id, user.Id, searchText, filter, sort));
     }
+
+    #region save party post method
+    [HttpPost]
+    [Route("SaveParty")]
+    [PermissionAuthorize("AnyRole")]
+    public async Task<IActionResult> SaveParty([FromForm] SavePartyViewModel partyViewModel)
+    {
+        ApplicationUser user = GetCurrentUserIdentity();
+        Businesses business = GetBusinessFromToken();
+        if (!ModelState.IsValid)
+        {
+            return Ok(new ApiResponse<SavePartyViewModel>(false, Messages.ExceptionMessage, partyViewModel, HttpStatusCode.BadRequest));
+        }
+        return Ok(await _partyService.SaveParty(partyViewModel, user.Id, business));
+
+    }
+    #endregion
+
+    [HttpGet]
+    [Route("GetPartyDetails")]
+    [PermissionAuthorize("AnyRole")]
+    public IActionResult GetPartyDetails(int partyId)
+    {
+        if (partyId == 0)
+            return Ok(new ApiResponse<PartyViewModel>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest));
+        return Ok(new ApiResponse<PartyViewModel>(true, null, _partyService.GetPartyById(partyId), HttpStatusCode.OK));
+    }
+
+    #region display transaction entries
+     [HttpGet]
+    [Route("GetTransationEntries")]
+    [PermissionAuthorize("AnyRole")]
+    public IActionResult GetTransationEntries(int partyId)
+    {
+        return Ok(_partyService.GetTransactionsByPartyId(partyId));
+    }
+    #endregion
 }

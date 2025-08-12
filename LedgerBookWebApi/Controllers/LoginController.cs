@@ -40,7 +40,7 @@ public class LoginController : BaseController
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Login()
     {
-        string token = GetData(TokenKey.UserToken);
+        string token = GetData(TokenKey.Authorization);
         if (token.IsNullOrEmpty())
         {
             return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.BadRequest));

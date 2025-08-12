@@ -54,7 +54,7 @@ public class BaseController : ControllerBase
     #region get current user from token
     protected ApplicationUser GetCurrentUserIdentity()
     {
-        string token = GetData("Authorization")!;
+        string token = GetData(TokenKey.Authorization)!;
         if (string.IsNullOrEmpty(token))
         {
             return null;

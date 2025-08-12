@@ -40,6 +40,8 @@ public class TokenKey
 {
     public static string BusinessToken = "BusinessToken";
     public static string UserToken = "UserToken";
+    public static string Authorization = "Authorization";
+
     public static string UserName = "UserName";
     public static string BusinessName = "BusinessName";
     public static string BusinessId = "BusinessId";
