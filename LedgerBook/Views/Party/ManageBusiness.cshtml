@@ -243,6 +243,10 @@
 
 @section Scripts {
     <script>
+        let searchText = $("#partySearch").val();
+        let filter = $("#filterParty").val();
+        let sort = $("#sortParty").val();
+        
         $(document).ready(function () {
             displayPartyList();
 
@@ -274,6 +278,22 @@
                 emptyInputValidation("save-transaction-entry-form")
                 RemoveValidations();
             })
+
+            $(document).on("keyup", "#partySearch", function () {
+                searchText = $(this).val().trim();
+                displayPartyList(searchText, filter, sort)
+            })
+
+            $(document).on("change", "#filterParty", function () {
+                filter = $(this).val();
+                displayPartyList(searchText, filter, sort)
+            })
+
+            $(document).on("change", "#sortParty", function () {
+                sort = $(this).val();
+                displayPartyList(searchText, filter, sort)
+            })
+
         })
 
         var displaytime = window.setInterval(function () {
