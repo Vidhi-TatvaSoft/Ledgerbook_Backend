@@ -473,7 +473,7 @@ public class PartyService : IPartyService
                                    TransactionAmount = x.Amount,
                                    TransactionType = x.TransactionType,
                                    CreatedAt = x.CreatedAt,
-                                   CreateDate = x.CreatedAt.ToString("dd MMM yyyy"),
+                                   CreateDate = x.CreatedAt.ToString("dd MMM yyyy hh:mm tt"),
                                    UpdatedAt = x.UpdatedAt,
                                    Balance = 0,
                                    Description = x.Description,

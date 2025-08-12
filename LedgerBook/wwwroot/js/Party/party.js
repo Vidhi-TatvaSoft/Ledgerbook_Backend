@@ -65,15 +65,21 @@ function displayTransactionEntries(partyId) {
     let params = setBusinessParameter("/Party/GetTransationEntries", GET, null, FORM_URL, { partyId: partyId }, transactionEntriesSuccess);
     $("body").addClass("loading");
     ajaxCall(params);
+}
 
-    // $.ajax({
-    //     url: "/Party/DisplyTransationEntries",
-    //     type: "GET",
-    //     data: { partyId },
-    //     success: function (response) {
-    //         $("#transaction-entries-id").html(response);
-    //     }
-    // })
+function updateParty(partyId){
+    $("#save-party-modal-content").html($("#save-party-modal-innercontent").html());
+    $("#add-party-modal-title").html("Update Party");
+    if ($("#customer-layout-div").hasClass("d-none")) {
+        $("#supplier-radio").prop("checked", true);
+        $("#customer-radio").parent().addClass("d-none");
+    } else if ($("#supplier-layout-div").hasClass("d-none")) {
+        $("#supplier-radio").parent().addClass("d-none");
+    }
+    $(".party-amount-div").addClass("d-none")
+    let params = setBusinessParameter("/Party/GetPartyDetails", GET, null, FORM_URL, { partyId: partyId }, getPartyDetailsToUpdateSuccess);
+    $("body").addClass("loading");
+    ajaxCall(params);
 }
 
 //display time
@@ -132,3 +138,4 @@ function partyTimeDisplay() {
         }
     }
 }
+

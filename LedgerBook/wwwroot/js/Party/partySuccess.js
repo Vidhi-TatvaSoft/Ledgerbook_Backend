@@ -112,7 +112,7 @@ function partyDetailsSuccess(response) {
                                                     style="color: #2F8891;">${party.partyName[0].toUpperCase()}</span></div>
                                             <div class=" fs-4 fw-bold pb-2">${party.partyName}</div>
                                         </div>
-                                        <div><i class="fa-solid fa-pen cursor-pointer" data-bs-toggle="modal" data-bs-target="#party-modal"
+                                        <div><i class="fa-solid fa-pen cursor-pointer" data-bs-toggle="modal" data-bs-target="#save-party-modal"
                                                 title="Update party" onclick="updateParty(${party.partyId})"
                                                 data-partyId="${party.partyId}"></i>
                                         </div>
@@ -203,8 +203,7 @@ function transactionEntriesSuccess(response) {
                     htmlContent += `<div class="row border-bottom p-2  cursor-pointer d-flex align-items-center" data-bs-toggle="modal" title="Update transaction"
                                 data-bs-target="#transaction-entry-modal" onclick="displayUpdateTransactionModal(${entry.transactionId})">
                                 <div class="col-4  d-flex flex-column">
-                                    <div class="fw-bold entry-date"></div>
-                                    <div class="fw-bold entry-date-hidden d-none">${entry.createDate}</div>
+                                    <div class="fw-bold entry-date ">${entry.createDate}</div>
                                     <div class="text-secondary">BALANCE : ${entry.balance}</div>`
                     if (entry.dueDateString != null) {
                         htmlContent += `<div class="text-secondary"> Due Date : ${entry.dueDateString} </div>`
@@ -226,10 +225,35 @@ function transactionEntriesSuccess(response) {
                 })
                 htmlContent += `</div>`
             }
+            $("#transaction-entries-id").html(htmlContent)
         }
     } else {
         if (response.toasterMessage != null) {
             Toaster(response.toasterMessage, "error")
         }
+    }
+}
+
+function getPartyDetailsToUpdateSuccess(response){
+    if(response.isSuccess){
+        if(response.result != null){
+            let party = response.result;
+            $("#party-id").val(party.partyId)
+            $("#party-name").val(party.partyName)
+            $("#party-email").val(party.email)
+            if(party.partyTypeString == "Customer"){
+                $("#customer-radio").prop("checked",true);
+            }else{
+                $("#supplier-radio").prop("checked",true);
+            }
+        }
+    }else{
+        if (response.toasterMessage != null) {
+            Toaster(response.toasterMessage, "error")
+        }
+        displayPartyList();
+        $(".btn-close").click();
+        RemoveValidations();
+        emptyInputValidation("save-party-form-id");
     }
 }
