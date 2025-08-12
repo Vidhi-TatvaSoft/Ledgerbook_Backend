@@ -616,10 +616,20 @@ public class PartyService : IPartyService
         }).ToList().FirstOrDefault();
     }
 
-    public int DeleteTransaction(int transactionId, int userId)
+    public ApiResponse<int> DeleteTransaction(int transactionId, int userId, int businessId)
     {
+        if (transactionId == 0 || businessId == 0 || userId == 0)
+        {
+            return new ApiResponse<int>(false, Messages.ExceptionMessage, 0, HttpStatusCode.BadRequest);
+        }
         LedgerTransactions transaction = _genericRepository.Get<LedgerTransactions>(t => t.Id == transactionId && !t.DeletedAt.HasValue);
         PartyViewModel partyViewModel = GetPartyById(transaction.PartyId);
+        if (!_userBusinessMappingService.HasPermission(businessId, userId, partyViewModel.PartyTypeString))
+        {
+            return new ApiResponse<int>(false, Messages.ForbiddenMessage, transaction.PartyId, HttpStatusCode.Forbidden);
+        }
+
+        bool isDeleted = false;
         string businessname = _businessService.GetBusinessNameById(partyViewModel.BusinessId);
         string userName = _userService.GetuserNameById(userId);
         if (transaction != null)
@@ -629,12 +639,12 @@ public class PartyService : IPartyService
             _genericRepository.Update<LedgerTransactions>(transaction);
             string message = string.Format(Messages.TransactionActivity, partyViewModel.PartyTypeString, partyViewModel.PartyName, businessname, "deleted", userName);
             _activityLogService.SetActivityLog(message, EnumHelper.Actiontype.Delete, EnumHelper.ActivityEntityType.Business, partyViewModel.BusinessId, userId, EnumHelper.ActivityEntityType.Transaction, transaction.Id);
-            return transaction.PartyId;
+            isDeleted = true;
         }
+        if (isDeleted)
+            return new ApiResponse<int>(true, string.Format(Messages.GlobalAddUpdateMesage, "Transaction", "deleted"), partyViewModel.PartyId, HttpStatusCode.OK);
         else
-        {
-            return 0;
-        }
+            return new ApiResponse<int>(false, string.Format(Messages.GlobalAddUpdateFailMessage, "delete", "transaction"), partyViewModel.PartyId, HttpStatusCode.BadRequest);
     }
 
     public List<Parties> GetAllPartiesByBusiness(int businessId, int userId)

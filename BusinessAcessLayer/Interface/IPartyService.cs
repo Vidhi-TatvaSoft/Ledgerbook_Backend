@@ -20,7 +20,7 @@ public interface IPartyService
     ApiResponse<LedgerEntriesViewModel> GetTransactionsByPartyId(int partyId, int businessId, int userId);
     ApiResponse<TransactionEntryViewModel> GetTransactionDetailById(int businessId, int userId, int partyId, EnumHelper.TransactionType? transactionType, int? transactionId);
     TransactionEntryViewModel GetTransactionbyTransactionId(int transactionId);
-    int DeleteTransaction(int transactionId, int userId);
+    ApiResponse<int> DeleteTransaction(int transactionId, int userId, int businessId);
     List<Parties> GetAllPartiesByBusiness(int businessId, int userId);
     List<TransactionEntryViewModel> GetAllTransaction(int businessId);
     List<TransactionEntryViewModel> GetUpcomingDues(int businessId);

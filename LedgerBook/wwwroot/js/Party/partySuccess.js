@@ -318,3 +318,22 @@ function saveTransactionSuccess(response) {
         closeTransactionModal()
     }
 }
+
+function deleteTransactionSuccess(response){
+    if (response.isSuccess) {
+        if (response.toasterMessage != null) {
+            Toaster(response.toasterMessage);
+        }
+        displayPartyList();
+        if (response.result != null) {
+            displaySelectedParyDetails(parseInt(response.result))
+        }
+        $(".btn-close").click();
+    } else {
+        if (response.toasterMessage != null) {
+            Toaster(response.toasterMessage, "error")
+        }
+        displayPartyList();
+        $(".btn-close").click();
+    }
+}

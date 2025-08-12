@@ -154,3 +154,36 @@ function displayUpdateTransactionModal(partyId,transactionId) {
     $("body").addClass("loading");
     ajaxCall(params);
 }
+
+function deleteTransactionId(transactionId) {
+    document.getElementById("delete-transaction-id").value = transactionId;
+}
+
+//delete transaction ajax
+function deleteTransaction() {
+    let transactionId = document.getElementById("delete-transaction-id").value;
+    let params = setBusinessParameter("/Party/DeleteTransaction", POST, null, FORM_URL, { transactionId : transactionId }, deleteTransactionSuccess);
+    $("body").addClass("loading");
+    ajaxCall(params);
+
+    // $.ajax({
+    //     url: "/Party/DeleteTransaction",
+    //     type: "GET",
+    //     data: { transactionId },
+    //     success: function (response) {
+    //         IsHtmlDoc(response.toString());
+    //         if (response.success) {
+    //             Toaster(response.message);
+    //             $('.btn-close').click();
+    //             displayPartyList();
+    //             displaySelectedParyDetails(response.partyId)
+
+    //         } else {
+    //             Toaster(response.message, "error");
+    //             $('.btn-close').click();
+    //             displayPartyList();
+    //             displaySelectedParyDetails(response.partyId)
+    //         }
+    //     }
+    // })
+}

@@ -106,4 +106,16 @@ public class PartyController : BaseController
         return Ok(await _partyService.SaveTransactionEntryWithPermission(transactionEntryVM, user.Id, business));
     }
     #endregion
+
+    #region delete transaction
+    [HttpPost]
+    [Route("DeleteTransaction")]
+    [PermissionAuthorize("AnyRole")]
+    public IActionResult DeleteTransaction([FromForm] int transactionId)
+    {
+        ApplicationUser user = GetCurrentUserIdentity();
+        Businesses business = GetBusinessFromToken();
+        return Ok(_partyService.DeleteTransaction(transactionId, user.Id, business.Id));
+    }
+    #endregion
 }
