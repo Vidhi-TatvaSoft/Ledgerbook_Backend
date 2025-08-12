@@ -36,4 +36,10 @@ public class EnumHelper
         Update = 2,
         Delete = 3
     }
+
+    public enum PartyType
+    {
+        Customer,
+        Supplier
+    }
 }

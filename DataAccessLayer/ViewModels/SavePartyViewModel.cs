@@ -18,7 +18,7 @@ public class SavePartyViewModel
     public string Email { get; set; }
     public int PartyTypId { get; set; }
 
-    public string PartyTypeString { get; set; }
+    public EnumHelper.PartyType PartyTypeString { get; set; }
 
     public int BusinessId { get; set; }
 

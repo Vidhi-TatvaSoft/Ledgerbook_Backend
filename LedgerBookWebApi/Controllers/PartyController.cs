@@ -66,18 +66,44 @@ public class PartyController : BaseController
     [PermissionAuthorize("AnyRole")]
     public IActionResult GetPartyDetails(int partyId)
     {
-        if (partyId == 0)
-            return Ok(new ApiResponse<PartyViewModel>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest));
-        return Ok(new ApiResponse<PartyViewModel>(true, null, _partyService.GetPartyById(partyId), HttpStatusCode.OK));
+        ApplicationUser user = GetCurrentUserIdentity();
+        Businesses business = GetBusinessFromToken();
+        return Ok(_partyService.GetpartyByIdResponse(partyId, business.Id, user.Id));
     }
 
     #region display transaction entries
-     [HttpGet]
+    [HttpGet]
     [Route("GetTransationEntries")]
     [PermissionAuthorize("AnyRole")]
     public IActionResult GetTransationEntries(int partyId)
     {
-        return Ok(_partyService.GetTransactionsByPartyId(partyId));
+        ApplicationUser user = GetCurrentUserIdentity();
+        Businesses business = GetBusinessFromToken();
+        return Ok(_partyService.GetTransactionsByPartyId(partyId, business.Id, user.Id));
+    }
+    #endregion
+
+    #region save transaction modal display
+    [HttpGet]
+    [Route("GetTransactionDetailById")]
+    [PermissionAuthorize("AnyRole")]
+    public IActionResult GetTransactionDetailById(int partyId, EnumHelper.TransactionType? transactionType, int? transactionId)
+    {
+        ApplicationUser user = GetCurrentUserIdentity();
+        Businesses business = GetBusinessFromToken();
+        return Ok(_partyService.GetTransactionDetailById(business.Id, user.Id, partyId, transactionType, transactionId));
+    }
+    #endregion
+
+    #region save transaction post method
+    [HttpPost]
+    [Route("SaveTransactionEntry")]
+    [PermissionAuthorize("AnyRole")]
+    public async Task<IActionResult> SaveTransactionEntry([FromForm] TransactionEntryViewModel transactionEntryVM)
+    {
+        ApplicationUser user = GetCurrentUserIdentity();
+        Businesses business = GetBusinessFromToken();
+        return Ok(await _partyService.SaveTransactionEntryWithPermission(transactionEntryVM, user.Id, business));
     }
     #endregion
 }

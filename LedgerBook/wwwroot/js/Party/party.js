@@ -45,6 +45,10 @@ function ClosePartyModal() {
     $("#save-party-modal").modal("hide")
 }
 
+function closeTransactionModal(){
+    $("#transaction-entry-modal").modal("hide")
+}
+
 //display details of selected party
 function displaySelectedParyDetails(partyId) {
     let params = setBusinessParameter("/Party/GetPartyDetails", GET, null, FORM_URL, { partyId: partyId }, partyDetailsSuccess);
@@ -57,7 +61,7 @@ function displaySelectedParyDetails(partyId) {
     }
     setTimeout(function () {
         document.getElementById(`party-id-${partyId}`).classList.add("selected-party");
-    }, 500);
+    }, 300);
 }
 
 //display transaction entries of selected parties
@@ -67,7 +71,7 @@ function displayTransactionEntries(partyId) {
     ajaxCall(params);
 }
 
-function updateParty(partyId){
+function updateParty(partyId) {
     $("#save-party-modal-content").html($("#save-party-modal-innercontent").html());
     $("#add-party-modal-title").html("Update Party");
     if ($("#customer-layout-div").hasClass("d-none")) {
@@ -139,3 +143,14 @@ function partyTimeDisplay() {
     }
 }
 
+function displayAddTransactionModal(partyId, transactionType) {
+    let params = setBusinessParameter("/Party/GetTransactionDetailById", GET, null, FORM_URL, { partyId: partyId, transactionType: transactionType }, AddTransactionModalSuccess);
+    $("body").addClass("loading");
+    ajaxCall(params);
+}
+
+function displayUpdateTransactionModal(partyId,transactionId) {
+    let params = setBusinessParameter("/Party/GetTransactionDetailById", GET, null, FORM_URL, { partyId: partyId, transactionId: transactionId }, UpdateTransactionModalSuccess);
+    $("body").addClass("loading");
+    ajaxCall(params);
+}

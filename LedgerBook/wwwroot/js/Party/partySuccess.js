@@ -16,9 +16,7 @@ function rolePermissionSuccess(response) {
 }
 
 function getAllPartiesSuccess(response) {
-    console.log(response)
     if (response.isSuccess) {
-        console.log("hii")
         if (response.result != null) {
             let parties = response.result;
             let htmlContent = ""
@@ -53,7 +51,7 @@ function getAllPartiesSuccess(response) {
                         htmlContent += `<div class="fs-5 fw-bold text-end">₹${Math.Abs(element.amount)}</div><div></div>`
                     }
                     else {
-                        if (element.transactionType == "GAVE") {
+                        if (element.transactionType == 2) {
                             htmlContent += `<div class="fs-5 fw-bold text-end text-danger" > ₹${Math.abs(element.amount)}</div >
                                 <div class="text-secondary">YOU'LL GET</div>`
                         } else {
@@ -144,7 +142,6 @@ function partyDetailsSuccess(response) {
 function transactionEntriesSuccess(response) {
     if (response.isSuccess) {
         if (response.result != null) {
-            console.log("hbhjfbcsjkd")
             let transactions = response.result.transactionsList
             let htmlContent = "";
             if (transactions.length == 0) {
@@ -201,7 +198,7 @@ function transactionEntriesSuccess(response) {
 
                 transactions.forEach(entry => {
                     htmlContent += `<div class="row border-bottom p-2  cursor-pointer d-flex align-items-center" data-bs-toggle="modal" title="Update transaction"
-                                data-bs-target="#transaction-entry-modal" onclick="displayUpdateTransactionModal(${entry.transactionId})">
+                                data-bs-target="#transaction-entry-modal" onclick="displayUpdateTransactionModal(${entry.partyId},${entry.transactionId})">
                                 <div class="col-4  d-flex flex-column">
                                     <div class="fw-bold entry-date ">${entry.createDate}</div>
                                     <div class="text-secondary">BALANCE : ${entry.balance}</div>`
@@ -209,7 +206,7 @@ function transactionEntriesSuccess(response) {
                         htmlContent += `<div class="text-secondary"> Due Date : ${entry.dueDateString} </div>`
                     }
                     htmlContent += `</div>`
-                    if (entry.TransactionType == 2) {
+                    if (entry.transactionType == 2) {
                         htmlContent += `<div class="col-3 text-center text-danger fw-bold fs-5">₹${entry.transactionAmount}</div>
                             <div class="col-3 text-center text-success fw-bold fs-5">-</div>`
                     }
@@ -234,20 +231,20 @@ function transactionEntriesSuccess(response) {
     }
 }
 
-function getPartyDetailsToUpdateSuccess(response){
-    if(response.isSuccess){
-        if(response.result != null){
+function getPartyDetailsToUpdateSuccess(response) {
+    if (response.isSuccess) {
+        if (response.result != null) {
             let party = response.result;
             $("#party-id").val(party.partyId)
             $("#party-name").val(party.partyName)
             $("#party-email").val(party.email)
-            if(party.partyTypeString == "Customer"){
-                $("#customer-radio").prop("checked",true);
-            }else{
-                $("#supplier-radio").prop("checked",true);
+            if (party.partyTypeString == "Customer") {
+                $("#customer-radio").prop("checked", true);
+            } else {
+                $("#supplier-radio").prop("checked", true);
             }
         }
-    }else{
+    } else {
         if (response.toasterMessage != null) {
             Toaster(response.toasterMessage, "error")
         }
@@ -255,5 +252,69 @@ function getPartyDetailsToUpdateSuccess(response){
         $(".btn-close").click();
         RemoveValidations();
         emptyInputValidation("save-party-form-id");
+    }
+}
+
+function AddTransactionModalSuccess(response) {
+    if (response.isSuccess) {
+        if (response.result != null) {
+            let transaction = response.result;
+            $("#save-transaction-modal-header").html("Add Transaction");
+            $("#transaction-id").val(transaction.transactionId)
+            $("#transaction-partyId").val(transaction.partyId);
+            $("#transaction-transactionType").val(transaction.transactionTypeEnum == 1 ? "GOT" : "GAVE");
+        }
+    } else {
+        if (response.toasterMessage != null) {
+            Toaster(response.toasterMessage, "error")
+        }
+    }
+}
+
+function UpdateTransactionModalSuccess(response) {
+    if (response.isSuccess) {
+        if (response.result != null) {
+            let transaction = response.result;
+            $("#save-transaction-modal-header").html("Update Transaction");
+            $("#transaction-id").val(transaction.transactionId)
+            $("#transaction-partyId").val(transaction.partyId);
+            $("#transaction-amount").val(transaction.transactionAmount);
+            $("#transaction-transactionType").val(transaction.transactionTypeEnum == 1 ? "GOT" : "GAVE");
+            if (transaction.dueDate != null) {
+                const dateObject = new Date(transaction.dueDate);
+
+                const year = dateObject.getFullYear();
+                const month = (dateObject.getMonth() + 1).toString().padStart(2, '0'); // Month is 0-indexed, add 1 and pad with '0'
+                const day = dateObject.getDate().toString().padStart(2, '0'); // Pad with '0'
+
+                // Format the date as "YYYY-MM-DD"
+                const formattedDate = `${year}-${month}-${day}`;
+
+                // Set the value of the input type="date" element
+                $("#transaction-duedate").val(formattedDate)
+            }
+        }
+    } else {
+        if (response.toasterMessage != null) {
+            Toaster(response.toasterMessage, "error")
+        }
+    }
+}
+
+function saveTransactionSuccess(response) {
+    if (response.isSuccess) {
+        if (response.toasterMessage != null) {
+            Toaster(response.toasterMessage);
+        }
+        displayPartyList();
+        if (response.result != null) {
+            displaySelectedParyDetails(parseInt(response.result))
+        }
+    } else {
+        if (response.toasterMessage != null) {
+            Toaster(response.toasterMessage, "error")
+        }
+        displayPartyList();
+        closeTransactionModal()
     }
 }

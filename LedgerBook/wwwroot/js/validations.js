@@ -299,6 +299,17 @@ function validateSavePartyForm(){
     }else{
         return false;
     }
+}
+
+function validateSaveTransactionForm(){
+    let amount = document.getElementById("party-amount")
+    MinAmount(amount)
+
+    if($(".amountValidationMessage").html() == ""){
+        return true;
+    }else{
+        return false;
+    }
     
 }
 

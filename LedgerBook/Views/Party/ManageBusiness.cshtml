@@ -103,7 +103,7 @@
                             onblur="TrimInput(this);partyNameValidation(this)" class="form-control" id="party-name"
                             placeholder="Party Name">
                         <label for="party-name" class="fs-6 text-secondary">Party Name*</label>
-                        <span class="text-danger partyNameValidationMessage"></span>
+                        <span class="text-danger partyNameValidationMessage validationMessage"></span>
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-6 col-xl-6 col-sm-12 col-12 mt-3">
@@ -112,7 +112,7 @@
                             onblur="TrimInput(this);emailValidation(this)" class="form-control" id="party-email"
                             placeholder="Email">
                         <label for="party-email" class="fs-6 text-secondary">Email*</label>
-                        <span class="text-danger emailValidationMessage"></span>
+                        <span class="text-danger emailValidationMessage validationMessage"></span>
                     </div>
                 </div>
                 <div class=" col-8 mt-3 pe-0 d-none party-amount-div">
@@ -121,7 +121,7 @@
                             onblur="TrimInput(this);MinAmount(this)" class="form-control" id="party-amount"
                             placeholder="Opening Amount">
                         <label for="party-amount" class="fs-6 text-secondary">Opening Amount</label>
-                        <span class="text-danger amountValidationMessage"></span>
+                        <span class="text-danger amountValidationMessage validationMessage"></span>
                     </div>
                 </div>
                 <div class=" col-4 mt-3 ps-0 d-none party-amount-div">
@@ -167,6 +167,54 @@
     </div>
 </div>
 
+<div id="transaction-entry-modal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered " id="transaction-modal-content">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="save-transaction-modal-header">Add Transaction</h5>
+                <button type="button" class="btn-close userdetail-confirmation-modal-close" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <form id="save-transaction-entry-form">
+                <div class="modal-body row ">
+                    <input type="hidden" id="transaction-id">
+                    <input type="hidden" id="transaction-partyId">
+                    <div class=" col-8 mt-3 pe-0">
+                        <div class="form-floating ">
+                            <input type="Number" oninput="RemoveWhiteSpace(this);MinAmount(this)"
+                                onblur="RemoveWhiteSpace(this);MinAmount(this)" class="form-control"
+                                id="transaction-amount" placeholder="Opening Amount">
+                            <label for="transaction-amount" class="fs-6 text-secondary">Amount</label>
+                            <span class="text-danger amountValidationMessage validationMessage"></span>
+                        </div>
+                    </div>
+                    <div class=" col-4 mt-3 ps-0">
+                        <div class="form-floating">
+                            <select id="transaction-transactionType" class="form-control">
+                                <option value="@EnumHelper.TransactionType.GOT">You Got
+                                </option>
+                                <option value="@EnumHelper.TransactionType.GAVE">You Gave
+                                </option>
+                            </select>
+                            <label for="transaction-transactionType">Type</label>
+                        </div>
+                    </div>
+                    <div class=" col-6 mt-3 ">
+                        <div class="form-floating">
+                            <input type="date" class="form-control" id="transaction-duedate">
+                            <label for="transaction-duedate">Due date</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer d-flex justify-content-center">
+                    <button type="submit" class="btn btn-primary" onclick="closeTransactionModal()">Save</button>
+                    <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
 <!----------------------------- partial views ------------------------------->
 
 
@@ -174,18 +222,34 @@
     <script>
         $(document).ready(function () {
             displayPartyList();
-            @* setTimeout(function () {
-                partyTimeDisplay();
-            }, 300) *@
 
-                $(document).on("submit", "#save-party-form-id", function (e) {
-                    e.preventDefault();
-                })
+            $(document).on("submit", "#save-party-form-id", function (e) {
+                e.preventDefault();
+            })
+            $(document).on("submit", "#save-transaction-entry-form", function (e) {
+                e.preventDefault();
+                if (validateSaveTransactionForm()) {
+                    let formData = new FormData();
+                    formData.append("PartyId", $("#transaction-partyId").val())
+                    formData.append("TransactionId", $("#transaction-id").val() == "" ? 0 : $("#transaction-id").val())
+                    formData.append("TransactionAmount", $("#transaction-amount").val())
+                    formData.append("TransactionTypeEnum", $("#transaction-transactionType").val())
+                    formData.append("DueDate", $("#transaction-duedate").val())
+                    let params = setBusinessParameter("/Party/SaveTransactionEntry", POST, null, FORMDATA, formData, saveTransactionSuccess);
+                    $("body").addClass("loading");
+                    ajaxCall(params);
+                }
+            })
 
             $(document).on('hidden.bs.modal', "#save-party-modal", function (e) {
                 emptyInputValidation("save-party-form-id")
                 RemoveValidations();
                 displayPartyList();
+            })
+
+            $(document).on('hidden.bs.modal', "#transaction-entry-modal", function (e) {
+                emptyInputValidation("save-transaction-entry-form")
+                RemoveValidations();
             })
         })
 
