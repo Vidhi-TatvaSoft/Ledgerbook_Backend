@@ -10,7 +10,7 @@ public interface IPartyService
     Task<ApiResponse<SavePartyViewModel>> SaveParty(SavePartyViewModel partyViewModel, int userId, Businesses business);
     Task<int> SavePartyDetails(SavePartyViewModel partyViewModel, int userId);
     string GetEmailVerifiactionTokenForParty(int partyId);
-    Task<bool> PartyEmailVerification(PartyVerifiedViewModel partyVerifiedViewModel);
+    Task<ApiResponse<PartyVerifiedViewModel>> PartyEmailVerification(string verificationCode);
     bool IsPartyverified(int partyId);
     bool IsEmailChanged(SavePartyViewModel partyViewModel);
     List<PartyViewModel> GetPartiesByType(string partyType, int businessId, string searchText, string? filter, string? sort);

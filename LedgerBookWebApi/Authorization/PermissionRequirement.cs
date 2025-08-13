@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 
-namespace LedgerBook.Authorization;
+namespace LedgerBookWebApi.Authorization;
 
 public class PermissionRequirement : IAuthorizationRequirement
 {

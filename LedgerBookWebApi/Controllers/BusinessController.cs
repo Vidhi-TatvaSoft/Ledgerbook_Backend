@@ -4,7 +4,7 @@ using BusinessAcessLayer.Constant;
 using BusinessAcessLayer.Interface;
 using DataAccessLayer.Models;
 using DataAccessLayer.ViewModels;
-using LedgerBook.Authorization;
+using LedgerBookWebApi.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 

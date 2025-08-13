@@ -6,7 +6,8 @@ using DataAccessLayer.Models;
 using DataAccessLayer.ViewModels;
 using BusinessAcessLayer.Constant;
 using System.Net;
-namespace LedgerBook.Authorization;
+using BusinessAcessLayer.CustomException;
+namespace LedgerBookWebApi.Authorization;
 
 public class PermissionHandler : AuthorizationHandler<PermissionRequirement>
 {
@@ -54,12 +55,12 @@ public class PermissionHandler : AuthorizationHandler<PermissionRequirement>
         {
             if (string.IsNullOrEmpty(businessToken))
             {
-                throw new  HttpRequestException("Business Token Not found.", null, HttpStatusCode.ServiceUnavailable);
+                throw new BusinessNotFoundException("Business Token Not found.");
             }
             Businesses business = _businessService.GetBusinessFromToken(businessToken);
             if (business == null)
             {
-                throw new  HttpRequestException("Business Token Not found.", null, HttpStatusCode.ServiceUnavailable);
+                throw new BusinessNotFoundException("Business Token Not found.");
             }
             List<RoleViewModel> rolesByUser = _userBusinessMappingService.GetRolesByBusinessId(business.Id, user.Id);
             switch (requirement.Permission)

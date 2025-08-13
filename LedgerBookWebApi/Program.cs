@@ -4,7 +4,7 @@ using BusinessAcessLayer.Constant;
 using BusinessAcessLayer.Interface;
 using BusinessAcessLayer.Services;
 using DataAccessLayer.Models;
-using LedgerBook.Authorization;
+using LedgerBookWebApi.Authorization;
 using LedgerBook.ExceptionMiddleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;

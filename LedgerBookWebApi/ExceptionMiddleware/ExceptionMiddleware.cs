@@ -2,6 +2,7 @@ using System.Net;
 using System.Reflection.Metadata;
 using System.Text.Json;
 using BusinessAcessLayer.Constant;
+using BusinessAcessLayer.CustomException;
 using BusinessAcessLayer.Interface;
 using DataAccessLayer.ViewModels;
 
@@ -37,23 +38,28 @@ public class ExceptionMiddleware
 
     private async Task HandleExceptions(HttpContext context, Exception exception)
     {
+        var exceptiontype = exception.GetType();
          HttpStatusCode code;
         string message;
-
         switch (exception)
         {
             case UnauthorizedAccessException:
                 code = HttpStatusCode.Unauthorized;
                 message = null!;
                 break;
+            case BusinessNotFoundException:
+                code = HttpStatusCode.ServiceUnavailable;
+                message = exception.Message;
+                break;
             default:
-                code = context.Response.StatusCode switch
+                code =  context.Response.StatusCode switch
                 {
                     400 => HttpStatusCode.BadRequest,
                     401 => HttpStatusCode.Unauthorized,
                     403 => HttpStatusCode.Forbidden,
                     404 => HttpStatusCode.NotFound,
                     500 => HttpStatusCode.InternalServerError,
+                    503 => HttpStatusCode.ServiceUnavailable,
                     _ => HttpStatusCode.InternalServerError
                 };
                 message = Messages.ExceptionMessage;

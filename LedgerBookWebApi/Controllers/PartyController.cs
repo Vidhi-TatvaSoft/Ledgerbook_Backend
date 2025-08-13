@@ -4,7 +4,7 @@ using BusinessAcessLayer.Interface;
 using DataAccessLayer.Constant;
 using DataAccessLayer.Models;
 using DataAccessLayer.ViewModels;
-using LedgerBook.Authorization;
+using LedgerBookWebApi.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LedgerBookWebApi.Controllers;
@@ -58,6 +58,15 @@ public class PartyController : BaseController
         }
         return Ok(await _partyService.SaveParty(partyViewModel, user.Id, business));
 
+    }
+    #endregion
+
+    #region verify party email
+    [HttpGet]
+    [Route("VerifyPartyEmail")]
+    public async Task<IActionResult> VerifyPartyEmail(string verificationCode)
+    {
+        return Ok(await _partyService.PartyEmailVerification(verificationCode));
     }
     #endregion
 
@@ -118,4 +127,6 @@ public class PartyController : BaseController
         return Ok(_partyService.DeleteTransaction(transactionId, user.Id, business.Id));
     }
     #endregion
+
+
 }

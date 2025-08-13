@@ -170,7 +170,7 @@ public class PartyService : IPartyService
         {
             string verificationToken = GetEmailVerifiactionTokenForParty(partyId);
             string verificationCode = _jwtTokenService.GenerateTokenPartyEmailVerification(partyViewModel.Email, verificationToken, partyId, business.BusinessName, partyViewModel.PartyTypeString.ToString());
-            string verificationLink = "http://localhost:5189/Party/VerifyPartyEmail?verificationCode=" + verificationCode;
+            string verificationLink = "http://localhost:5189/Party/VerifyParty?verificationCode=" + verificationCode;
             _ = CommonMethods.VerifyParty(partyViewModel.PartyName, partyViewModel.Email, verificationLink, partyViewModel.PartyTypeString.ToString(), business.BusinessName);
         }
 
@@ -274,19 +274,33 @@ public class PartyService : IPartyService
         return _genericRepository.Get<Parties>(x => x.Id == partyId && !x.DeletedAt.HasValue).VerificationToken;
     }
 
-    public async Task<bool> PartyEmailVerification(PartyVerifiedViewModel partyVerifiedViewModel)
+    public async Task<ApiResponse<PartyVerifiedViewModel>> PartyEmailVerification(string verificationCode)
     {
-        Parties party = _genericRepository.Get<Parties>(x => x.Email.ToLower().Trim() == partyVerifiedViewModel.Email.ToLower().Trim() && x.VerificationToken == partyVerifiedViewModel.Token && x.Id == partyVerifiedViewModel.PartyId && !x.DeletedAt.HasValue);
+        PartyVerifiedViewModel partyVerifiedVM = new();
+        partyVerifiedVM.Email = _jwtTokenService.GetClaimValue(verificationCode, "email");
+        partyVerifiedVM.Token = _jwtTokenService.GetClaimValue(verificationCode, "token");
+        partyVerifiedVM.PartyId = int.Parse(_jwtTokenService.GetClaimValue(verificationCode, "partyId"));
+        partyVerifiedVM.BusinessName = _jwtTokenService.GetClaimValue(verificationCode, "businessName");
+        partyVerifiedVM.PartyType = _jwtTokenService.GetClaimValue(verificationCode, "partyType");
+
+        bool isEmailVerified = false;
+         Parties party = _genericRepository.Get<Parties>(x => x.Email.ToLower().Trim() == partyVerifiedVM.Email.ToLower().Trim() && x.VerificationToken == partyVerifiedVM.Token && x.Id == partyVerifiedVM.PartyId && !x.DeletedAt.HasValue);
         if (party != null)
         {
             party.IsEmailVerified = true;
             await _genericRepository.UpdateAsync<Parties>(party);
-            return true;
+            isEmailVerified = true;
+        }
+        if (isEmailVerified)
+        {
+            partyVerifiedVM.IsEmailVerified = true;
+            return new ApiResponse<PartyVerifiedViewModel>(true, null, partyVerifiedVM, HttpStatusCode.OK);
         }
         else
         {
-            return false;
+            return new ApiResponse<PartyVerifiedViewModel>(false, null, partyVerifiedVM, HttpStatusCode.BadRequest);
         }
+       
     }
 
     public bool IsPartyverified(int partyId)

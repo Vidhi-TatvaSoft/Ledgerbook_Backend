@@ -15,6 +15,7 @@ using System.Security.Claims;
 using System.Net;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Newtonsoft.Json;
+using BusinessAcessLayer.CustomException;
 
 namespace BusinessAcessLayer.Services;
 
@@ -386,7 +387,7 @@ public class BusinessService : IBusinessService
         }
         catch (Exception e)
         {
-            throw new HttpRequestException("Business Token Not found.", null, HttpStatusCode.ServiceUnavailable);
+            throw new BusinessNotFoundException("Business Token Not found.");
         }
 
     }

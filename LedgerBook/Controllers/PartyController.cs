@@ -12,5 +12,11 @@ public class PartyController : Controller
         ViewData["sidebar"] = partyType;
         return View();
     }
-    
+
+    [HttpGet]
+    public IActionResult VerifyParty(string verificationCode)
+    {
+        return View("VerifyParty",verificationCode);
+    }
+
 }
