@@ -128,5 +128,29 @@ public class PartyController : BaseController
     }
     #endregion
 
+    #region settle up party balance
+    [HttpPost]
+    [Route("SettleUpParty")]
+    [PermissionAuthorize("AnyRole")]
+    public async Task<IActionResult> SettleUpParty([FromForm] decimal netBalance, [FromForm] int partyId)
+    {
+        ApplicationUser user = GetCurrentUserIdentity();
+        Businesses business = GetBusinessFromToken();
+        return Ok(await _partyService.SettleUp(netBalance, partyId, user.Id, business));
+    }
+    #endregion
+
+    #region Send reminders to party for pending payment
+    [HttpGet]
+    [Route("SettleUpParty")]
+    [PermissionAuthorize("AnyRole")]
+    public IActionResult SendReminderToParty(decimal netBalance, int partyId)
+    {
+        ApplicationUser user = GetCurrentUserIdentity();
+        Businesses business = GetBusinessFromToken();
+        return Ok(_partyService.SendReminder(netBalance, partyId, user.Id, business));
+    }
+    #endregion
+
 
 }

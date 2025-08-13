@@ -750,6 +750,50 @@ public class PartyService : IPartyService
         return partyRevenue;
     }
 
+    public async Task<ApiResponse<int>> SettleUp(decimal netBalance, int partyId, int userId, Businesses business)
+    {
+        if (partyId == 0 || userId == 0 || business.Id == 0 || netBalance == 0)
+        {
+            return new ApiResponse<int>(false, Messages.ExceptionMessage, 0, HttpStatusCode.BadRequest);
+        }
+        PartyViewModel partyViewModel = GetPartyById(partyId);
+         if (!_userBusinessMappingService.HasPermission(business.Id, userId, partyViewModel.PartyTypeString.ToString()))
+        {
+            return new ApiResponse<int>(false, Messages.ForbiddenMessage, partyId, HttpStatusCode.Forbidden);
+        }
+        TransactionEntryViewModel transactionEntryVM = new();
+        transactionEntryVM.PartyId = partyId;
+        transactionEntryVM.TransactionAmount = Math.Abs(netBalance);
+        transactionEntryVM.BusinessName = business.BusinessName;
+        transactionEntryVM.IsSettleup = true;
+        //entry in Gave
+        if (netBalance < 0)
+            transactionEntryVM.TransactionType = (byte)EnumHelper.TransactionType.GAVE;
+        //got
+        else
+            transactionEntryVM.TransactionType = (byte)EnumHelper.TransactionType.GOT;
+        int transactionId = await SaveTransactionEntry(transactionEntryVM, userId);
+        if (transactionId != 0)
+            return new ApiResponse<int>(true, Messages.SettleUpMessage, partyId, HttpStatusCode.OK);
+        else
+            return new ApiResponse<int>(false, Messages.SettleUpFailMessage, partyId, HttpStatusCode.BadRequest);
+    }
+
+    public ApiResponse<string> SendReminder(decimal netBalance, int partyId, int userId, Businesses business)
+    {
+        if (partyId == 0 || userId == 0 || business.Id == 0 || netBalance == 0)
+        {
+            return new ApiResponse<string>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
+        }
+        PartyViewModel partyViewModel = GetPartyById(partyId);
+        if (!_userBusinessMappingService.HasPermission(business.Id, userId, partyViewModel.PartyTypeString.ToString()))
+        {
+            return new ApiResponse<string>(false, Messages.ForbiddenMessage, null, HttpStatusCode.Forbidden);
+        }
+        _ = CommonMethods.Sendreminder(partyViewModel.Email, partyViewModel.PartyTypeString, business.BusinessName, netBalance);
+        return new ApiResponse<string>(true, Messages.ReminderSentMessage, null, HttpStatusCode.OK);
+    }
+
     public ApiResponse<CookiesViewModel> CheckRolepermission(int businessId, int userId)
     {
         if (businessId == 0 || userId == 0)

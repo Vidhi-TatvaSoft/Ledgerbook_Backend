@@ -49,6 +49,14 @@ function closeTransactionModal(){
     $("#transaction-entry-modal").modal("hide")
 }
 
+function closeDelteTransactionModal(){
+    $("#delete-entry-modal").modal("hide")
+}
+
+function closeSettleUpModal(){
+    $("#settleup-modal").modal("hide")
+}
+
 //display details of selected party
 function displaySelectedParyDetails(partyId) {
     let params = setBusinessParameter("/Party/GetPartyDetails", GET, null, FORM_URL, { partyId: partyId }, partyDetailsSuccess);
@@ -163,6 +171,37 @@ function deleteTransactionId(transactionId) {
 function deleteTransaction() {
     let transactionId = document.getElementById("delete-transaction-id").value;
     let params = setBusinessParameter("/Party/DeleteTransaction", POST, null, FORM_URL, { transactionId : transactionId }, deleteTransactionSuccess);
+    $("body").addClass("loading");
+    ajaxCall(params);
+}
+
+//display modal fro settleup
+function settleUpModal(netBalance, partyId) {
+    console.log(Math.abs(netBalance))
+    $("#settleup-partyId").val(partyId);
+    $("#settleup-netBalance").val(netBalance);
+    $("#settleup-amount").html(Math.abs(netBalance).toString())
+    if(netBalance < 0){
+        $("#settleup-type").html("You Paid")
+    }else{
+        $("#settleup-type").html("You Recieved")
+    }
+}
+
+//settle up for party
+function settleUp() {
+    let netBalance = $("#settleup-netBalance").val();
+    let partyId = $("#settleup-partyId").val();
+    console.log(netBalance,partyId)
+    let params = setBusinessParameter("/Party/SettleUpParty", POST, null, FORM_URL, { netBalance: netBalance, partyId: partyId }, settleUpSuccess);
+    $("body").addClass("loading");
+    ajaxCall(params);
+}
+
+//send reminder to party through email
+function SendReminder(netBalance, partyId) {
+    console.log(netBalance, " ", partyId)
+    let params = setBusinessParameter("/Party/SettleUpParty", GET, null, FORM_URL, { netBalance: netBalance, partyId: partyId }, sendReminderSuccess);
     $("body").addClass("loading");
     ajaxCall(params);
 }

@@ -25,6 +25,8 @@ public interface IPartyService
     List<TransactionEntryViewModel> GetAllTransaction(int businessId);
     List<TransactionEntryViewModel> GetUpcomingDues(int businessId);
     List<decimal> GetPartyRevenue(int businessId, string year = null);
+    Task<ApiResponse<int>> SettleUp(decimal netBalance, int partyId, int userId, Businesses business);
+    ApiResponse<string> SendReminder(decimal netBalance, int partyId, int userId, Businesses business);
     ApiResponse<CookiesViewModel> CheckRolepermission(int businessId, int userId);
     ApiResponse<PartyViewModel> GetpartyByIdResponse(int partyId, int businessId, int userId);
 }

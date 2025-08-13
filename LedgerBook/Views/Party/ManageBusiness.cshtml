@@ -231,14 +231,38 @@
                 </div>
             </div>
             <div class="modal-footer d-flex justify-content-center">
-                <a type="button" class="btn btn-primary" onclick="deleteTransaction()">Yes</a>
+                <a type="button" class="btn btn-primary" onclick="deleteTransaction();closeDelteTransactionModal()">Yes</a>
                 <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">No</button>
             </div>
         </div>
     </div>
 </div>
 
-<!----------------------------- partial views ------------------------------->
+
+<div id="settleup-modal" class="modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="add-user-modal-title">Settled up confirmation</h5>
+                <button type="button" class="btn-close user-delete-modal-close-btn" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body ">
+                <div class="delete-cat-image d-flex flex-column  align-items-center">
+                    <p>Are you sure you want to settle up party transaction?</p>
+                    <p>A new transaction of ₹<span id="settleup-amount" class="fw-bold"></span> will be recorded as "<span id="settleup-type" class="fw-bold"></span>".</p>
+                    <input type="hidden" id="settleup-partyId">
+                    <input type="hidden" id="settleup-netBalance">
+                </div>
+            </div>
+            <div class="modal-footer d-flex justify-content-center">
+                <a type="submit" class="btn btn-primary" onclick="settleUp();closeSettleUpModal()">Yes</a>
+                <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
 @section Scripts {
@@ -277,6 +301,15 @@
             $(document).on('hidden.bs.modal', "#transaction-entry-modal", function (e) {
                 emptyInputValidation("save-transaction-entry-form")
                 RemoveValidations();
+            })
+
+             $(document).on('hidden.bs.modal', "#delete-entry-modal", function (e) {
+                $("#delete-transaction-id").val("");
+            })
+
+             $(document).on('hidden.bs.modal', "#settleup-modal", function (e) {
+                $("#settleup-partyId").val("")
+                $("#settleup-netBalance").val("")
             })
 
             $(document).on("change", "#filterParty", function () {

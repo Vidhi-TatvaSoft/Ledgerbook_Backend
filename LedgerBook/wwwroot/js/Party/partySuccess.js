@@ -48,7 +48,7 @@ function getAllPartiesSuccess(response) {
 
                             <div class="amount-type">`
                     if (element.amount == 0) {
-                        htmlContent += `<div class="fs-5 fw-bold text-end">₹${Math.Abs(element.amount)}</div><div></div>`
+                        htmlContent += `<div class="fs-5 fw-bold text-end">₹${Math.abs(element.amount)}</div><div></div>`
                     }
                     else {
                         if (element.transactionType == 2) {
@@ -92,7 +92,6 @@ function savePartySuccess(response) {
         emptyInputValidation("save-party-form-id");
     }
 }
-
 
 //displays party details and transaction details
 function partyDetailsSuccess(response) {
@@ -166,10 +165,10 @@ function transactionEntriesSuccess(response) {
                     if (response.result.netBalance != 0) {
                         if (response.result.ispartyVerified) {
                             htmlContent += `<div class="btn btn-outline-danger text-nowrap p-1 mt-2 mt-xl-0 ms-xl-2" data-bs-toggle="modal" data-bs-target="#settleup-modal"
-                                    onclick="SettleUpModal(${response.result.netBalance},${response.result.transactionsList[0].partyId})">Mark as settled</div>`
+                                    onclick="settleUpModal(${response.result.netBalance},${response.result.transactionsList[0].partyId})">Mark as settled</div>`
                         } else {
                             htmlContent += `<div class="btn btn-outline-danger text-nowrap p-1 mt-2 mt-xl-0 ms-0"  data-bs-toggle="modal" data-bs-target="#settleup-modal"
-                                    onclick="SettleUpModal(${response.result.netBalance},${response.result.transactionsList[0].partyId})">Mark as settled</div>`
+                                    onclick="settleUpModal(${response.result.netBalance},${response.result.transactionsList[0].partyId})">Mark as settled</div>`
                         }
 
                     }
@@ -319,21 +318,46 @@ function saveTransactionSuccess(response) {
     }
 }
 
-function deleteTransactionSuccess(response){
+function deleteTransactionSuccess(response) {
     if (response.isSuccess) {
         if (response.toasterMessage != null) {
             Toaster(response.toasterMessage);
         }
-        displayPartyList();
-        if (response.result != null) {
-            displaySelectedParyDetails(parseInt(response.result))
-        }
-        $(".btn-close").click();
     } else {
         if (response.toasterMessage != null) {
             Toaster(response.toasterMessage, "error")
         }
-        displayPartyList();
-        $(".btn-close").click();
+    }
+    displayPartyList();
+    if (response.result != null) {
+        displaySelectedParyDetails(parseInt(response.result))
+    }
+}
+
+function settleUpSuccess(response) {
+    if (response.isSuccess) {
+        if (response.toasterMessage != null) {
+            Toaster(response.toasterMessage);
+        }
+    } else {
+        if (response.toasterMessage != null) {
+            Toaster(response.toasterMessage, "error")
+        }
+    }
+    displayPartyList();
+    if (response.result != null) {
+        displaySelectedParyDetails(parseInt(response.result))
+    }
+}
+
+function sendReminderSuccess(response){
+    if (response.isSuccess) {
+        if (response.toasterMessage != null) {
+            Toaster(response.toasterMessage);
+        }
+    } else {
+        if (response.toasterMessage != null) {
+            Toaster(response.toasterMessage, "error")
+        }
     }
 }
