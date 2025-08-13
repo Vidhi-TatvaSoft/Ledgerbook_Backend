@@ -139,11 +139,11 @@
                                     <!-- business dropdown-->
                                     <div
                                         class=" fs-5 fw-bold  sidebar-menu-parent text-color btn-light text-center position-relative">
-                                        <select id="businessNameDropdown" onclick="click()" title="Select business"
+                                        <select id="businessNameDropdown" title="Select business"
                                             class="form-control h-100 w-100 fs-5 fw-bold business-label sidebar-menu-parent text-color btn-light text-center  cursor-pointer"></select>
                                         <i id="businessNameDropDownIcon"
                                             class="fa-solid fa-caret-down position-absolute translate-middle-y fs-4 me-3 cursor-pointer "
-                                            onclick="openDropDown()" style="top:48%; right :0px;"></i>
+                                            style="top:48%; right :0px;"></i>
                                     </div>
 
                                     <div class="fs-5 fw-bold sidebar-menu-parent">
@@ -162,7 +162,8 @@
                                     <!-- 0sidebar -->
                                     @* @if ((await AuthorizationService.AuthorizeAsync(User, "SalesManager")).Succeeded)
                                     { *@
-                                    <div class="fs-5 fw-bold sidebar-menu-parent d-none" id="customer-layout-div" onclick="ManageParty('Customer')">
+                                    <div class="fs-5 fw-bold sidebar-menu-parent" id="customer-layout-div"
+                                        onclick="ManageParty('Customer')">
                                         <a class=" d-flex sidebar-menu-item @((ViewData["sidebar"] as string) == "Customer" ? "sidebar-active-div" : "")"
                                             style="text-decoration: none;" style="max-width: 210px;">
                                             <i class="fa-solid fa-user text-white mt-1 ms-1 position-absolute"
@@ -177,9 +178,10 @@
                                     @* }
                                     @if ((await AuthorizationService.AuthorizeAsync(User, "PurchaseManager")).Succeeded)
                                     { *@
-                                    <div class="fs-5 fw-bold sidebar-menu-parent d-none" id="supplier-layout-div" >
-                                        <a class=" d-flex sidebar-menu-item @((ViewData["sidebar"] as string) == "Supplier" ? "sidebar-active-div" : "")" onclick="ManageParty('Supplier')"
-                                            style="text-decoration: none;" style="max-width: 210px;">
+                                    <div class="fs-5 fw-bold sidebar-menu-parent" id="supplier-layout-div">
+                                        <a class=" d-flex sidebar-menu-item @((ViewData["sidebar"] as string) == "Supplier" ? "sidebar-active-div" : "")"
+                                            onclick="ManageParty('Supplier')" style="text-decoration: none;"
+                                            style="max-width: 210px;">
                                             <i class="fa-solid fa-truck text-white mt-1 position-absolute"
                                                 style="margin-left: 2px !important;"></i>
                                             <span
@@ -258,6 +260,7 @@
     <script src="~/js/validations.js" asp-append-version="true"></script>
     <script src="~/js/ajaxCall/ajaxCall.js" asp-append-version="true"></script>
     <script src="~/js/User/userProfile.js" asp-append-version="true"></script>
+    <script src="~/js/Business/business.js" asp-append-version="true"></script>
     <script src="~/js/Party/party.js" asp-append-version="true"></script>
     <script src="~/js/Party/partySuccess.js" asp-append-version="true"></script>
 
@@ -306,6 +309,30 @@
         SetuserNameImage();
         checkRolePermission();
         GetBusinessList(getCookie(All_Businesses))
+
+
+        $('#businessNameDropdown').change(function () {
+            console.log(this.value)
+            let params = setParameter("/Business/GetBusinessData", GET, null, FORM_URL, { businessId: this.value }, SetBusinessCookiesSuccess);
+            $("body").addClass("loading");
+            ajaxCall(params);
+
+            @* let params = setBusinessParameter("/Business/SetBusinessToken", POST, null, NODATA, null, rolePermissionSuccess);
+            $("body").addClass("loading");
+            ajaxCall(params);
+            $.ajax({
+                url: "/Business/SetBusinessToken",
+                type: "POST",
+                data: { businessId: this.value },
+                success: function (response) {
+                    if (response.success) {
+                        window.location = "/Dashboard/Dashboard"
+                    } else {
+                        Toaster("Not set cookie")
+                    }
+                }
+            }) *@
+        });
     });
 
 </script>

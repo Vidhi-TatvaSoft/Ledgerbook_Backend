@@ -4,14 +4,23 @@ function rolePermissionSuccess(response) {
             Toaster(response.toasterMessage);
         }
         let cookies = response.result;
-        if (cookies.customerPermission) {
-            $("#customer-layout-div").removeClass("d-none")
-        } if (cookies.supplierPermission) {
-            $("#supplier-layout-div").removeClass("d-none")
+        if (!cookies.customerPermission) {
+            $("#customer-layout-div").addClass("d-none")
+        } if (!cookies.supplierPermission) {
+            $("#supplier-layout-div").addClass("d-none")
         }
     } else {
         if (response.toasterMessage != null)
             Toaster(response.toasterMessage, "error");
+    }
+}
+
+function getTotalsSuccess(response){
+    if(response.isSuccess){
+        if(response.result != null){
+            $("#total-amount-give").html(Math.abs(response.result.amountToGive))
+            $("#total-amount-get").html(Math.abs(response.result.amountToGet))
+        }
     }
 }
 
@@ -144,8 +153,8 @@ function transactionEntriesSuccess(response) {
             let transactions = response.result.transactionsList
             let htmlContent = "";
             if (transactions.length == 0) {
-                htmlContent += ` <div class="d-flex flex-column justify-content-center align-items-center h-100">
-                                    <div><img src="~/images/users.png" alt="" height="150px"></div>
+                htmlContent += ` <div class="" style="position:absolute; top:40%; left:75%">
+                                    <div><img src="/images/users.png" alt="" height="150px"></div>
                                     <div class="fs-4 text-secondary">No entries Added</div>
                                 </div>`
             } else {

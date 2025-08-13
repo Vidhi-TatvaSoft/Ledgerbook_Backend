@@ -9,7 +9,13 @@
 <!-------------------- /customer details-------------------------------->
 <div class="col-6  party-list border shadow p-0">
     <div class="row  border mx-0 p-3" id="total-amount-id">
-
+        <div class="col-6 fs-5 fw-semibold ">You'll Give: <span class="fw-bold text-success"><span id="total-amount-give"></span>
+                <i class="bi bi-arrow-up-right ms-2"></i>
+            </span></div>
+        <div class="col-6 fs-5 fw-semibold ">You'll Get: <span class="fw-bold text-danger"><span id="total-amount-get"></span>
+                <i class="bi bi-arrow-down-right ms-2"></i>
+            </span>
+        </div>
     </div>
 
     <div class="row border mx-0 p-3">
@@ -74,7 +80,7 @@
 <!------------------- transaction details-------------------------------->
 <div class="col-6 party-list p-0" id="displaySelectedParty">
     <div class="d-flex flex-column justify-content-center align-items-center h-100">
-        <div><img src="~/images/users.png" alt="" height="150px"></div>
+        <div><img src="/images/users.png" alt="" height="150px"></div>
         <div class="fs-4 text-secondary">No Party
             Selected</div>
     </div>
@@ -112,7 +118,7 @@
                             onblur="TrimInput(this);emailValidation(this)" class="form-control" id="party-email"
                             placeholder="Email">
                         <label for="party-email" class="fs-6 text-secondary">Email*</label>
-                        <span class="text-danger emailValidationMessage validationMessage"></span>
+                        <span class=" text-danger emailValidationMessage validationMessage"></span>
                     </div>
                 </div>
                 <div class=" col-8 mt-3 pe-0 d-none party-amount-div">
@@ -158,8 +164,8 @@
             </div>
 
             <div class="modal-footer">
-                <button type="submit" class="btn btn-primary" onclick="saveParty()">Save </button>
-                <button type="submit" class="btn btn-primary" onclick="saveParty();ClosePartyModal()">Save &
+                <button type="submit" class="btn btn-primary" onclick="saveParty(false)">Save </button>
+                <button type="submit" class="btn btn-primary" onclick="saveParty(true)">Save &
                     Close</button>
                 <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Close</button>
             </div>
@@ -181,8 +187,8 @@
                     <input type="hidden" id="transaction-partyId">
                     <div class=" col-8 mt-3 pe-0">
                         <div class="form-floating ">
-                            <input type="Number" oninput="RemoveWhiteSpace(this);MinAmount(this)"
-                                onblur="RemoveWhiteSpace(this);MinAmount(this)" class="form-control"
+                            <input type="Number" oninput="RemoveWhiteSpace(this);MinAmountRequire(this)" step=".01"
+                                onblur="RemoveWhiteSpace(this);MinAmountRequire(this)" class="form-control"
                                 id="transaction-amount" placeholder="Opening Amount">
                             <label for="transaction-amount" class="fs-6 text-secondary">Amount</label>
                             <span class="text-danger amountValidationMessage validationMessage"></span>
@@ -207,7 +213,7 @@
                     </div>
                 </div>
                 <div class="modal-footer d-flex justify-content-center">
-                    <button type="submit" class="btn btn-primary" onclick="closeTransactionModal()">Save</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
                     <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Close</button>
                 </div>
             </form>
@@ -231,7 +237,8 @@
                 </div>
             </div>
             <div class="modal-footer d-flex justify-content-center">
-                <a type="button" class="btn btn-primary" onclick="deleteTransaction();closeDelteTransactionModal()">Yes</a>
+                <a type="button" class="btn btn-primary"
+                    onclick="deleteTransaction();closeDelteTransactionModal()">Yes</a>
                 <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">No</button>
             </div>
         </div>
@@ -250,7 +257,8 @@
             <div class="modal-body ">
                 <div class="delete-cat-image d-flex flex-column  align-items-center">
                     <p>Are you sure you want to settle up party transaction?</p>
-                    <p>A new transaction of ₹<span id="settleup-amount" class="fw-bold"></span> will be recorded as "<span id="settleup-type" class="fw-bold"></span>".</p>
+                    <p>A new transaction of ₹<span id="settleup-amount" class="fw-bold"></span> will be recorded as
+                        "<span id="settleup-type" class="fw-bold"></span>".</p>
                     <input type="hidden" id="settleup-partyId">
                     <input type="hidden" id="settleup-netBalance">
                 </div>
@@ -270,7 +278,7 @@
         let searchText = $("#partySearch").val();
         let filter = $("#filterParty").val();
         let sort = $("#sortParty").val();
-        
+
         $(document).ready(function () {
             displayPartyList();
 
@@ -279,6 +287,7 @@
             })
             $(document).on("submit", "#save-transaction-entry-form", function (e) {
                 e.preventDefault();
+                console.log($("#transaction-amount").val())
                 if (validateSaveTransactionForm()) {
                     let formData = new FormData();
                     formData.append("PartyId", $("#transaction-partyId").val())
@@ -289,6 +298,7 @@
                     let params = setBusinessParameter("/Party/SaveTransactionEntry", POST, null, FORMDATA, formData, saveTransactionSuccess);
                     $("body").addClass("loading");
                     ajaxCall(params);
+                    closeTransactionModal()
                 }
             })
 
@@ -303,11 +313,11 @@
                 RemoveValidations();
             })
 
-             $(document).on('hidden.bs.modal', "#delete-entry-modal", function (e) {
+            $(document).on('hidden.bs.modal', "#delete-entry-modal", function (e) {
                 $("#delete-transaction-id").val("");
             })
 
-             $(document).on('hidden.bs.modal', "#settleup-modal", function (e) {
+            $(document).on('hidden.bs.modal', "#settleup-modal", function (e) {
                 $("#settleup-partyId").val("")
                 $("#settleup-netBalance").val("")
             })
@@ -355,6 +365,7 @@
             let params = setBusinessParameter("/Party/GetAllParties", GET, null, FORM_URL, { partyType: partyType, searchText: searchText, filter: filter, sort: sort }, getAllPartiesSuccess);
             $("body").addClass("loading");
             ajaxCall(params);
+            displayTotalAmounts();
         }
     </script>
 }

@@ -128,6 +128,18 @@ public class PartyController : BaseController
     }
     #endregion
 
+    #region  total amount base on partytype
+    [HttpGet]
+    [Route("GetTotalAmount")]
+    [PermissionAuthorize("AnyRole")]
+    public IActionResult GetTotalAmount(EnumHelper.PartyType partyType)
+    {
+        ApplicationUser user = GetCurrentUserIdentity();
+        Businesses business = GetBusinessFromToken();
+        return Ok(_partyService.GetTotalByPartyType(partyType, user.Id, business.Id));
+    }
+    #endregion
+
     #region settle up party balance
     [HttpPost]
     [Route("SettleUpParty")]

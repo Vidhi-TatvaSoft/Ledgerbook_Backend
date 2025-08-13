@@ -284,7 +284,7 @@ public class PartyService : IPartyService
         partyVerifiedVM.PartyType = _jwtTokenService.GetClaimValue(verificationCode, "partyType");
 
         bool isEmailVerified = false;
-         Parties party = _genericRepository.Get<Parties>(x => x.Email.ToLower().Trim() == partyVerifiedVM.Email.ToLower().Trim() && x.VerificationToken == partyVerifiedVM.Token && x.Id == partyVerifiedVM.PartyId && !x.DeletedAt.HasValue);
+        Parties party = _genericRepository.Get<Parties>(x => x.Email.ToLower().Trim() == partyVerifiedVM.Email.ToLower().Trim() && x.VerificationToken == partyVerifiedVM.Token && x.Id == partyVerifiedVM.PartyId && !x.DeletedAt.HasValue);
         if (party != null)
         {
             party.IsEmailVerified = true;
@@ -300,7 +300,7 @@ public class PartyService : IPartyService
         {
             return new ApiResponse<PartyVerifiedViewModel>(false, null, partyVerifiedVM, HttpStatusCode.BadRequest);
         }
-       
+
     }
 
     public bool IsPartyverified(int partyId)
@@ -757,7 +757,7 @@ public class PartyService : IPartyService
             return new ApiResponse<int>(false, Messages.ExceptionMessage, 0, HttpStatusCode.BadRequest);
         }
         PartyViewModel partyViewModel = GetPartyById(partyId);
-         if (!_userBusinessMappingService.HasPermission(business.Id, userId, partyViewModel.PartyTypeString.ToString()))
+        if (!_userBusinessMappingService.HasPermission(business.Id, userId, partyViewModel.PartyTypeString.ToString()))
         {
             return new ApiResponse<int>(false, Messages.ForbiddenMessage, partyId, HttpStatusCode.Forbidden);
         }
@@ -792,6 +792,34 @@ public class PartyService : IPartyService
         }
         _ = CommonMethods.Sendreminder(partyViewModel.Email, partyViewModel.PartyTypeString, business.BusinessName, netBalance);
         return new ApiResponse<string>(true, Messages.ReminderSentMessage, null, HttpStatusCode.OK);
+    }
+
+    public ApiResponse<TotalAmountViewModel> GetTotalByPartyType(EnumHelper.PartyType partyType, int userId, int businessId)
+    {
+        if (userId == 0 || businessId == 0)
+        {
+            return new ApiResponse<TotalAmountViewModel>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
+        }
+        if (!_userBusinessMappingService.HasPermission(businessId, userId, partyType.ToString()))
+        {
+            return new ApiResponse<TotalAmountViewModel>(false, Messages.ForbiddenMessage, null, HttpStatusCode.Forbidden);
+        }
+        List<PartyViewModel> parties = GetPartiesByType(partyType.ToString(), businessId, "", "-1", "-1");
+
+        TotalAmountViewModel totalAmountViewModel = new();
+        totalAmountViewModel.AmountToGet = 0;
+        totalAmountViewModel.AmountToGive = 0;
+        if (parties.Count != 0)
+        {
+            foreach (PartyViewModel party in parties)
+            {
+                if (party.TransactionType == EnumHelper.TransactionType.GAVE)
+                    totalAmountViewModel.AmountToGet += (decimal)party.Amount;
+                else
+                    totalAmountViewModel.AmountToGive += (decimal)party.Amount;
+            }
+        }
+        return new ApiResponse<TotalAmountViewModel>(true, null, totalAmountViewModel, HttpStatusCode.OK);
     }
 
     public ApiResponse<CookiesViewModel> CheckRolepermission(int businessId, int userId)

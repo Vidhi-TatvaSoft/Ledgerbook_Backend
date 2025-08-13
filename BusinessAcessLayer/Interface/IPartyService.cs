@@ -29,4 +29,5 @@ public interface IPartyService
     ApiResponse<string> SendReminder(decimal netBalance, int partyId, int userId, Businesses business);
     ApiResponse<CookiesViewModel> CheckRolepermission(int businessId, int userId);
     ApiResponse<PartyViewModel> GetpartyByIdResponse(int partyId, int businessId, int userId);
+    ApiResponse<TotalAmountViewModel> GetTotalByPartyType(EnumHelper.PartyType partyType, int userId, int businessId);
 }

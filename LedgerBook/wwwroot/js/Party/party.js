@@ -3,6 +3,20 @@ function ManageParty(partyType) {
     window.location = "/Party/ManageBusiness";
 }
 
+function displayTotalAmounts() {
+    let params = setBusinessParameter("/Party/GetTotalAmount", GET, null, FORM_URL, { partyType: getCookie(Party_Type) }, getTotalsSuccess);
+    $("body").addClass("loading");
+    ajaxCall(params);
+
+    // $.ajax({
+    //     url: "/Party/GetTotalAmount",
+    //     type: "GET",
+    //     success: function (response) {
+    //         HandleResponse(response, "#total-amount-id")
+    //     }
+    // })
+}
+
 function addPartyModal() {
     $("#save-party-modal-content").html($("#save-party-modal-innercontent").html());
     $("#add-party-modal-title").html("Add Party");
@@ -21,7 +35,7 @@ function addPartyModal() {
     $(".party-amount-div").removeClass("d-none")
 }
 
-function saveParty() {
+function saveParty(close) {
     if (validateSavePartyForm()) {
         let formData = new FormData();
         formData.append("PartyId", $("#party-id").val() == "" ? 0 : $("#party-id").val())
@@ -38,6 +52,9 @@ function saveParty() {
         let params = setBusinessParameter("/Party/SaveParty", POST, null, FORMDATA, formData, savePartySuccess);
         $("body").addClass("loading");
         ajaxCall(params);
+        if(close){
+            ClosePartyModal()
+        }
     }
 }
 
@@ -45,15 +62,15 @@ function ClosePartyModal() {
     $("#save-party-modal").modal("hide")
 }
 
-function closeTransactionModal(){
+function closeTransactionModal() {
     $("#transaction-entry-modal").modal("hide")
 }
 
-function closeDelteTransactionModal(){
+function closeDelteTransactionModal() {
     $("#delete-entry-modal").modal("hide")
 }
 
-function closeSettleUpModal(){
+function closeSettleUpModal() {
     $("#settleup-modal").modal("hide")
 }
 
@@ -157,7 +174,7 @@ function displayAddTransactionModal(partyId, transactionType) {
     ajaxCall(params);
 }
 
-function displayUpdateTransactionModal(partyId,transactionId) {
+function displayUpdateTransactionModal(partyId, transactionId) {
     let params = setBusinessParameter("/Party/GetTransactionDetailById", GET, null, FORM_URL, { partyId: partyId, transactionId: transactionId }, UpdateTransactionModalSuccess);
     $("body").addClass("loading");
     ajaxCall(params);
@@ -170,7 +187,7 @@ function deleteTransactionId(transactionId) {
 //delete transaction ajax
 function deleteTransaction() {
     let transactionId = document.getElementById("delete-transaction-id").value;
-    let params = setBusinessParameter("/Party/DeleteTransaction", POST, null, FORM_URL, { transactionId : transactionId }, deleteTransactionSuccess);
+    let params = setBusinessParameter("/Party/DeleteTransaction", POST, null, FORM_URL, { transactionId: transactionId }, deleteTransactionSuccess);
     $("body").addClass("loading");
     ajaxCall(params);
 }
@@ -180,9 +197,9 @@ function settleUpModal(netBalance, partyId) {
     $("#settleup-partyId").val(partyId);
     $("#settleup-netBalance").val(netBalance);
     $("#settleup-amount").html(Math.abs(netBalance).toString())
-    if(netBalance < 0){
+    if (netBalance < 0) {
         $("#settleup-type").html("You Paid")
-    }else{
+    } else {
         $("#settleup-type").html("You Recieved")
     }
 }

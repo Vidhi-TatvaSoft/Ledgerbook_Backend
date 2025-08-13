@@ -148,7 +148,7 @@ function partyNameValidation(input) {
     } else {
         $(`.partyNameValidationMessage`).html("");
     }
-} 
+}
 
 function MinAmount(input) {
     let value = parseFloat(input.value);
@@ -157,11 +157,28 @@ function MinAmount(input) {
     }
     else if (value > 10000) {
         $(".amountValidationMessage").text("Amount should be greater than 0")
-    }else{
+    } else {
         $(".amountValidationMessage").text("")
     }
 }
 
+function MinAmountRequire(input) {
+    if (input.value == "") {
+        $(".amountValidationMessage").text("Amount is required")
+        return;
+    }
+    let value = parseFloat(input.value);
+    console.log(value)
+   
+    if (value <= 0.0) {
+        $(".amountValidationMessage").text("Amount should be greater than 0")
+    }
+    else if (value > 10000) {
+        $(".amountValidationMessage").text("Amount should be greater than 0")
+    } else {
+        $(".amountValidationMessage").text("")
+    }
+}
 
 function validateLoginForm() {
     let email = document.getElementById("login-email")
@@ -281,36 +298,36 @@ function validateSaveUserForm() {
     } else {
         return false;
     }
-    
+
 }
 
 //////////validate party forms//////////
-function validateSavePartyForm(){
+function validateSavePartyForm() {
     let email = document.getElementById("party-email")
-    let name= document.getElementById("party-name")
+    let name = document.getElementById("party-name")
     let amount = document.getElementById("party-amount")
 
     emailValidation(email)
     partyNameValidation(name);
     MinAmount(amount)
 
-    if($(".amountValidationMessage").html() == "" && $(".emailValidationMessage").html() == "" && $(".partyNameValidationMessage").html() == ""){
+    if ($(".amountValidationMessage").html() == "" && $(".emailValidationMessage").html() == "" && $(".partyNameValidationMessage").html() == "") {
         return true;
-    }else{
+    } else {
         return false;
     }
 }
 
-function validateSaveTransactionForm(){
-    let amount = document.getElementById("party-amount")
-    MinAmount(amount)
+function validateSaveTransactionForm() {
+    let amount = document.getElementById("transaction-amount")
+    MinAmountRequire(amount)
 
-    if($(".amountValidationMessage").html() == ""){
+    if ($(".amountValidationMessage").html() == "") {
         return true;
-    }else{
+    } else {
         return false;
     }
-    
+
 }
 
 function RemoveValidations() {
