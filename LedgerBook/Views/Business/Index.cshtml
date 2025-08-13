@@ -453,7 +453,6 @@
 
                     reader.onload = function (e) {
                         $('#add-business-uploadedimage').attr('src', e.target.result).width(50).height(50);
-                        console.log("readurl",document.getElementById("add-business-uploadedimage"))
                         document.getElementById("add-business-uploadedimage").classList.remove("d-none")
                     };
                     reader.readAsDataURL(input.files[0]);
@@ -468,7 +467,6 @@
         function removeOpacity() {
             let classname = document.getElementsByClassName("uploadedimage-class-business")[0].getAttribute('src')
             if (classname != "#") {
-                console.log("opar",document.getElementsByClassName("image-overlay")[0])
                 document.getElementsByClassName("image-overlay")[0].classList.remove("opacity-class")
             }
         }
@@ -476,7 +474,6 @@
         function addOpacity() {
             let classname = document.getElementsByClassName("uploadedimage-class-business")[0].getAttribute('src')
             if (classname != "#") {
-                console.log("addo",document.getElementsByClassName("image-overlay")[0])
                 document.getElementsByClassName("image-overlay")[0].classList.add("opacity-class")
             }
         }

@@ -90,7 +90,6 @@ function getBusinessByIdSuccess(response) {
         }
         if (response.result.businessLogoAttachment != null && response.result.businessLogoAttachment.businesLogoPath != null) {
             $('#add-business-uploadedimage').attr('src', BASE_URL.replace("api", response.result.businessLogoAttachment.businesLogoPath)).width(50).height(50);
-            console.log("getbusiness", document.getElementById("add-business-uploadedimage"))
             document.getElementById("add-business-uploadedimage").classList.remove("d-none");
         }
 
@@ -106,7 +105,6 @@ function SaveBusinessSuccess(response) {
     if (response.isSuccess) {
         if (response.isSuccess) {
             let businessId = $("#business-businessId").val() == "" ? 0 : $("#business-businessId").val();
-            console.log(businessId)
             if (businessId == 0) {
                 $("#user-details-confirmation-modal").modal("show");
             } else {
@@ -116,7 +114,6 @@ function SaveBusinessSuccess(response) {
             }
         }
         $("#add-business-modal-header").html("Update Business")
-        console.log($("#add-business-modal-header"))
         $("#user-details-btn").removeClass("d-none")
         $("#business-image").val("");
         if (response.result.businessLogoAttachment != null && response.result.businessLogoAttachment.businesLogoPath != null) {
@@ -330,7 +327,6 @@ function deleteUserSuccess(response) {
 
 function toggleActive(userId) {
     let userActiveIcon = document.getElementById(`active-user-${userId}`);
-    console.log("toggle", userActiveIcon)
     if (userActiveIcon.classList.contains("fa-circle-check")) {
         let modalbody = document.getElementById("inactive-user-modal").innerHTML.toString().replace("{{status}}", "Inactive").replace("{{statusbody}}", "inactivate");
         document.getElementById("inactive-user-modal").innerHTML = modalbody
@@ -345,7 +341,6 @@ function ActiveInactiveUser() {
     $("body").addClass("loading");
     let userId = $("#userId-active").val()
     let businessId = $("#business-businessId").val();
-    console.log("active", document.getElementById(`active-user-${userId}`))
     let isActive = document.getElementById(`active-user-${userId}`).classList.contains("fa-circle-check") ? false : true
     let params = setParameter("/Business/ActiveInactiveUser", GET, null, FORM_URL, { userId: userId, isActive: isActive, businessId: businessId }, activeInactiveUserSuccess);
     $("body").addClass("loading");

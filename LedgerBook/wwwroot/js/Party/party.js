@@ -177,7 +177,6 @@ function deleteTransaction() {
 
 //display modal fro settleup
 function settleUpModal(netBalance, partyId) {
-    console.log(Math.abs(netBalance))
     $("#settleup-partyId").val(partyId);
     $("#settleup-netBalance").val(netBalance);
     $("#settleup-amount").html(Math.abs(netBalance).toString())
@@ -192,7 +191,6 @@ function settleUpModal(netBalance, partyId) {
 function settleUp() {
     let netBalance = $("#settleup-netBalance").val();
     let partyId = $("#settleup-partyId").val();
-    console.log(netBalance,partyId)
     let params = setBusinessParameter("/Party/SettleUpParty", POST, null, FORM_URL, { netBalance: netBalance, partyId: partyId }, settleUpSuccess);
     $("body").addClass("loading");
     ajaxCall(params);
@@ -200,7 +198,6 @@ function settleUp() {
 
 //send reminder to party through email
 function SendReminder(netBalance, partyId) {
-    console.log(netBalance, " ", partyId)
     let params = setBusinessParameter("/Party/SettleUpParty", GET, null, FORM_URL, { netBalance: netBalance, partyId: partyId }, sendReminderSuccess);
     $("body").addClass("loading");
     ajaxCall(params);
