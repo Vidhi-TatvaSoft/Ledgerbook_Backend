@@ -15,9 +15,9 @@ function rolePermissionSuccess(response) {
     }
 }
 
-function getTotalsSuccess(response){
-    if(response.isSuccess){
-        if(response.result != null){
+function getTotalsSuccess(response) {
+    if (response.isSuccess) {
+        if (response.result != null) {
             $("#total-amount-give").html(Math.abs(response.result.amountToGive))
             $("#total-amount-get").html(Math.abs(response.result.amountToGet))
         }
@@ -44,13 +44,7 @@ function getAllPartiesSuccess(response) {
                             </div>
                             <div class="name-time">
                                 <div class="name fs-5 fw-semibold">${element.partyName}</div>
-                                <div class="party-created-time-hidden d-none">`
-                    if (element.updatedAt != null) {
-                        htmlContent += `${element.updatedAt}`
-                    } else if (element.createdAt != null) {
-                        htmlContent += `${element.createdAt}`
-                    }
-                    htmlContent += `</div>
+                                <div class="party-created-time-hidden d-none">${element.createdAt}</div>
                                     <div class="text-secondary party-created-time">1 day ago</div>
                                 </div>
                             </div>
@@ -359,7 +353,7 @@ function settleUpSuccess(response) {
     }
 }
 
-function sendReminderSuccess(response){
+function sendReminderSuccess(response) {
     if (response.isSuccess) {
         if (response.toasterMessage != null) {
             Toaster(response.toasterMessage);

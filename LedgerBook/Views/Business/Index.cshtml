@@ -282,7 +282,8 @@
             <div class="modal-footer d-flex justify-content-center">
                 <button type="submit" class="btn btn-primary" id="temp-id"
                     onclick="saveBusinessDetails(false)">Save</button>
-                <button type="submit" class="btn btn-primary" id="saveclose-id" onclick="saveBusinessDetails(true)">Save & Close</button>
+                <button type="submit" class="btn btn-primary" id="saveclose-id" onclick="saveBusinessDetails(true)">Save
+                    & Close</button>
                 <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Close</button>
             </div>
         </form>
@@ -333,7 +334,7 @@
         </div>
         <div class="modal-footer d-flex justify-content-center">
             <a type="submit" class="btn btn-primary" data-bs-dismiss="modal">Save</a>
-            <a type="submit"  class="btn btn-primary" onclick="closeBusinessModal()">Save &
+            <a type="submit" class="btn btn-primary" onclick="closeBusinessModal()">Save &
                 Close</a>
             <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal"
                 onclick="displayBusinessCards()">Close</button>
@@ -495,6 +496,7 @@
             $(document).on('hidden.bs.modal', "#add-business-modal", function (e) {
                 $("#business-businessId").val("")
                 emptyInputValidation("business-details-form-id")
+                console.log("fsd")
                 $("#user-details-confirmation-modal").modal("hide")
                 displayBusinessCards()
             })
@@ -555,8 +557,7 @@
                 $("body").addClass("loading");
                 ajaxCall(params);
             }
-            if(close){
-                @* $(".btn-close").click(); *@
+            if (close) {
                 $("#add-business-modal").modal("hide");
             }
         }

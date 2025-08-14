@@ -13,7 +13,6 @@ function getDashboardDataSuccess(response) {
 
             //customer data
             let customerhtml = "";
-            console.log("Fdv", dashboard.customerType)
             if (dashboard.customerAmount == 0) {
                 customerhtml += `<div class="text-secondary fs-5">SETTLED UP</div>
                                                                     <div class="fs-5 fw-bold text-end ms-2">₹ ${Math.abs(dashboard.customerAmount)}</div>`
@@ -71,7 +70,7 @@ function getDashboardDataSuccess(response) {
                                                                     <div>
                                                                         <div class="fs-5 text-truncate" title="${dashboard.topParty[i].partyName}" style="max-width: 10vw;"><span class="badge bg-secondary rounded-circle me-2" title="${dashboard.topParty[i].partyTypeString}">${dashboard.topParty[i].partyTypeString[0]}</span>${dashboard.topParty[i].partyName}</div>
                                                                     </div>`
-                    if(Math.abs(dashboard.topParty[i].amount) == 0){
+                    if (Math.abs(dashboard.topParty[i].amount) == 0) {
                         topPartyHtml += `<div class="fs-5 fw-bold text-dark">₹ ${Math.abs(dashboard.topParty[i].amount)}</div></div>`
                     }
                     else if (dashboard.topParty[i].transactionType == 2) {
@@ -179,9 +178,9 @@ function getPartyRevenueSuccess(response) {
         if (response.result != null) {
             PartyRevenue(response.result)
         }
-    }else{
-        if(response.toasterMessgae != null){
-            Toaster(response.toasterMessgae,"error")
+    } else {
+        if (response.toasterMessgae != null) {
+            Toaster(response.toasterMessgae, "error")
         }
     }
 }
@@ -213,15 +212,20 @@ function getYearsSuccess(response) {
             document.getElementById("year-for-party-revenue").value = yearForGraph;
             GetPartyrevenue(yearForGraph);
         }
-    }else{
-        if(response.toasterMessgae != null){
-            Toaster(response.toasterMessgae,"error")
+    } else {
+        if (response.toasterMessgae != null) {
+            Toaster(response.toasterMessgae, "error")
         }
     }
 }
 
 function ShowGraphs() {
+    // Destroy all existing chart instances
+    Chart.helpers.each(Chart.instances, function (instance) {
+        instance.destroy();
+    });
     var ctx = document.getElementById("ChartId").getContext("2d");
+
     // Revenue chart
     RevenueChart = new Chart(ctx, {
         type: 'bar',

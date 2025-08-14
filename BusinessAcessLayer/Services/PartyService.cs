@@ -128,7 +128,7 @@ public class PartyService : IPartyService
         switch (sort)
         {
             case "-1":
-                partyList = partyList;
+                partyList = partyList.OrderByDescending(x => x.CreatedAt).ToList();;
                 break;
             case "mostRecent":
                 partyList = partyList.OrderByDescending(x => x.CreatedAt).ToList();
@@ -276,6 +276,10 @@ public class PartyService : IPartyService
 
     public async Task<ApiResponse<PartyVerifiedViewModel>> PartyEmailVerification(string verificationCode)
     {
+        if (verificationCode == null )
+        {
+            return new ApiResponse<PartyVerifiedViewModel>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
+        }
         PartyVerifiedViewModel partyVerifiedVM = new();
         partyVerifiedVM.Email = _jwtTokenService.GetClaimValue(verificationCode, "email");
         partyVerifiedVM.Token = _jwtTokenService.GetClaimValue(verificationCode, "token");
@@ -830,14 +834,14 @@ public class PartyService : IPartyService
         }
         CookiesViewModel cookiesViewModel = new();
         List<RoleViewModel> rolesByUser = _userBusinessMappingService.GetRolesByBusinessId(businessId, userId);
-        if (rolesByUser.Any(role => role.RoleName == "Owner/Admin"))
+        if (rolesByUser.Any(role => role.RoleName == ConstantVariables.OwnerRole))
         {
             cookiesViewModel.CustomerPermission = true;
             cookiesViewModel.SupplierPermission = true;
         }
-        else if (rolesByUser.Any(role => role.RoleName == "Purchase Manager"))
+        else if (rolesByUser.Any(role => role.RoleName == ConstantVariables.PurchaseManagerRole))
             cookiesViewModel.SupplierPermission = true;
-        else if (rolesByUser.Any(role => role.RoleName == "Sales Manager"))
+        else if (rolesByUser.Any(role => role.RoleName == ConstantVariables.SalesManagerRole))
             cookiesViewModel.CustomerPermission = true;
         else
         {

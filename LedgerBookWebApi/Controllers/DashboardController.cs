@@ -30,15 +30,18 @@ public class DashboardController : BaseController
     [HttpGet]
     [Route("GetDashboardData")]
     [PermissionAuthorize("AnyRole")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public IActionResult GetDashboardData()
     {
         Businesses business = GetBusinessFromToken();
         return Ok(_dashboardService.GetDashboardData(business.Id));
     }
-    
+
     [HttpGet]
     [Route("GetGraphDetails")]
     [PermissionAuthorize("AnyRole")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public IActionResult GetGraphDetails(string year = null)
     {
         Businesses business = GetBusinessFromToken();
@@ -48,6 +51,8 @@ public class DashboardController : BaseController
     [HttpGet]
     [Route("GetYearsForRevenue")]
     [PermissionAuthorize("AnyRole")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public IActionResult GetYearsForRevenue()
     {
         Businesses business = GetBusinessFromToken();

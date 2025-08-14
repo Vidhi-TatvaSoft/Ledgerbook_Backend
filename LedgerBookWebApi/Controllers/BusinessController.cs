@@ -31,6 +31,9 @@ public class BusinessController : BaseController
     [HttpGet]
     [Route("GetBusinesses")]
     [PermissionAuthorize("User")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public IActionResult GetBusinesses(string searchText = null)
     {
         ApplicationUser user = GetCurrentUserIdentity();
@@ -41,6 +44,8 @@ public class BusinessController : BaseController
     [HttpGet]
     [Route("GetBusinessDetails")]
     [PermissionAuthorize("User")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status206PartialContent)]
     public IActionResult GetBusinessDetails(int businessId)
     {
         ApplicationUser user = GetCurrentUserIdentity();
@@ -50,6 +55,9 @@ public class BusinessController : BaseController
     [HttpPost]
     [Route("SaveBusiness")]
     [PermissionAuthorize("User")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> SaveBusiness([FromForm] BusinessItem businessItem)
     {
         ApplicationUser user = GetCurrentUserIdentity();
@@ -59,6 +67,9 @@ public class BusinessController : BaseController
     [HttpGet]
     [Route("GetAllUsersOfBusiness")]
     [PermissionAuthorize("User")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetAllUsersOfBusiness(int businessId)
     {
         ApplicationUser user = GetCurrentUserIdentity();
@@ -68,6 +79,9 @@ public class BusinessController : BaseController
     [HttpGet]
     [Route("GetuserDetailById")]
     [PermissionAuthorize("User")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetuserDetailById(int businessId, int? userId)
     {
         ApplicationUser user = GetCurrentUserIdentity();
@@ -77,6 +91,9 @@ public class BusinessController : BaseController
     [HttpPost]
     [Route("SaveUserDetails")]
     [PermissionAuthorize("User")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> SaveUserDetails([FromBody] UserDetailsViewModel userDetailsViewModel)
     {
         ApplicationUser user = GetCurrentUserIdentity();
@@ -91,6 +108,9 @@ public class BusinessController : BaseController
     [HttpGet]
     [Route("DeleteUserFromBusiness")]
     [PermissionAuthorize("User")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> DeleteUserFromBusiness(int userId, int businessId)
     {
         ApplicationUser user = GetCurrentUserIdentity();
@@ -102,6 +122,9 @@ public class BusinessController : BaseController
     [HttpGet]
     [Route("ActiveInactiveUser")]
     [PermissionAuthorize("User")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> ActiveInactiveUser(int userId, bool isActive, int businessId)
     {
         ApplicationUser user = GetCurrentUserIdentity();
@@ -113,6 +136,9 @@ public class BusinessController : BaseController
     [HttpPost]
     [Route("DeleteBusiness")]
     [PermissionAuthorize("User")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> DeleteBusiness([FromForm] int businessId)
     {
         ApplicationUser user = GetCurrentUserIdentity();
@@ -124,6 +150,9 @@ public class BusinessController : BaseController
     [HttpGet]
     [Route("GetBusinessData")]
     [PermissionAuthorize("User")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public IActionResult GetBusinessData(int businessId)
     {
         ApplicationUser user = GetCurrentUserIdentity();

@@ -1,0 +1,28 @@
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Reports";
+}
+
+<div class="col-3 col-xl-2 party-list bg-light p-0 border shadow">
+    <div class="border border-2 p-2">
+        Reports
+    </div>
+    <div class=" p-0">
+        <div class="p-2">PARTIES REPORTS</div>
+        <div
+            class="bg-white d-flex justify-content-start align-items-center p-2 border @(ViewData["report"] as string == "transaction" ? "shadow" : "")">
+            <div class="image @(ViewData["report"] as string == "transaction" ? "bg-color-light text-black " : "bg-light text-black-50")   rounded-circle d-flex justify-content-center align-items-center border p-1"
+                style="height: 3rem; width: 3rem;">
+                <i class="fa-solid fa-right-left fs-6 text-white"></i>
+            </div>
+            <div class="ms-2 cursor-pointer">
+                <div class=" fs-6 fw-bold ">Transaction Report</div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+<div class="col-9 col-xl-10 p-0" id="transactionReportPageId">
+
+</div>

@@ -168,7 +168,6 @@ function MinAmountRequire(input) {
         return;
     }
     let value = parseFloat(input.value);
-    console.log(value)
    
     if (value <= 0.0) {
         $(".amountValidationMessage").text("Amount should be greater than 0")

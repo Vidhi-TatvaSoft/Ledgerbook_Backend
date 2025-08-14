@@ -19,6 +19,8 @@ public class Messages
     //global messages
     public static string ExceptionMessage = "Something went wrong. Please try again later.";
     public static string ForbiddenMessage = "You don't have permission to access this resource.";
+    public static string CanNotDeleteBusinessMessage = "You dont have permission to delete this busiess.";
+
     public static string CanNotAddOwnerMessage = "You dont have permission to add Owner.";
     public static string CanNotDeletUserMessage = "You dont have permission to delete this user.";
     public static string CanNotEditUserMessage = "You dont have permission to edit this user.";

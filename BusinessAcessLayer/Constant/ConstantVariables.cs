@@ -22,6 +22,9 @@ public class ConstantVariables
     public static string EmailHost = "mail.etatvasoft.com";
 
     public static string OwnerRole = "Owner/Admin";
+    public static string PurchaseManagerRole = "Purchase Manager";
+    public static string SalesManagerRole = "Sales Manager";
+
     public static string PartyType = "PartyType";
 
 

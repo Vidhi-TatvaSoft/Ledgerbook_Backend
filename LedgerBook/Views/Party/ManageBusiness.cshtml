@@ -287,7 +287,6 @@
             })
             $(document).on("submit", "#save-transaction-entry-form", function (e) {
                 e.preventDefault();
-                console.log($("#transaction-amount").val())
                 if (validateSaveTransactionForm()) {
                     let formData = new FormData();
                     formData.append("PartyId", $("#transaction-partyId").val())

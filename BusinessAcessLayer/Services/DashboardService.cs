@@ -32,7 +32,7 @@ public class DashboardService : IDashboardService
         dashboardVM.TotalCustomer = CustomersList.Count();
         dashboardVM.TotalSupplier = SuppliersList.Count();
         dashboardVM.NetBalance = dashboardVM.CustomerAmount + dashboardVM.SupplierAmount;
-        dashboardVM.NetBalanceTye = dashboardVM.NetBalanceTye < 0 ? EnumHelper.TransactionType.GOT : EnumHelper.TransactionType.GAVE;
+        dashboardVM.NetBalanceTye = dashboardVM.NetBalance < 0 ? EnumHelper.TransactionType.GOT : EnumHelper.TransactionType.GAVE;
         dashboardVM.RecentTransaction = _partyService.GetAllTransaction(businessId)!.Take(3).ToList();
         dashboardVM.UpcomingDue = _partyService.GetUpcomingDues(businessId).OrderBy(x => x.DueDate).ToList();
         return new ApiResponse<DashboardViewModel>(true, null, dashboardVM, HttpStatusCode.OK);

@@ -251,13 +251,13 @@ public class UserBusinessMappingService : IUserBusinessMappingService
         List<RoleViewModel> rolesByUser = GetRolesByBusinessId(businessId, userId);
         if (partyType == PartyType.Customer)
         {
-            if (rolesByUser.Any(role => role.RoleName == "Sales Manager" || role.RoleName == "Owner/Admin"))
+            if (rolesByUser.Any(role => role.RoleName == ConstantVariables.SalesManagerRole || role.RoleName == ConstantVariables.OwnerRole))
             {
                 return true;
             }
         }else if (partyType == PartyType.Supplier)
         {
-            if (rolesByUser.Any(role => role.RoleName == "Purchase Manager" || role.RoleName == "Owner/Admin"))
+            if (rolesByUser.Any(role => role.RoleName == ConstantVariables.PurchaseManagerRole || role.RoleName == ConstantVariables.OwnerRole))
             {
                 return true;
             }

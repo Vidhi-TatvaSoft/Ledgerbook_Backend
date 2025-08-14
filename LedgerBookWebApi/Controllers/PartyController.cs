@@ -27,6 +27,8 @@ public class PartyController : BaseController
     [HttpGet]
     [Route("CheckRolePermission")]
     [PermissionAuthorize("AnyRole")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
     public IActionResult CheckRolePermission()
     {
         ApplicationUser user = GetCurrentUserIdentity();
@@ -37,6 +39,9 @@ public class PartyController : BaseController
     [HttpGet]
     [Route("GetAllParties")]
     [PermissionAuthorize("AnyRole")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public IActionResult GetAllParties(string partyType, string searchText = "", string filter = "-1", string sort = "-1")
     {
         ApplicationUser user = GetCurrentUserIdentity();
@@ -48,6 +53,9 @@ public class PartyController : BaseController
     [HttpPost]
     [Route("SaveParty")]
     [PermissionAuthorize("AnyRole")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> SaveParty([FromForm] SavePartyViewModel partyViewModel)
     {
         ApplicationUser user = GetCurrentUserIdentity();
@@ -64,6 +72,8 @@ public class PartyController : BaseController
     #region verify party email
     [HttpGet]
     [Route("VerifyPartyEmail")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> VerifyPartyEmail(string verificationCode)
     {
         return Ok(await _partyService.PartyEmailVerification(verificationCode));
@@ -73,6 +83,9 @@ public class PartyController : BaseController
     [HttpGet]
     [Route("GetPartyDetails")]
     [PermissionAuthorize("AnyRole")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public IActionResult GetPartyDetails(int partyId)
     {
         ApplicationUser user = GetCurrentUserIdentity();
@@ -84,6 +97,9 @@ public class PartyController : BaseController
     [HttpGet]
     [Route("GetTransationEntries")]
     [PermissionAuthorize("AnyRole")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public IActionResult GetTransationEntries(int partyId)
     {
         ApplicationUser user = GetCurrentUserIdentity();
@@ -96,6 +112,9 @@ public class PartyController : BaseController
     [HttpGet]
     [Route("GetTransactionDetailById")]
     [PermissionAuthorize("AnyRole")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public IActionResult GetTransactionDetailById(int partyId, EnumHelper.TransactionType? transactionType, int? transactionId)
     {
         ApplicationUser user = GetCurrentUserIdentity();
@@ -108,6 +127,9 @@ public class PartyController : BaseController
     [HttpPost]
     [Route("SaveTransactionEntry")]
     [PermissionAuthorize("AnyRole")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> SaveTransactionEntry([FromForm] TransactionEntryViewModel transactionEntryVM)
     {
         ApplicationUser user = GetCurrentUserIdentity();
@@ -120,6 +142,9 @@ public class PartyController : BaseController
     [HttpPost]
     [Route("DeleteTransaction")]
     [PermissionAuthorize("AnyRole")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public IActionResult DeleteTransaction([FromForm] int transactionId)
     {
         ApplicationUser user = GetCurrentUserIdentity();
@@ -132,6 +157,9 @@ public class PartyController : BaseController
     [HttpGet]
     [Route("GetTotalAmount")]
     [PermissionAuthorize("AnyRole")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public IActionResult GetTotalAmount(EnumHelper.PartyType partyType)
     {
         ApplicationUser user = GetCurrentUserIdentity();
@@ -144,6 +172,9 @@ public class PartyController : BaseController
     [HttpPost]
     [Route("SettleUpParty")]
     [PermissionAuthorize("AnyRole")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> SettleUpParty([FromForm] decimal netBalance, [FromForm] int partyId)
     {
         ApplicationUser user = GetCurrentUserIdentity();
@@ -156,6 +187,9 @@ public class PartyController : BaseController
     [HttpGet]
     [Route("SettleUpParty")]
     [PermissionAuthorize("AnyRole")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public IActionResult SendReminderToParty(decimal netBalance, int partyId)
     {
         ApplicationUser user = GetCurrentUserIdentity();

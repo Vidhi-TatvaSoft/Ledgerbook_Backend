@@ -9,6 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - LedgerBook</title>
+     <link rel="icon" type="image/x-icon" href="/images/logotransparent.png">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/LedgerBook.styles.css" asp-append-version="true" />
@@ -315,26 +316,9 @@
 
 
         $('#businessNameDropdown').change(function () {
-            console.log(this.value)
             let params = setParameter("/Business/GetBusinessData", GET, null, FORM_URL, { businessId: this.value }, SetBusinessCookiesSuccess);
             $("body").addClass("loading");
             ajaxCall(params);
-
-            @* let params = setBusinessParameter("/Business/SetBusinessToken", POST, null, NODATA, null, rolePermissionSuccess);
-            $("body").addClass("loading");
-            ajaxCall(params);
-            $.ajax({
-                url: "/Business/SetBusinessToken",
-                type: "POST",
-                data: { businessId: this.value },
-                success: function (response) {
-                    if (response.success) {
-                        window.location = "/Dashboard/Dashboard"
-                    } else {
-                        Toaster("Not set cookie")
-                    }
-                }
-            }) *@
         });
     });
 

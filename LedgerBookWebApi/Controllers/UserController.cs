@@ -4,6 +4,7 @@ using BusinessAcessLayer.Helper;
 using BusinessAcessLayer.Interface;
 using DataAccessLayer.Models;
 using DataAccessLayer.ViewModels;
+using LedgerBookWebApi.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Threading.Tasks;
@@ -27,22 +28,23 @@ public class UserController : BaseController
     #region profile index page
     [HttpGet]
     [Route("GetProfile")]
+    [PermissionAuthorize("User")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public IActionResult GetProfile()
     {
         ApplicationUser user = GetCurrentUserIdentity();
-        if (user == null)
-            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Unauthorized));
         UserProfileViewModel userProfileViewModel = _userService.GetUserProfile(user.Id);
         return Ok(new ApiResponse<UserProfileViewModel>(true, null, userProfileViewModel, HttpStatusCode.OK));
     }
 
     [HttpPost]
     [Route("UpdateProfile")]
+    [PermissionAuthorize("User")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateProfile([FromForm] UserProfileViewModel userProfileViewModel)
     {
         ApplicationUser user = GetCurrentUserIdentity();
-        if (user == null)
-            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Unauthorized));
         if (!ModelState.IsValid)
         {
             return Ok(new ApiResponse<string>(false, Messages.InvalidCredentilMessage, null, HttpStatusCode.BadRequest));
@@ -51,20 +53,14 @@ public class UserController : BaseController
     }
     #endregion
 
-    [HttpGet]
-    [Route("getusers")]
-    public IActionResult getusers()
-    {
-        return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.OK));
-    }
-
     [HttpPost]
     [Route("ChangePassword")]
+    [PermissionAuthorize("User")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ChangePassword([FromForm] ChangePasswordViewModel changePasswordViewModel)
     {
-        ApplicationUser user = GetCurrentUserIdentity();
-        if (user == null)
-            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.Unauthorized));
+        ApplicationUser user = GetCurrentUserIdentity();;
         if (!ModelState.IsValid)
         {
             return Ok(new ApiResponse<string>(false, Messages.InvalidCredentilMessage, null, HttpStatusCode.BadRequest));

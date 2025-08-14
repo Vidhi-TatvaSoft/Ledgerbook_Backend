@@ -31,7 +31,7 @@ public class AttachmentService : IAttachmentService
         await _genericRepository.AddAsync<Attachment>(attachment);
         return attachment.Id;
     }
-
+    
     public AttachmentViewModel GetAttachmentById(int attachmentId)
     {
         return _genericRepository.GetAll<Attachment>(a => a.Id == attachmentId && a.DeletedAt == null).Select(a => new AttachmentViewModel

@@ -135,6 +135,10 @@ public class BusinessService : IBusinessService
 
     public ApiResponse<List<BusinessViewModel>> GetRolewiseBusiness(int userId, string searchText = null)
     {
+        if (userId == 0)
+        {
+            return new ApiResponse<List<BusinessViewModel>>(false, Messages.ExceptionMessage, null, HttpStatusCode.Forbidden);
+        }
         List<BusinessViewModel> businessList = GetBusinesses(userId, searchText);
         if (businessList != null)
         {
@@ -168,7 +172,10 @@ public class BusinessService : IBusinessService
     {
         try
         {
-
+            if (userId == 0)
+            {
+                return new ApiResponse<BusinessItem>(false, Messages.ExceptionMessage, businessItem, HttpStatusCode.BadRequest);
+            }
             if (businessItem.BusinessLogoIForm != null)
             {
                 businessItem.BusinessLogoAttachment = new();
@@ -211,15 +218,7 @@ public class BusinessService : IBusinessService
 
             if (businessItem.BusinessLogoAttachment.BusinesLogoPath != null)
             {
-                if (businessItem.BusinessLogoAttachment.AttachmentId != 0)
-                {
-                    attachmentId = await _attachmentService.SaveAttachment(businessItem.BusinessLogoAttachment, userId);
-                }
-                else
-                {
-                    // update
-                    attachmentId = await _attachmentService.SaveAttachment(businessItem.BusinessLogoAttachment, userId);
-                }
+                attachmentId = await _attachmentService.SaveAttachment(businessItem.BusinessLogoAttachment, userId);
             }
 
             if (businessItem.AddressLine1 != null || businessItem.AddressLine2 != null || businessItem.City != null || businessItem.Pincode != null)
@@ -403,6 +402,14 @@ public class BusinessService : IBusinessService
     {
         try
         {
+            if (businessId == 0 || userId == 0)
+            {
+                return new ApiResponse<string>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
+            }
+            if (!CanDeleteBusiness(businessId, userId))
+            {
+                return new ApiResponse<string>(false, Messages.CanNotDeleteBusinessMessage, null, HttpStatusCode.Forbidden);
+            }
             await _transactionRepository.BeginTransactionAsync();
             Businesses business = _genericRepository.Get<Businesses>(b => b.Id == businessId && !b.DeletedAt.HasValue)!;
             if (business != null)
@@ -519,7 +526,7 @@ public class BusinessService : IBusinessService
     //get user by id
     public async Task<ApiResponse<UserViewmodel>> GetUserById(int businessId, int curentUserId, int? userId)
     {
-        if (businessId == 0)
+        if (businessId == 0 || curentUserId == 0)
         {
             return new ApiResponse<UserViewmodel>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
         }

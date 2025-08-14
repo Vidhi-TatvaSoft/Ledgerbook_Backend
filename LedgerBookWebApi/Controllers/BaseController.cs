@@ -31,8 +31,7 @@ public class BaseController : ControllerBase
     }
 
     #region get data from ajax header
-    [HttpGet]
-    public string? GetData(string tokenKey)
+    protected string? GetData(string tokenKey)
     {
         try
         {
@@ -94,43 +93,4 @@ public class BaseController : ControllerBase
         return Ok(new ApiResponse<ApplicationUser>(true, null, user, HttpStatusCode.OK));
     }
     #endregion
-
-    // #region render to login page if not authorized
-    // protected IActionResult RedirectToIndexIfBusinessNotFound()
-    // {
-    //     string token = Request.Cookies[TokenKey.BusinessToken];
-    //     if (Request.Cookies[TokenKey.BusinessToken] == null)
-    //     {
-    //         return RedirectToAction("Index", "Business");
-    //     }
-    //     return null;
-    // }
-    // #endregion
-
-    // // #region partial view response
-    // // protected async Task<ViewResponseModel> PartialViewResponse(string viewName, object model, string message = null, ErrorType errorType = ErrorType.Success)
-    // // {
-    // //     ViewResponseModel partialViewResponseModel = new();
-    // //     partialViewResponseModel.Message = message;
-    // //     partialViewResponseModel.ErrorType = errorType;
-    // //     partialViewResponseModel.HTML = await _viewRenderService.RenderToStringAsync($"Views/{viewName}", model);
-    // //     return partialViewResponseModel;
-    // // }
-    // // #endregion
-
-    // #region set activity log
-    // protected async Task<ActivityLogs> SetActivityLog(string message, EnumHelper.Actiontype action, EnumHelper.ActivityEntityType entityType, int EntityTypeId, int? createdById = null, EnumHelper.ActivityEntityType? subEntityType = null, int? subEntityTypeId = null)
-    // {
-    //     return await _activityLogService.SetActivityLog(message, action, entityType, EntityTypeId, createdById, subEntityType, subEntityTypeId);
-    // }
-    // #endregion
-
-    // #region fill view bag for category, type
-    // // protected void SetViewBag(List<ReferenceDataValues>? categories = null, List<ReferenceDataValues>? Types = null)
-    // // {
-    // //     ViewBag.Categories = new SelectList(categories, "Id", "EntityValue");
-    // //     ViewBag.Types = new SelectList(Types, "Id", "EntityValue");
-    // //     return;
-    // // }
-    // #endregion
 }
