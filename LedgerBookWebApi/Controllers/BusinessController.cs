@@ -52,7 +52,6 @@ public class BusinessController : BaseController
     [PermissionAuthorize("User")]
     public async Task<IActionResult> SaveBusiness([FromForm] BusinessItem businessItem)
     {
-        // return Ok(false);
         ApplicationUser user = GetCurrentUserIdentity();
         return Ok(await _businessService.SaveBusiness(businessItem, user.Id));
     }

@@ -74,7 +74,7 @@ builder.Services.AddAuthentication(x =>
     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer("UserToken", options =>
+}).AddJwtBearer("Authorization", options =>
 {
     options.RequireHttpsMetadata = false;
     options.SaveToken = true;
@@ -144,7 +144,7 @@ builder.Services.AddSwaggerGen(c =>
         {
             new OpenApiSecurityScheme
             {
-                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "UserToken" }
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Authorization" }
             },
             new string[] { }
         },

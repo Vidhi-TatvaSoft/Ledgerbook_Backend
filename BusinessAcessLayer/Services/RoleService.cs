@@ -9,7 +9,7 @@ public class RoleService : IRoleService
 {
     private readonly LedgerBookDbContext _context;
     private readonly IGenericRepo _genericRepo;
-    public RoleService(LedgerBookDbContext context, 
+    public RoleService(LedgerBookDbContext context,
     IGenericRepo genericRepo)
     {
         _context = context;
@@ -38,5 +38,10 @@ public class RoleService : IRoleService
             RoleName = x.RoleName,
             RoleDescription = x.Description
         }).ToList();
-    } 
+    }
+
+    public int GetOwnerRoleId()
+    {
+        return _genericRepo.Get<Role>(x => x.RoleName == Constant.ConstantVariables.OwnerRole).Id;
+    }
 }

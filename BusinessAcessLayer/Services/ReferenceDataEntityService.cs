@@ -35,6 +35,5 @@ public class ReferenceDataEntityService : IReferenceDataEntityService
     public String GetReferenceValueById(int referenceDataId)
     {
         return _genericRepository.Get<ReferenceDataValues>(x => x.Id == referenceDataId && x.DeletedAt == null).EntityValue;
-
     }
 }

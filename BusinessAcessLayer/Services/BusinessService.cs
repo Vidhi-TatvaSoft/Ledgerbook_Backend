@@ -168,6 +168,7 @@ public class BusinessService : IBusinessService
     {
         try
         {
+
             if (businessItem.BusinessLogoIForm != null)
             {
                 businessItem.BusinessLogoAttachment = new();
@@ -279,6 +280,11 @@ public class BusinessService : IBusinessService
             }
             else
             {
+                if (!CanEditBusiness((int)businessItem.BusinessId, userId))
+                {
+                    await _transactionRepository.RollbackAsync();
+                    return new ApiResponse<BusinessItem>(false, Messages.ForbiddenMessage, businessItem, HttpStatusCode.Forbidden);
+                }
                 Businesses updateBusiness = _genericRepository.Get<Businesses>(b => b.Id == businessItem.BusinessId && b.DeletedAt == null)!;
                 if (updateBusiness != null)
                 {
@@ -312,6 +318,7 @@ public class BusinessService : IBusinessService
                 }
                 else
                 {
+                    await _transactionRepository.RollbackAsync();
                     return new ApiResponse<BusinessItem>(false, Messages.ExceptionMessage, businessItem, HttpStatusCode.BadRequest);
                 }
             }
@@ -493,12 +500,16 @@ public class BusinessService : IBusinessService
     //get all users of business
     public async Task<ApiResponse<List<UserViewmodel>>> GetUsersOfBusiness(int businessId, int userId)
     {
-        if (businessId == 0)
+        if (businessId == 0 || userId == 0)
         {
             return new ApiResponse<List<UserViewmodel>>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
         }
         else
         {
+            if (!CanEditBusiness(businessId, userId))
+            {
+                return new ApiResponse<List<UserViewmodel>>(false, Messages.ForbiddenMessage, null, HttpStatusCode.Forbidden);
+            }
             List<UserViewmodel> users = await _userBusinessMappingService.GetUsersByBusiness((int)businessId, userId);
             users = _userBusinessMappingService.SetPermissions(users, userId, (int)businessId);
             return new ApiResponse<List<UserViewmodel>>(true, null, users, HttpStatusCode.OK);
@@ -511,6 +522,10 @@ public class BusinessService : IBusinessService
         if (businessId == 0)
         {
             return new ApiResponse<UserViewmodel>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
+        }
+        if (!CanEditBusiness(businessId, curentUserId))
+        {
+            return new ApiResponse<UserViewmodel>(false, Messages.ForbiddenMessage, null, HttpStatusCode.Forbidden);
         }
         UserViewmodel userDetail = new();
         if (userId != 0 || userId == null)
@@ -535,6 +550,14 @@ public class BusinessService : IBusinessService
     //Save user details in business
     public async Task<ApiResponse<List<UserViewmodel>>> SaveUserDetails(UserViewmodel userViewmodel, List<int> selectedRole, int businessId, int userId)
     {
+        if (businessId == 0 || userId == 0 || selectedRole.Count <= 0)
+        {
+            return new ApiResponse<List<UserViewmodel>>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
+        }
+        if (!CanEditBusiness(businessId, userId))
+        {
+            return new ApiResponse<List<UserViewmodel>>(false, Messages.ForbiddenMessage, null, HttpStatusCode.Forbidden);
+        }
         bool isUserPresent = false;
         string businessName = GetBusinessNameById(businessId);
         UserViewmodel user = _userService.GetuserById(userId, businessId);
@@ -544,6 +567,10 @@ public class BusinessService : IBusinessService
         //update user
         if (userViewmodel.UserId != 0)
         {
+            if (!await CanEditDeleteUser(businessId, userId, userViewmodel.UserId))
+            {
+                return new ApiResponse<List<UserViewmodel>>(false, Messages.CanNotEditUserMessage, null, HttpStatusCode.Forbidden);
+            }
             createdUserId = userViewmodel.UserId;
             if (userViewmodel.PersonalDetailId != null)
             {
@@ -576,6 +603,15 @@ public class BusinessService : IBusinessService
         }
         else
         {
+            if (!await CanAddOwner(businessId, userId))
+            {
+                int OwnerId = _roleService.GetOwnerRoleId();
+                if (selectedRole.Contains(OwnerId))
+                {
+                    return new ApiResponse<List<UserViewmodel>>(false, Messages.CanNotAddOwnerMessage, null, HttpStatusCode.Forbidden);
+                }
+                return new ApiResponse<List<UserViewmodel>>(false, Messages.CanNotAddUserMessage, null, HttpStatusCode.Forbidden);
+            }
             //add user
             if (_userService.IsUserRegistered(userViewmodel.Email))
             {
@@ -655,9 +691,17 @@ public class BusinessService : IBusinessService
 
     public async Task<ApiResponse<string>> DeleteUserFromBusiness(int userId, int businessId, ApplicationUser logedinUser)
     {
-        if (userId == 0 || businessId == 0)
+        if (userId == 0 || businessId == 0 || logedinUser.Id == 0)
         {
             return new ApiResponse<string>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
+        }
+        if (!CanEditBusiness(businessId, userId))
+        {
+            return new ApiResponse<string>(false, Messages.CanNotDeletUserMessage, null, HttpStatusCode.Forbidden);
+        }
+        if (!await CanEditDeleteUser(businessId, logedinUser.Id, userId))
+        {
+            return new ApiResponse<string>(false, Messages.CanNotDeletUserMessage, null, HttpStatusCode.Forbidden);
         }
         UserViewmodel user = _userService.GetuserById(userId, businessId);
         bool isDeletedMapping = await _userBusinessMappingService.DeleteUserBusinessMappingByBusinessId(userId, businessId, logedinUser.Id);
@@ -684,6 +728,14 @@ public class BusinessService : IBusinessService
         if (userId == 0 || businessId == 0)
         {
             return new ApiResponse<string>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
+        }
+        if (!CanEditBusiness(businessId, userId))
+        {
+            return new ApiResponse<string>(false, Messages.ForbiddenMessage, null, HttpStatusCode.Forbidden);
+        }
+        if (!await CanEditDeleteUser(businessId, logedinUser.Id, userId))
+        {
+            return new ApiResponse<string>(false, Messages.CanNotEditUserMessage, null, HttpStatusCode.Forbidden);
         }
 
         bool isUserUpdated = await _userBusinessMappingService.ActiveInactiveUser(userId, businessId, isActive, logedinUser.Id);
@@ -742,4 +794,55 @@ public class BusinessService : IBusinessService
         return new ApiResponse<CookiesViewModel>(true, null, cookiesViewModel, HttpStatusCode.OK);
     }
 
+    public bool CanEditBusiness(int businessId, int userId)
+    {
+        List<UserBusinessMappings> businessMappings = _genericRepository.GetAll<UserBusinessMappings>(x => x.BusinessId == businessId && x.UserId == userId && x.Role.RoleName == ConstantVariables.OwnerRole && !x.DeletedAt.HasValue).ToList();
+        if (businessMappings.Count > 0)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public bool CanDeleteBusiness(int businessId, int userId)
+    {
+        List<UserBusinessMappings> businessMappings = _genericRepository.GetAll<UserBusinessMappings>(x => x.BusinessId == businessId && x.UserId == userId && x.Role.RoleName == ConstantVariables.OwnerRole && x.UserId == x.CreatedById && !x.DeletedAt.HasValue).ToList();
+        if (businessMappings.Count > 0)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public async Task<bool> CanEditDeleteUser(int businessId, int userId, int userToUpdateId)
+    {
+        var busienss = GetBusinesses(userId).Where(x => x.BusinessId == businessId);
+        if (_userBusinessMappingService.IsMainOwner(businessId, userId))
+        {
+            return true;
+        }
+        else
+        {
+            List<UserViewmodel> users = await _userBusinessMappingService.GetUsersByBusiness((int)businessId, userId);
+            users = _userBusinessMappingService.SetPermissions(users, userId, businessId);
+            var user = users.FirstOrDefault(x => x.UserId == userToUpdateId);
+            if (user != null && user.CanEdit == true)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public async Task<bool> CanAddOwner(int businessId, int userId)
+    {
+        if (_userBusinessMappingService.IsMainOwner(businessId, userId))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 }

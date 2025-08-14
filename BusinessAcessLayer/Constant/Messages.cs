@@ -19,6 +19,11 @@ public class Messages
     //global messages
     public static string ExceptionMessage = "Something went wrong. Please try again later.";
     public static string ForbiddenMessage = "You don't have permission to access this resource.";
+    public static string CanNotAddOwnerMessage = "You dont have permission to add Owner.";
+    public static string CanNotDeletUserMessage = "You dont have permission to delete this user.";
+    public static string CanNotEditUserMessage = "You dont have permission to edit this user.";
+    public static string CanNotAddUserMessage = "You dont have permission to add user.";
+
     public static string GlobalAddUpdateMesage = "{0} {1} successfully.";
     public static string GlobalAddUpdateFailMessage = "Failed to {0} {1}. Try again!";
     public static string VerificationSuccessMessage = "Email has been verified successfully.";

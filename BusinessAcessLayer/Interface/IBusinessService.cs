@@ -19,4 +19,8 @@ public interface IBusinessService
     Task<ApiResponse<string>> DeleteUserFromBusiness(int userId, int businessId, ApplicationUser logedinUser);
     Task<ApiResponse<string>> ActiveInactiveUser(int userId, bool isActive, int businessId, ApplicationUser logedinUser);
     ApiResponse<CookiesViewModel> GetBusinessData(int businessId, ApplicationUser user);
+    bool CanEditBusiness(int businessId, int userId);
+    bool CanDeleteBusiness(int businessId, int userId);
+    Task<bool> CanEditDeleteUser(int businessId, int userId, int userToUpdateId);
+    Task<bool> CanAddOwner(int businessId, int userId);
 }
