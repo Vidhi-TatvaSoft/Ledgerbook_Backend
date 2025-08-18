@@ -1,4 +1,5 @@
 using System.Net;
+using System.Net.Http.Headers;
 using BusinessAcessLayer.Constant;
 using BusinessAcessLayer.Interface;
 using DataAccessLayer.Constant;
@@ -75,6 +76,27 @@ public class ReportsController : BaseController
         Businesses business = GetBusinessFromToken();
         ApplicationUser user = GetCurrentUserIdentity();
         return Ok(_transactionReportService.GetReportdata(partytype, timePeriod, business, user.Id, searchPartyId, startDate, endDate));
+    }
+
+    [HttpPost]
+    [Route("GetReportPdfDatatest")]
+    [PermissionAuthorize("AnyRole")]
+    public IActionResult GetReportPdfDatatest(string partytype, string htmlContent)
+    {
+        Businesses business = GetBusinessFromToken();
+        ApplicationUser user = GetCurrentUserIdentity();
+        var renderer = new IronPdf.ChromePdfRenderer();
+        var pdf = renderer.RenderHtmlAsPdf(htmlContent);
+        byte[] pdfBytes = pdf.BinaryData;
+        HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK);
+        response.Content = new ByteArrayContent(pdfBytes);
+        response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/pdf");
+        response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
+        {
+            FileName = "generated_document.pdf"
+        };
+        return (IActionResult)response;
+        // return Ok(_transactionReportService.GetReportdata(partytype, timePeriod, business, user.Id, searchPartyId, startDate, endDate));
     }
     #endregion
 

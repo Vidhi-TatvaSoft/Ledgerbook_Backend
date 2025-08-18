@@ -36,7 +36,7 @@ function searchByParty(partyId, partyName) {
 
 }
 
-function GeneratePdf() {
+function GeneratePdf2() {
     // // const { jsPDF } = window.jspdf;
     // // const doc = new jsPDF();
     // // doc.text(element, 0, 0);
@@ -68,6 +68,50 @@ function GeneratePdf() {
     };
 
     html2pdf().set(options).from(element).save();
+}
+
+function GeneratePdf() {
+    console.log(searchTextId)
+    $.ajax({
+        url: `${BASE_URL}/Reports/GetReportPdfDatatest`,
+        type: "POST",
+        headers: {
+            "Authorization": getCookie(User_Token),
+            "BusinessToken": getCookie(Business_Token)
+        },
+        data: { partytype:partytype, htmlContent : JSON.stringify(document.getElementById("report-pdf-html").innerHTML) },
+        xhrFields: {
+            responseType: 'blob' //binary large object -- to handle binary response
+        },
+        success: function (data, status, xhr) {
+            console.log("ok")
+            let filename = `TransactionReport_${startDate}_to_${endDate}.xlsx`;
+            
+            let disposition = xhr.getResponseHeader('Content-Disposition');
+            console.log(disposition)
+            if (disposition && disposition.indexOf('filename') !== -1) {
+                let matches = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/.exec(disposition); //ExportOrderDataToExcel filename From disposition
+                if (matches && matches[1]) {
+                    filename = matches[1].replace(/['"]/g, ''); // Remove quotes if present
+                }
+            }
+
+            let blob = new Blob([data], { type: xhr.getResponseHeader('Content-Type') });
+            let link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob); //timePeriod url points to blob obj
+            link.download = filename; //Download file name
+            document.body.appendChild(link); //appendChild so that it Cancelled be cliked
+            link.click();
+            document.body.removeChild(link);
+
+            console.log("Export Successfully");
+
+        }, error: function (res) {
+            Toaster("Something went wrong. Please try again later.", "error")
+            
+        }
+
+    })
 }
 
 
