@@ -1,11 +1,15 @@
 using System.Drawing;
 using System.Linq.Expressions;
+using System.Net;
+using System.Threading.Tasks;
 using BusinessAcessLayer.Constant;
 using BusinessAcessLayer.Interface;
 using DataAccessLayer.Constant;
 using DataAccessLayer.Models;
 using DataAccessLayer.ViewModels;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 
@@ -30,8 +34,12 @@ public class TransactionReportService : ITransactionReportSevice
         _partyService = partyService;
     }
 
-    public ReportCountsViewModel GetReportCounts(int businessId)
+    public ApiResponse<ReportCountsViewModel> GetReportCounts(int businessId)
     {
+        if (businessId == 0)
+        {
+            return new ApiResponse<ReportCountsViewModel>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
+        }
         int customerTypeId = _genericRepository.Get<ReferenceDataValues>(x => x.EntityType.EntityType == ConstantVariables.PartyType && x.EntityValue == PartyType.Customer,
          includes: new List<Expression<Func<ReferenceDataValues, object>>>
             {
@@ -46,11 +54,15 @@ public class TransactionReportService : ITransactionReportSevice
         ReportCountsViewModel reportCountsViewModel = new();
         reportCountsViewModel.CustomerCount = _genericRepository.GetAll<Parties>(x => x.PartyTypId == customerTypeId && x.BusinessId == businessId && x.DeletedAt == null).Count();
         reportCountsViewModel.SupplierCount = _genericRepository.GetAll<Parties>(x => x.PartyTypId == supplierTypeId && x.BusinessId == businessId && x.DeletedAt == null).Count();
-        return reportCountsViewModel;
+        return new ApiResponse<ReportCountsViewModel>(true, null, reportCountsViewModel, HttpStatusCode.OK);
     }
 
-    public List<TransactionEntryViewModel> GetTransactionEntries(int businessId, string partyType, int searchPartyId = 0, string startDate = "", string endDate = "")
+    public ApiResponse<ReportTransactionEntriesViewModel> GetReportTransactionEntries(int businessId, string partyType, int searchPartyId = 0, string startDate = "", string endDate = "")
     {
+        if (businessId == 0 || partyType == "")
+        {
+            return new ApiResponse<ReportTransactionEntriesViewModel>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
+        }
         List<LedgerTransactions> Entries = new();
         int partyTypeId = _genericRepository.Get<ReferenceDataValues>(x => x.EntityType.EntityType == ConstantVariables.PartyType && x.EntityValue == partyType,
             includes: new List<Expression<Func<ReferenceDataValues, object>>>
@@ -128,37 +140,31 @@ public class TransactionReportService : ITransactionReportSevice
         {
             EntriesList = EntriesList.Where(x => x.CreatedAt >= DateTime.Parse(startDate) && x.CreatedAt <= DateTime.Parse(endDate)).ToList();
         }
-
-        return EntriesList;
+        ReportTransactionEntriesViewModel reportTransactionEntriesVM = new()
+        {
+            TransactionsList = EntriesList,
+            youGave = EntriesList.Where(x => x.TransactionType == (byte)EnumHelper.TransactionType.GAVE).Sum(x => x.TransactionAmount),
+            YouGot = EntriesList.Where(x => x.TransactionType == (byte)EnumHelper.TransactionType.GOT).Sum(x => x.TransactionAmount),
+        };
+        reportTransactionEntriesVM.NetBalance = reportTransactionEntriesVM.YouGot - reportTransactionEntriesVM.youGave;
+        return new ApiResponse<ReportTransactionEntriesViewModel>(true, null, reportTransactionEntriesVM, HttpStatusCode.OK); ;
     }
 
-    // public ReportTransactionEntriesViewModel GetReportdata(string partytype, string timePeriod, int businessId, int searchPartyId = 0, string startDate = "", string endDate = "")
-    // {
-    //     ReportTransactionEntriesViewModel reportVM = new();
-    //     BusinessItem business = _businessService.GetBusinessItemById(businessId);
-    //     reportVM.BusinessId = business.BusinessId;
-    //     reportVM.Businessname = business.BusinessName;
-    //     reportVM.TimePeriod = timePeriod;
-    //     reportVM.PartyId = searchPartyId;
-    //     if (searchPartyId != 0)
-    //     {
-    //         reportVM.PartyName = _partyService.GetPartyById(searchPartyId).PartyName;
-    //     }
-    //     else
-    //     {
-    //         reportVM.PartyName = "Account";
-    //     }
-
-    //     reportVM.TransactionsList = GetTransactionEntries(business.BusinessId, partytype, searchPartyId, startDate, endDate);
-    //     reportVM.youGave = reportVM.TransactionsList.Where(x => x.TransactionType == (byte)EnumHelper.TransactionType.GAVE).Sum(x => x.TransactionAmount);
-    //     reportVM.YouGot = reportVM.TransactionsList.Where(x => x.TransactionType == (byte)EnumHelper.TransactionType.GOT).Sum(x => x.TransactionAmount);
-    //     reportVM.NetBalance = reportVM.YouGot - reportVM.youGave;
-    //     DateTime startDateTemp = DateTime.Parse(startDate);
-    //     reportVM.Startdate = startDateTemp.ToString("dd MMMM yyyy");
-    //     DateTime endDateTemp = DateTime.Parse(endDate);
-    //     reportVM.EndDate = endDateTemp.ToString("dd MMMM yyyy");
-    //     return reportVM;
-    // }
+    public  async Task<FileContentResult> GetExcelData(string partytype, string timePeriod, Businesses business, int searchPartyId = 0, string startDate = "", string endDate = "")
+    {
+        var reportData = GetReportdata(partytype, timePeriod, business, searchPartyId, startDate, endDate);
+        ReportTransactionEntriesViewModel reportExcel =new();
+        if ((bool)reportData.IsSuccess)
+        {
+            reportExcel = reportData.Result;
+        }
+        byte[] FileData =await  ExportData(reportExcel);
+        FileContentResult result = new FileContentResult(FileData, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        {
+            FileDownloadName = "TransactionReport_" + reportExcel.Startdate + "_to_" + reportExcel.EndDate + ".xlsx"
+        };
+        return result;
+    }
 
     public Task<byte[]> ExportData(ReportTransactionEntriesViewModel reportExcel)
     {
@@ -327,4 +333,39 @@ public class TransactionReportService : ITransactionReportSevice
 
     }
 
+    public ApiResponse<ReportTransactionEntriesViewModel> GetReportdata(string partytype, string timePeriod, Businesses curBusiness, int searchPartyId = 0, string startDate = "", string endDate = "")
+    {
+        if (partytype.IsNullOrEmpty() || curBusiness == null)
+        {
+            return new ApiResponse<ReportTransactionEntriesViewModel>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
+        }
+        ReportTransactionEntriesViewModel reportVM = new();
+
+        reportVM.BusinessId = curBusiness.Id;
+        reportVM.Businessname = curBusiness.BusinessName;
+
+        reportVM.TimePeriod = timePeriod;
+        reportVM.PartyId = searchPartyId;
+        if (searchPartyId != 0)
+        {
+            reportVM.PartyName = _partyService.GetPartyById(searchPartyId).PartyName;
+        }
+        else
+        {
+            reportVM.PartyName = "Account";
+        }
+        ApiResponse<ReportTransactionEntriesViewModel> transactionReportData = GetReportTransactionEntries(reportVM.BusinessId, partytype, searchPartyId, startDate, endDate);
+        if ((bool)transactionReportData.IsSuccess && transactionReportData.Result != null)
+        {
+            reportVM.TransactionsList = transactionReportData.Result.TransactionsList;
+            reportVM.youGave = transactionReportData.Result.youGave;
+            reportVM.YouGot = transactionReportData.Result.YouGot;
+        }
+        reportVM.NetBalance = reportVM.YouGot - reportVM.youGave;
+        DateTime startDateTemp = DateTime.Parse(startDate);
+        reportVM.Startdate = startDateTemp.ToString("dd MMMM yyyy");
+        DateTime endDateTemp = DateTime.Parse(endDate);
+        reportVM.EndDate = endDateTemp.ToString("dd MMMM yyyy");
+        return new ApiResponse<ReportTransactionEntriesViewModel>(true, null, reportVM, HttpStatusCode.OK);
+    }
 }

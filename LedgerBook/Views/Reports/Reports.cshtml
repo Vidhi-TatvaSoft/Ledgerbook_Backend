@@ -24,5 +24,401 @@
 
 </div>
 <div class="col-9 col-xl-10 p-0" id="transactionReportPageId">
+    <div class="p-2 ps-3 ">
+        <div
+            class="d-flex flex-column flex-md-row justify-content-md-between align-items-start align-items-md-center w-100">
+            <div class="bg-white d-flex justify-content-start align-items-center p-2">
+                <div class="image bg-color-light text-black rounded-circle d-flex justify-content-center align-items-center border p-1"
+                    style="height: 3.5rem; width: 3.5rem;">
+                    <i class="fa-solid fa-right-left fs-5 text-white"></i>
+                </div>
+                <div class="ms-2 pointer-cursor">
+                    <div class=" fs-4 fw-bold ">Transaction Reports</div>
+                </div>
+            </div>
+
+            <!-- pdf button  -->
+            <div class="p-2 w-md-100 text-end">
+                <div class="btn btn-outline-secondary" onclick="GeneratePdf()">Download PDF</div>
+                <div class="btn btn-outline-secondary" onclick="GenerateExcel()">Download Excel</div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="p-2">
+        <div class="bg-white  mt-2 pb-0 d-flex justify-content-start align-item-center border-bottom  ">
+            <div class="allParty ms-3 me-3 pb-1 fs-5  fw-bold text-secondary text-nowrap d-flex align-items-center cursor-pointer"
+                id="report-customer-div" data-party="Customer" onclick="SelectOption(this)"
+                style="max-width-content=fit;">Customers
+                <div class="bg-secondary text-white ms-1 text-nowrap"
+                    style="border-radius: 50% !important; width:22px;">
+                    <div id="report-customer-count" class="d-flex justify-content-center align-items-center"
+                        style="font-size:15px;"></div>
+                </div>
+            </div>
+            <div class="allParty ms-3 me-3 pb-1 fs-5  fw-bold text-secondary text-nowrap d-flex align-items-center cursor-pointer"
+                id="report-supplier-div" data-party="Supplier" onclick="SelectOption(this)"
+                style="max-width-content=fit;">Suppliers
+                <div class="bg-secondary text-white ms-1 text-nowrap"
+                    style="border-radius: 50% !important; width:22px;">
+                    <div id="report-supplier-count" class="d-flex justify-content-center align-items-center"
+                        style="font-size:15px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="border-bottom p-2">
+        <div class="row mx-0 p-3">
+            <div class="d-flex flex-column col-xl-2 col-lg-3 col-md-6 col-12">
+                <div class="fs-5 text-secondary ">Party Name</div>
+                <div class="position-relative">
+                    <input type="text" id="partySearch-report" class="form-control text-dark p-2 "
+                        style="height:35px; width:100% !important;" placeholder="Search" />
+                    <div id="party-search-options" class="w-100 shadow d-none">
+
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex flex-column col-xl-2 col-lg-3 col-md-6 col-12">
+                <div class="fs-5 text-secondary ">Filter By</div>
+                <div class="">
+                    <select name="" id="timeperiod-report" class=" form-control">
+                        <option value="This year">This Year </option>
+                        <option value="This Quarter">This Quarter </option>
+                        <option value="This Month">This Month </option>
+                        <option value="Last Month">Last Month </option>
+                        <option value="Yesterday">Yesterday</option>
+                        <option value="Today">Today</option>
+                        <option value="Custom">Custom Date</option>
+
+
+                    </select>
+                </div>
+
+            </div>
+            <div class="d-flex flex-column col-xl-2 col-lg-3 col-md-6 col-12">
+                <div class="fs-5 text-secondary ">Start</div>
+                <div><input type="date" class="form-control" name="" id="startDate-report"></div>
+            </div>
+            <div class="d-flex flex-column col-xl-2 col-lg-3 col-md-6 col-12">
+                <div class="fs-5 text-secondary ">End</div>
+                <div><input type="date" class="form-control" name="" id="endDate-report"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="p-2">
+        <div class="ms-4">Total 5 entries</div>
+        <div class="row gap-2 mt-2 ms-4">
+            <div class="border p-3 rounded bg-light col-2 d-flex flex-column align-items-start">
+                <div class="fs-4 fw-bold" id="report-entry-gave"></div>
+                <div class="fs-6 fw-bold text-danger">You Gave</div>
+            </div>
+            <div class="border p-3 rounded bg-light col-2 d-flex flex-column align-items-start">
+                <div class="fs-4 fw-bold" id="report-entry-got"></div>
+                <div class="fs-6 fw-bold text-success">You Got</div>
+            </div>
+            <div class="border p-3 rounded bg-light col-2 d-flex flex-column align-items-start">
+                <div class="fs-4 fw-bold " id="report-entry-net"></div>
+                <div class="fs-6 fw-bold text-secondary">Net Balance</div>
+            </div>
+        </div>
+    </div>
+    <div class="p-2 ms-4">
+        <div class="table-responsive p-0" id="entry-table-report-id">
+            <table class="table table-hover table-borderless1 p-0">
+                <thead>
+                    <th class="text-start text-nowrap">Date</th>
+                    <th class="text-start text-nowrap">Party Name</th>
+                    <th class="text-center text-nowrap">DETAILS</th>
+                    <th class="text-end text-nowrap">YOU GAVE</th>
+                    <th class="text-end text-nowrap">YOU GOT</th>
+                </thead>
+                <tbody id="report-transaction-entries">
+                </tbody>
+
+            </table>
+        </div>
+    </div>
 
 </div>
+
+<!-- pdf design html-->
+<div id="abc">
+    <div class="" style="background-color: red;">a</div>
+</div>
+<div id="report-pdf-html">
+    <div style="background-color: green;">
+        <div
+            style="width: 100% !important;margin: 0 !important; padding: 0 !important;  ">
+            <!-- Start heading logo -->
+            <div class="logo-container d-flex"
+                style=" display: flex I !important; margin-bottom: 20px; background-color: #126773; height: 80px;">
+                <div class="business-name"
+                    style="text-align: left; margin-left: 2%; padding-top: 30px; color: white; font-size: large; font-weight: bold;">
+                    business-name</div>
+                <div class="logo-image" style="  position: absolute; right: 2%;">
+                    <img src="/images/logo.jpg" alt="ledgerbook" class="logo"
+                        style="width: 40px; display: inline-block; vertical-align: middle; border-radius: 50%; color: white; right: 0px;" />
+                    <p class="logo-text"
+                        style="color: white; font-size: 25px; font-weight: 600; display: inline-block; vertical-align: middle;">
+                        Ledgerbook</p>
+                </div>
+
+            </div>
+
+            <div class="text-center" style="text-align: center;">
+                <div class="statement-name" style="text-align: center; font-size: 25px;">partyNmae Statement</div>
+                <div class="text-cneter date-range" style="text-align: center;  margin-top: 10px; font-size: 18px;">
+                    (startDate - EndDate)</div>
+            </div>
+
+            <div class="credit-debit-balance-div"
+                style="margin-top: 20px; margin-left: 4%; margin-right: 4%; border: 2px solid gray; border-radius: 5px; padding: 30px;">
+                <table class="table-styling" style=" width: 100%;">
+                    <tbody>
+                        <tr>
+                            <td class="debit-td" style="text-align: start; font-size: 20px;">
+                                <div>
+                                    <div>Total Debit (-)</div>
+                                    <div class="margin-left-debit margin-top"
+                                        style=" margin-left: 12%; margin-top: 2%;">
+                                        youGave</div>
+                                </div>
+                            </td>
+                            <td class="credit-td border-table"
+                                style="text-align: center; font-size: 20px; border-left: 2px solid gray; border-right: 2px solid gray;">
+                                <div>
+                                    <div>Total Credit (+)</div>
+                                    <div class="margin-top" style="margin-top: 2%;">YouGot</div>
+                                </div>
+                            </td>
+                            <td class="balance-td" style="text-align: end; font-size: 20px;">
+                                <div>
+                                    <div>Net Balance</div>
+                                    <div class="margin-right-net margin-top"
+                                        style="margin-top: 2%;  margin-right: 12%;">
+                                        NetBalance</div>
+                                </div>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="entries-count" style=" padding: 30px; margin-left: 1.5%; padding-bottom: 0px;">No. of entries :
+                TransactionsListCount (TimePeriod)
+            </div>
+
+            <div class="entries-table-div" style="padding: 30px; margin-left: 1.5%; margin-right: 1.5%;">
+                <table class="table-entries borders"
+                    style="width: 100%; border-collapse: collapse; color: gray;  border: 2px solid gray; padding: 10px;">
+                    <thead class="">
+                        <tr class="">
+                            <th class="text-center borders"
+                                style="text-align: center;  border: 2px solid gray; padding: 10px; color: gray; background-color: rgb(252, 246, 240);">
+                                Date</th>
+                            <th class="text-center borders"
+                                style="text-align: center;  border: 2px solid gray; padding: 10px; color: gray; background-color: rgb(252, 246, 240);">
+                                Name</th>
+                            <th class="text-center borders"
+                                style="text-align: center;  border: 2px solid gray; padding: 10px; color: gray; background-color: rgb(252, 246, 240);">
+                                Details</th>
+                            <th class="text-center borders"
+                                style="text-align: center;  border: 2px solid gray; padding: 10px; color: gray; background-color: rgb(252, 246, 240);">
+                                Debit(-)</th>
+                            <th class="text-center borders"
+                                style="text-align: center;  border: 2px solid gray; padding: 10px; color: gray; background-color: rgb(252, 246, 240);">
+                                Credit(+)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @* @if(Model.TransactionsList.Count != 0){
+                    @foreach(TransactionEntryViewModel transaction in  Model.TransactionsList){
+                        <tr>
+                            <td class="text-center borders" style="text-align: center;  border: 2px solid gray; padding: 10px;">@transaction.CreateDate</td>
+                            <td class="text-center borders" style="text-align: center;  border: 2px solid gray; padding: 10px;">@transaction.PartyName</td>
+                            <td class="text-center borders" style="text-align: center;  border: 2px solid gray; padding: 10px;">@transaction.Description</td>
+                            @if(transaction.TransactionType == (byte)EnumHelper.TransactionType.GAVE){
+                                <td class="text-center borders bg-light" style="text-align: center;  border: 2px solid gray; padding: 10px; background-color: rgb(252, 240, 240); text-align: end;">@transaction.TransactionAmount</td>
+                                <td class="text-center borders bg-success" style="background-color: rgb(218, 245, 238); text-align: end; text-align: center;  border: 2px solid gray; padding: 10px;">-</td>
+                            }else{
+                                 <td class="text-center borders bg-light" style="text-align: center;  border: 2px solid gray; padding: 10px; background-color: rgb(252, 240, 240); text-align: end;">-</td>
+                                <td class="text-center borders bg-success"  style="background-color: rgb(218, 245, 238); text-align: end; text-align: center;  border: 2px solid gray; padding: 10px;">@transaction.TransactionAmount</td>
+                            }
+                            
+                        </tr>
+                    }
+                    }else{
+                        <tr>
+                        <td colspan="5" class="text-center " style="font-size: 20px; padding: 10px; text-align: center;">
+                            No entries found
+                        </td>
+                    </tr>
+                    } *@
+                    </tbody>
+                </table>
+
+                <table class="table-entries borders margin-top"
+                    style="margin-top: 2%; width: 100%; border-collapse: collapse; color: gray; border: 2px solid gray; padding: 10px;">
+                    <tbody>
+                        <tr>
+                            <td class="borders bg-gray text-center"
+                                style="background-color: rgb(252, 246, 240);text-align: center; border: 2px solid gray; padding: 10px;">
+                                Grand Total</td>
+                            <td class="borders bg-light "
+                                style=" border: 2px solid gray; padding: 10px; background-color: rgb(252, 240, 240); text-align: end;">
+                                youGave</td>
+                            <td class="borders bg-success"
+                                style=" border: 2px solid gray; padding: 10px; background-color: rgb(218, 245, 238); text-align: end;">
+                                YouGot</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let partytype;
+        let searchTextId = 0;
+        let searchTextTemp = "";
+        let currentDate = new Date();
+        let currentYear = currentDate.getFullYear();
+        let currentMonth = currentDate.getMonth() + 1;
+        let currentMonthString = currentMonth.toString().padStart(2, '0');
+        let currentDay = currentDate.getDate()
+        let currentdayString = currentDay.toString().padStart(2, '0')
+        let daysInCurMonth = daysInMonth(currentMonth, currentYear);
+        let daysInCurMonthString = daysInCurMonth.toString().padStart(2, '0')
+        let startDate = `${currentYear}-${currentMonthString}-01`;
+        let endDate = `${currentYear}-${currentMonthString}-${daysInCurMonth}`;
+
+
+        $(document).ready(function () {
+            getPartyCounts();
+            let classList = document.getElementsByClassName("allParty");
+            classList[0].classList.add("party-selected");
+            partytype = document.getElementsByClassName('party-selected')[0].getAttribute("data-party").toLocaleLowerCase();
+            displayReportTransactionEntries(partytype, searchTextId, startDate, endDate)
+            $("#timeperiod-report").val("This Month")
+            $("#startDate-report").val(startDate);
+            $("#endDate-report").val(endDate);
+
+
+            $(document).on("change", "#timeperiod-report", function () {
+                let timePeriod = this.value;
+                endDate = new Date().toLocaleDateString('en-CA');
+
+                switch (timePeriod) {
+                    case "This year":
+                        startDate = `${currentYear}-01-01`;
+                        endDate = `${currentYear}-12-31`;
+                        break;
+                    case "This Month":
+                        startDate = `${currentYear}-${currentMonthString}-01`;
+                        endDate = `${currentYear}-${currentMonthString}-${daysInCurMonthString}`;
+                        break;
+                    case "This Quarter":
+                        let prevMonth = (currentMonth - 4).toString().padStart(2, '0');
+                        startDate = `${currentYear}-${prevMonth}-01`;
+                        endDate = `${currentYear}-${currentMonthString}-${daysInCurMonthString}`;
+                        break;
+                    case "Last Month":
+                        let prevMonth2 = (currentMonth - 1);
+                        let prevMonthstring2 = prevMonth2.toString().padStart(2, '0');
+                        let daysInPrevMonth = daysInMonth(prevMonth2, currentYear).toString().padStart(2, '0')
+                        startDate = `${currentYear}-${prevMonthstring2}-01`;
+                        endDate = `${currentYear}-${prevMonthstring2}-${daysInPrevMonth}`;
+                        break;
+                    case "Yesterday":
+                        startDate = `${currentYear}-${currentMonthString}-${(currentDay - 1).toString().padStart(2, '0')}`;
+                        endDate = `${currentYear}-${currentMonthString}-${currentdayString}`;
+                        break;
+                    case "Today":
+                        startDate = `${currentYear}-${currentMonthString}-${currentdayString}`;
+                        endDate = `${currentYear}-${currentMonthString}-${currentdayString}`;
+                        break;
+                    default:
+                        startDate = startDate;
+                        endDate = endDate;
+                        break;
+                }
+                $("#startDate-report").val(startDate);
+                $("#endDate-report").val(endDate);
+                displayReportTransactionEntries(partytype, searchTextId, startDate, endDate)
+            })
+
+            $(document).on("change", "#startDate-report", function () {
+                startDate = this.value;
+                $("#timeperiod-report").val("Custom")
+                if (startDate != "" && endDate != "") {
+                    if (startDate > endDate) {
+                        Toaster("start date should be less than end date", "error");
+                        $("#endDate-report").val("");
+                        endDate = "";
+                    } else {
+                        displayReportTransactionEntries(partytype, searchTextId, startDate, endDate)
+                    }
+                }
+            })
+
+            $(document).on("change", "#endDate-report", function () {
+                endDate = this.value;
+                $("#timeperiod-report").val("Custom")
+                if (startDate != "" && endDate != "") {
+                    if (startDate > endDate) {
+                        Toaster("start date should be less than end date", "error");
+                        this.value = "";
+                        endDate = ""
+                    } else {
+                        displayReportTransactionEntries(partytype, searchTextId, startDate, endDate)
+                    }
+                }
+            })
+
+            $(document).on("input", "#partySearch-report", function () {
+                searchTextTemp = this.value;
+                document.getElementById("party-search-options").classList.remove("d-none");
+                if (searchTextTemp != "") {
+                    let params = setBusinessParameter("/Reports/GetSearchPartyOptions", GET, null, FORM_URL, { partytype: partytype, searchText: searchTextTemp }, getSerachOptionsSuccess);
+                    @* $("body").addClass("loading"); *@
+                        ajaxCall(params);
+                    @* $.ajax({
+                        url: "/Reports/GetSearchPartyOptions",
+                        type: "GET",
+                        data: { partytype, searchText: searchTextTemp },
+                        success: function (response) {
+                            IsHtmlDoc(response);
+                            $("#party-search-options").html(response);
+                        }
+                    }) *@
+                                } else {
+                    document.getElementById("party-search-options").classList.add("d-none");
+                    searchByParty(0, "")
+                }
+            })
+
+            $(document).on("click", "#partySearch-report", function () {
+                searchTextTemp = "";
+                document.getElementById("party-search-options").classList.remove("d-none");
+                let params = setBusinessParameter("/Reports/GetSearchPartyOptions", GET, null, FORM_URL, { partytype: partytype, searchText: searchTextTemp }, getSerachOptionsSuccess);
+                @* $("body").addClass("loading"); *@
+                    ajaxCall(params);
+            })
+
+            $(document).on("blur", "#partySearch-report", function () {
+                setTimeout(function () {
+                    searchTextTemp = "";
+                    document.getElementById("party-search-options").classList.add("d-none");
+                }, 200)
+            })
+        })
+    </script>
+}

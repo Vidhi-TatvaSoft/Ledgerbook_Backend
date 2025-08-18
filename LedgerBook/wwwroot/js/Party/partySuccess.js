@@ -6,8 +6,10 @@ function rolePermissionSuccess(response) {
         let cookies = response.result;
         if (!cookies.customerPermission) {
             $("#customer-layout-div").addClass("d-none")
+            $("#report-customer-div").addClass("d-none")
         } if (!cookies.supplierPermission) {
             $("#supplier-layout-div").addClass("d-none")
+            $("#report-supplier-div").addClass("d-none")
         }
     } else {
         if (response.toasterMessage != null)

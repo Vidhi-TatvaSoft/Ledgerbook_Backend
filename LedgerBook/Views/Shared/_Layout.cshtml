@@ -29,7 +29,9 @@
 </head>
 
 <body>
-    <div class="overlay"></div>
+    <div class="overlay">
+        <div class="overlay-loader"></div>
+    </div>
     <div class="container-fluid">
         <div class="row">
 
@@ -266,10 +268,12 @@
     <script src="~/js/Party/party.js" asp-append-version="true"></script>
     <script src="~/js/Party/partySuccess.js" asp-append-version="true"></script>
     <script src="~/js/Dashboard/dashboard.js" asp-append-version="true"></script>
+    <script src="~/js/Reports/reports.js" asp-append-version="true"></script>
+    <script src="~/js/Reports/reportsSuccess.js" asp-append-version="true"></script>
 
-
-
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
     <partial name="_Toaster" />

@@ -1,11 +1,14 @@
+using DataAccessLayer.Models;
 using DataAccessLayer.ViewModels;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BusinessAcessLayer.Interface;
 
 public interface ITransactionReportSevice
 {
-    ReportCountsViewModel GetReportCounts(int businessId);
-    List<TransactionEntryViewModel> GetTransactionEntries(int businessId, string partyType, int searchPartyId = 0, string startDate = "", string endDate = "");
-    // ReportTransactionEntriesViewModel GetReportdata(string partytype, string timePeriod, int businessId, int searchPartyId = 0, string startDate = "", string endDate = "");
+    ApiResponse<ReportCountsViewModel> GetReportCounts(int businessId);
+    ApiResponse<ReportTransactionEntriesViewModel> GetReportTransactionEntries(int businessId, string partyType, int searchPartyId = 0, string startDate = "", string endDate = "");
+    ApiResponse<ReportTransactionEntriesViewModel> GetReportdata(string partytype, string timePeriod, Businesses curBusiness, int searchPartyId = 0, string startDate = "", string endDate = "");
+    Task<FileContentResult> GetExcelData(string partytype, string timePeriod, Businesses business, int searchPartyId = 0, string startDate = "", string endDate = "");
     Task<byte[]> ExportData(ReportTransactionEntriesViewModel reportExcel);
 }
