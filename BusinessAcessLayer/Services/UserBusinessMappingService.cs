@@ -249,13 +249,13 @@ public class UserBusinessMappingService : IUserBusinessMappingService
     public bool HasPermission(int businessId, int userId, string partyType)
     {
         List<RoleViewModel> rolesByUser = GetRolesByBusinessId(businessId, userId);
-        if (partyType == PartyType.Customer)
+        if (partyType.ToLower().Trim() == PartyType.Customer.ToLower().Trim())
         {
             if (rolesByUser.Any(role => role.RoleName == ConstantVariables.SalesManagerRole || role.RoleName == ConstantVariables.OwnerRole))
             {
                 return true;
             }
-        }else if (partyType == PartyType.Supplier)
+        }else if (partyType.ToLower().Trim() == PartyType.Supplier.ToLower().Trim())
         {
             if (rolesByUser.Any(role => role.RoleName == ConstantVariables.PurchaseManagerRole || role.RoleName == ConstantVariables.OwnerRole))
             {

@@ -21,17 +21,20 @@ public class TransactionReportService : ITransactionReportSevice
     private readonly LedgerBookDbContext _context;
     private readonly IBusinessService _businessService;
     private readonly IPartyService _partyService;
+    private readonly IUserBusinessMappingService _userBusinessMappingService;
 
     public TransactionReportService(LedgerBookDbContext context,
      IGenericRepo genericRepo,
      IBusinessService businessService,
-     IPartyService partyService
+     IPartyService partyService,
+     IUserBusinessMappingService userBusinessMappingService
      )
     {
         _genericRepository = genericRepo;
         _context = context;
         _businessService = businessService;
         _partyService = partyService;
+        _userBusinessMappingService = userBusinessMappingService;
     }
 
     public ApiResponse<ReportCountsViewModel> GetReportCounts(int businessId)
@@ -57,11 +60,29 @@ public class TransactionReportService : ITransactionReportSevice
         return new ApiResponse<ReportCountsViewModel>(true, null, reportCountsViewModel, HttpStatusCode.OK);
     }
 
-    public ApiResponse<ReportTransactionEntriesViewModel> GetReportTransactionEntries(int businessId, string partyType, int searchPartyId = 0, string startDate = "", string endDate = "")
+    public ApiResponse<List<PartyViewModel>> GetSearchPartyOptions(int businessId, int userId, string partyType, string searchText = "")
     {
-        if (businessId == 0 || partyType == "")
+        if (partyType.IsNullOrEmpty() || businessId == 0 || userId == 0)
+        {
+            return new ApiResponse<List<PartyViewModel>>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
+        }
+        if (!_userBusinessMappingService.HasPermission(businessId, userId, partyType))
+        {
+            return new ApiResponse<List<PartyViewModel>>(true, Messages.ForbiddenMessage, null, HttpStatusCode.OK);
+        }
+        List<PartyViewModel> parties = _partyService.GetPartiesByType(partyType, businessId, searchText, "-1", "-1");
+        return new ApiResponse<List<PartyViewModel>>(true, null, parties, HttpStatusCode.OK);
+    }
+
+    public ApiResponse<ReportTransactionEntriesViewModel> GetReportTransactionEntries(int businessId, int userId, string partyType, int searchPartyId = 0, string startDate = "", string endDate = "")
+    {
+        if (businessId == 0 || partyType == "" || userId == 0)
         {
             return new ApiResponse<ReportTransactionEntriesViewModel>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
+        }
+        if (!_userBusinessMappingService.HasPermission(businessId, userId, partyType))
+        {
+            return new ApiResponse<ReportTransactionEntriesViewModel>(false, Messages.ForbiddenMessage, null, HttpStatusCode.BadRequest);
         }
         List<LedgerTransactions> Entries = new();
         int partyTypeId = _genericRepository.Get<ReferenceDataValues>(x => x.EntityType.EntityType == ConstantVariables.PartyType && x.EntityValue == partyType,
@@ -150,15 +171,15 @@ public class TransactionReportService : ITransactionReportSevice
         return new ApiResponse<ReportTransactionEntriesViewModel>(true, null, reportTransactionEntriesVM, HttpStatusCode.OK); ;
     }
 
-    public  async Task<FileContentResult> GetExcelData(string partytype, string timePeriod, Businesses business, int searchPartyId = 0, string startDate = "", string endDate = "")
+    public async Task<FileContentResult> GetExcelData(string partytype, string timePeriod, Businesses business, int userId, int searchPartyId = 0, string startDate = "", string endDate = "")
     {
-        var reportData = GetReportdata(partytype, timePeriod, business, searchPartyId, startDate, endDate);
-        ReportTransactionEntriesViewModel reportExcel =new();
+        var reportData = GetReportdata(partytype, timePeriod, business, userId, searchPartyId, startDate, endDate);
+        ReportTransactionEntriesViewModel reportExcel = new();
         if ((bool)reportData.IsSuccess)
         {
             reportExcel = reportData.Result;
         }
-        byte[] FileData =await  ExportData(reportExcel);
+        byte[] FileData = await ExportData(reportExcel);
         FileContentResult result = new FileContentResult(FileData, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
         {
             FileDownloadName = "TransactionReport_" + reportExcel.Startdate + "_to_" + reportExcel.EndDate + ".xlsx"
@@ -333,7 +354,7 @@ public class TransactionReportService : ITransactionReportSevice
 
     }
 
-    public ApiResponse<ReportTransactionEntriesViewModel> GetReportdata(string partytype, string timePeriod, Businesses curBusiness, int searchPartyId = 0, string startDate = "", string endDate = "")
+    public ApiResponse<ReportTransactionEntriesViewModel> GetReportdata(string partytype, string timePeriod, Businesses curBusiness, int userId, int searchPartyId = 0, string startDate = "", string endDate = "")
     {
         if (partytype.IsNullOrEmpty() || curBusiness == null)
         {
@@ -354,7 +375,7 @@ public class TransactionReportService : ITransactionReportSevice
         {
             reportVM.PartyName = "Account";
         }
-        ApiResponse<ReportTransactionEntriesViewModel> transactionReportData = GetReportTransactionEntries(reportVM.BusinessId, partytype, searchPartyId, startDate, endDate);
+        ApiResponse<ReportTransactionEntriesViewModel> transactionReportData = GetReportTransactionEntries(reportVM.BusinessId, userId, partytype, searchPartyId, startDate, endDate);
         if ((bool)transactionReportData.IsSuccess && transactionReportData.Result != null)
         {
             reportVM.TransactionsList = transactionReportData.Result.TransactionsList;
@@ -362,9 +383,25 @@ public class TransactionReportService : ITransactionReportSevice
             reportVM.YouGot = transactionReportData.Result.YouGot;
         }
         reportVM.NetBalance = reportVM.YouGot - reportVM.youGave;
-        DateTime startDateTemp = DateTime.Parse(startDate);
+        DateTime startDateTemp;
+        DateTime endDateTemp;
+        if (!startDate.IsNullOrEmpty())
+        {
+            startDateTemp = DateTime.Parse(startDate);
+        }
+        else
+        {
+            startDateTemp = DateTime.Now;
+        }
+        if (!endDate.IsNullOrEmpty())
+        {
+            endDateTemp = DateTime.Parse(endDate);
+        }
+        else
+        {
+            endDateTemp = DateTime.Now;
+        }
         reportVM.Startdate = startDateTemp.ToString("dd MMMM yyyy");
-        DateTime endDateTemp = DateTime.Parse(endDate);
         reportVM.EndDate = endDateTemp.ToString("dd MMMM yyyy");
         return new ApiResponse<ReportTransactionEntriesViewModel>(true, null, reportVM, HttpStatusCode.OK);
     }

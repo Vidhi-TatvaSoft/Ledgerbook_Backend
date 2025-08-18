@@ -7,14 +7,6 @@ function displayTotalAmounts() {
     let params = setBusinessParameter("/Party/GetTotalAmount", GET, null, FORM_URL, { partyType: getCookie(Party_Type) }, getTotalsSuccess);
     $("body").addClass("loading");
     ajaxCall(params);
-
-    // $.ajax({
-    //     url: "/Party/GetTotalAmount",
-    //     type: "GET",
-    //     success: function (response) {
-    //         HandleResponse(response, "#total-amount-id")
-    //     }
-    // })
 }
 
 function addPartyModal() {

@@ -14,18 +14,22 @@ namespace LedgerBookWebApi.Controllers;
 [Route("api/[Controller]")]
 public class ReportsController : BaseController
 {
-    public ITransactionReportSevice _transactionReportService;
-    public IPartyService _partyService;
+    private readonly ITransactionReportSevice _transactionReportService;
+    private readonly IPartyService _partyService;
+    private readonly IUserBusinessMappingService _userBusinessMappingService;
+
     public ReportsController(
         ILoginService loginService,
         IActivityLogService activityLogService,
         IBusinessService businessService,
         ITransactionReportSevice transactionReportSevice,
-        IPartyService partyService
+        IPartyService partyService,
+        IUserBusinessMappingService userBusinessMappingService
     ) : base(loginService, activityLogService, businessService)
     {
         _transactionReportService = transactionReportSevice;
         _partyService = partyService;
+        _userBusinessMappingService = userBusinessMappingService;
     }
 
     [HttpGet]
@@ -45,7 +49,8 @@ public class ReportsController : BaseController
     public IActionResult GetReportTransactionEntries(string partyType, int searchPartyId = 0, string startDate = "", string endDate = "")
     {
         Businesses business = GetBusinessFromToken();
-        return Ok(_transactionReportService.GetReportTransactionEntries(business.Id, partyType, searchPartyId, startDate, endDate));
+        ApplicationUser user = GetCurrentUserIdentity();
+        return Ok(_transactionReportService.GetReportTransactionEntries(business.Id, user.Id, partyType, searchPartyId, startDate, endDate));
     }
     #endregion
 
@@ -56,12 +61,8 @@ public class ReportsController : BaseController
     public IActionResult GetSearchPartyOptions(string partytype, string searchText = "")
     {
         Businesses business = GetBusinessFromToken();
-        if (partytype.IsNullOrEmpty() || business.Id == 0)
-        {
-            return Ok(new ApiResponse<string>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest));
-        }
-        List<PartyViewModel> parties = _partyService.GetPartiesByType(partytype, business.Id, searchText, "-1", "-1");
-        return Ok(new ApiResponse<List<PartyViewModel>>(true, null, parties, HttpStatusCode.OK));
+        ApplicationUser user = GetCurrentUserIdentity();
+        return Ok(_transactionReportService.GetSearchPartyOptions(business.Id, user.Id, partytype));
     }
     #endregion
 
@@ -72,22 +73,28 @@ public class ReportsController : BaseController
     public IActionResult GetReportPdfData(string partytype, string timePeriod, int searchPartyId = 0, string startDate = "", string endDate = "")
     {
         Businesses business = GetBusinessFromToken();
-        return Ok(_transactionReportService.GetReportdata(partytype, timePeriod, business, searchPartyId, startDate, endDate));
+        ApplicationUser user = GetCurrentUserIdentity();
+        return Ok(_transactionReportService.GetReportdata(partytype, timePeriod, business, user.Id, searchPartyId, startDate, endDate));
     }
     #endregion
 
     #region  generate excel
     [HttpGet]
-    [Route("GenerateExcel")]
+    [Route("GetReportExcelData")]
     [PermissionAuthorize("AnyRole")]
-    public async Task<IActionResult> GenerateExcel(string partytype, string timePeriod, int searchPartyId = 0, string startDate = "", string endDate = "")
+    public async Task<IActionResult> GetReportExcelData(string partytype, string timePeriod = "This Month", int searchPartyId = 0, string startDate = "", string endDate = "")
     {
         Businesses business = GetBusinessFromToken();
-        if (partytype.IsNullOrEmpty() || business == null || business.Id == 0)
+        ApplicationUser user = GetCurrentUserIdentity();
+        if (partytype.IsNullOrEmpty() || business == null || business.Id == 0 || user.Id == 0)
         {
-            return Ok(new ApiResponse<FileContentResult >(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest));
+            return Ok(new ApiResponse<FileContentResult>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest));
         }
-        return await _transactionReportService.GetExcelData(partytype, timePeriod, business, searchPartyId, startDate, endDate);
+        if (!_userBusinessMappingService.HasPermission(business.Id, user.Id, partytype))
+        {
+            return Ok(new ApiResponse<ReportTransactionEntriesViewModel>(false, Messages.ForbiddenMessage, null, HttpStatusCode.BadRequest));
+        }
+        return await _transactionReportService.GetExcelData(partytype, timePeriod, business, user.Id, searchPartyId, startDate, endDate);
     }
     #endregion
 }

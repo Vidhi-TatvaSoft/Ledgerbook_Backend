@@ -73,11 +73,8 @@ function GeneratePdf() {
 
 function GenerateExcel() {
     console.log(searchTextId)
-    // let params = setBusinessParameter("/Reports/GenerateExcel", GET, null, FORM_URL,{ partytype, timePeriod: $("#timeperiod-report").val(), searchPartyId: searchTextId, startDate, endDate }, displayEntriesSuccess);
-    // $("body").addClass("loading");
-    // ajaxCall(params);
     $.ajax({
-        url: `${BASE_URL}/Reports/GenerateExcel`,
+        url: `${BASE_URL}/Reports/GetReportExcelData`,
         type: "GET",
         headers: {
             "Authorization": getCookie(User_Token),
@@ -88,14 +85,12 @@ function GenerateExcel() {
             responseType: 'blob' //binary large object -- to handle binary response
         },
         success: function (data, status, xhr) {
-            console.log("dvfdcvb dc")
-            console.log(data)
-            console.log("startus", status)
-            console.log("xhr", xhr)
-            let filename = "TransactionReport.xlsx";
 
+            let filename = `TransactionReport_${startDate}_to_${endDate}.xlsx`;
+            
             let disposition = xhr.getResponseHeader('Content-Disposition');
-            if (disposition && disposition.indexOf('attachment') !== -1) {
+            console.log(disposition)
+            if (disposition && disposition.indexOf('filename') !== -1) {
                 let matches = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/.exec(disposition); //ExportOrderDataToExcel filename From disposition
                 if (matches && matches[1]) {
                     filename = matches[1].replace(/['"]/g, ''); // Remove quotes if present
