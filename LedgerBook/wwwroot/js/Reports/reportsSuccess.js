@@ -75,3 +75,60 @@ function getSerachOptionsSuccess(response) {
         }
     }
 }
+
+function generatePdfSuccess(response) {
+    if (response.isSuccess) {
+        if (response.result != null) {
+            let reportdata = response.result;
+            console.log(reportdata)
+            $("#reportpdf-business-name").html(reportdata.businessname)
+            $("#reportpdf-startdate").html(reportdata.startdate)
+            $("#reportpdf-enddate").html(reportdata.endDate)
+            $(".reportpdf-youGave").html(reportdata.youGave)
+            $(".reportpdf-youGot").html(reportdata.youGot)
+            $("#reportpdf-net").html(reportdata.netBalance)
+            $("#reportpdf-partyName").html(reportdata.partyName)
+            $("#reportpdf-timePeriod").html(reportdata.timePeriod)
+            $("#reportpdf-count").html(reportdata.transactionsList.length)
+
+            let entries = reportdata.transactionsList;
+            let htmlContetnt = "";
+            if (entries.length != 0) {
+                entries.forEach(element => {
+                    htmlContetnt += `<tr>
+                            <td style="text-align: center;  border: 2px solid gray; padding: 10px;">${element.createDate}</td>
+                            <td style="text-align: center;  border: 2px solid gray; padding: 10px;">${element.partyName}</td>
+                            <td style="text-align: center;  border: 2px solid gray; padding: 10px;">${element.description}</td>`
+                    if (element.transactionType == 2) {
+                        htmlContetnt += `<td  style="text-align: center;  border: 2px solid gray; padding: 10px; color: gray; background-color: rgb(252, 240, 240);">${element.transactionAmount}</td>
+                                <td style="text-align: center;  border: 2px solid gray; padding: 10px; color: gray; background-color: rgb(218, 245, 238);">-</td>`
+                    } else {
+                        htmlContetnt += ` <td  style="text-align: center;  border: 2px solid gray; padding: 10px; color: gray; background-color: rgb(252, 240, 240);">-</td>
+                                <td style="text-align: center;  border: 2px solid gray; padding: 10px; color: gray; background-color: rgb(218, 245, 238);">${element.transactionAmount}</td>`
+                    }
+                    htmlContetnt += `</tr>`
+                })
+            }else{
+                htmlContetnt += `<tr>
+                        <td colspan="5" class="text-center " style="font-size: 20px; padding: 10px;">
+                            No entries found
+                        </td>
+                    </tr>`
+            }
+            $("#reportpdf-entries").html (htmlContetnt);
+
+            const element = document.getElementById('report-pdf-html').innerHTML;
+
+            const options = {
+                margin: [0, 0, 0, 0],
+                filename: `TransactionReport_${reportdata.startdate}_To_${reportdata.endDate}`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 1.5 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(options).from(element).save();
+
+        }
+    }
+}

@@ -356,9 +356,13 @@ public class TransactionReportService : ITransactionReportSevice
 
     public ApiResponse<ReportTransactionEntriesViewModel> GetReportdata(string partytype, string timePeriod, Businesses curBusiness, int userId, int searchPartyId = 0, string startDate = "", string endDate = "")
     {
-        if (partytype.IsNullOrEmpty() || curBusiness == null)
+        if (partytype.IsNullOrEmpty() || curBusiness == null || userId == 0)
         {
             return new ApiResponse<ReportTransactionEntriesViewModel>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
+        }
+        if (!_userBusinessMappingService.HasPermission(curBusiness.Id, userId, partytype))
+        {
+            return new ApiResponse<ReportTransactionEntriesViewModel>(false, Messages.ForbiddenMessage, null, HttpStatusCode.BadRequest);
         }
         ReportTransactionEntriesViewModel reportVM = new();
 

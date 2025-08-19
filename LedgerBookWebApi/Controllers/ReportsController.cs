@@ -1,13 +1,16 @@
 using System.Net;
 using System.Net.Http.Headers;
+using System.Threading.Tasks;
 using BusinessAcessLayer.Constant;
 using BusinessAcessLayer.Interface;
 using DataAccessLayer.Constant;
 using DataAccessLayer.Models;
 using DataAccessLayer.ViewModels;
+using IronPdf.Rendering;
 using LedgerBookWebApi.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using TheArtOfDev.HtmlRenderer.PdfSharp;
 
 namespace LedgerBookWebApi.Controllers;
 
@@ -78,25 +81,37 @@ public class ReportsController : BaseController
         return Ok(_transactionReportService.GetReportdata(partytype, timePeriod, business, user.Id, searchPartyId, startDate, endDate));
     }
 
-    [HttpPost]
+    [HttpGet]
     [Route("GetReportPdfDatatest")]
     [PermissionAuthorize("AnyRole")]
-    public IActionResult GetReportPdfDatatest(string partytype, string htmlContent)
+    public IActionResult GetReportPdfDatatest(string partytype)
     {
-        Businesses business = GetBusinessFromToken();
-        ApplicationUser user = GetCurrentUserIdentity();
-        var renderer = new IronPdf.ChromePdfRenderer();
-        var pdf = renderer.RenderHtmlAsPdf(htmlContent);
-        byte[] pdfBytes = pdf.BinaryData;
-        HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK);
-        response.Content = new ByteArrayContent(pdfBytes);
-        response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/pdf");
-        response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
-        {
-            FileName = "generated_document.pdf"
-        };
-        return (IActionResult)response;
-        // return Ok(_transactionReportService.GetReportdata(partytype, timePeriod, business, user.Id, searchPartyId, startDate, endDate));
+        var renderer = new ChromePdfRenderer();
+
+        // Remove all margins
+        renderer.RenderingOptions.MarginTop = 0;
+        renderer.RenderingOptions.MarginBottom = 0;
+        renderer.RenderingOptions.MarginLeft = 0;
+        renderer.RenderingOptions.MarginRight = 0;
+
+        // Ensure no automatic headers/footers
+        // renderer.RenderingOptions.CreatePdfFormsFromHtml = false;
+        // renderer.RenderingOptions.CssMediaType = PdfCssMediaType.Screen;
+        // renderer.RenderingOptions.PrintHtmlBackgrounds = true;
+
+        // // Paper settings
+        // renderer.RenderingOptions.PaperSize = PdfPaperSize.A4;
+
+        // // Disable Chrome’s default print margins
+        // renderer.RenderingOptions.SetCustomPaperSizeInInches(8.00, 11.00); // exact A4
+        //                                                                    // renderer.RenderingOptions.EnableCustomPaperSize = true;
+        // renderer.RenderingOptions.Zoom = 0;
+
+        string htmlContent = "<div style='background-color: green;width:100%;height:100%;margin:0;padding:0;'>hiiiii</div>";
+
+        var pdfDocument = renderer.RenderHtmlAsPdf(htmlContent);
+
+        return File(pdfDocument.BinaryData, "application/pdf", "generated.pdf");
     }
     #endregion
 
@@ -111,10 +126,6 @@ public class ReportsController : BaseController
         if (partytype.IsNullOrEmpty() || business == null || business.Id == 0 || user.Id == 0)
         {
             return Ok(new ApiResponse<FileContentResult>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest));
-        }
-        if (!_userBusinessMappingService.HasPermission(business.Id, user.Id, partytype))
-        {
-            return Ok(new ApiResponse<ReportTransactionEntriesViewModel>(false, Messages.ForbiddenMessage, null, HttpStatusCode.BadRequest));
         }
         return await _transactionReportService.GetExcelData(partytype, timePeriod, business, user.Id, searchPartyId, startDate, endDate);
     }

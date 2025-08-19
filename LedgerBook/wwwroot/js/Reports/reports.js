@@ -36,57 +36,31 @@ function searchByParty(partyId, partyName) {
 
 }
 
-function GeneratePdf2() {
-    // // const { jsPDF } = window.jspdf;
-    // // const doc = new jsPDF();
-    // // doc.text(element, 0, 0);
-    // // doc.save("document2.pdf");
-
-
-    // const { jsPDF } = window.jspdf;
-    //     const doc = new jsPDF();
-
-    //     doc.html(element, {
-    //         callback: function (doc) {
-    //             // Save the PDF
-    //             doc.save('myDocument.pdf');
-    //         },
-    //         x: 0,
-    //         y: 0,
-    //         html2canvas: {
-    //             // scale: 0.8 // Adjust scale for better rendering if needed
-    //         }
-    //     });
-    const element = document.getElementById('abc').innerHTML;
-
-    const options = {
-        margin: [0, 0, 0, 0],
-        filename: 'document.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 1.5 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-
-    html2pdf().set(options).from(element).save();
+function GeneratePdf() {
+    let params = setBusinessParameter("/Reports/GetReportPdfData", GET, null, FORM_URL, { partytype, timePeriod: $("#timeperiod-report").val(), searchPartyId: searchTextId, startDate, endDate }, generatePdfSuccess);
+    $("body").addClass("loading");
+    ajaxCall(params);
 }
 
-function GeneratePdf() {
-    console.log(searchTextId)
+function GeneratePdf2() {
+    console.log("oko", searchTextId)
     $.ajax({
         url: `${BASE_URL}/Reports/GetReportPdfDatatest`,
-        type: "POST",
+        type: "GET",
         headers: {
             "Authorization": getCookie(User_Token),
             "BusinessToken": getCookie(Business_Token)
         },
-        data: { partytype:partytype, htmlContent : JSON.stringify(document.getElementById("report-pdf-html").innerHTML) },
+        contentType: "application/x-www-form-urlencoded",
+        processData: true,
+        data: { partytype: partytype },
         xhrFields: {
             responseType: 'blob' //binary large object -- to handle binary response
         },
         success: function (data, status, xhr) {
             console.log("ok")
-            let filename = `TransactionReport_${startDate}_to_${endDate}.xlsx`;
-            
+            let filename = `TransactionReport.pdf`;
+
             let disposition = xhr.getResponseHeader('Content-Disposition');
             console.log(disposition)
             if (disposition && disposition.indexOf('filename') !== -1) {
@@ -107,16 +81,18 @@ function GeneratePdf() {
             console.log("Export Successfully");
 
         }, error: function (res) {
+            console.log(res)
             Toaster("Something went wrong. Please try again later.", "error")
-            
+
         }
 
     })
 }
 
-
 function GenerateExcel() {
     console.log(searchTextId)
+    let startDateTemp = convertDateFormat(startDate)
+    let endDateTemp = convertDateFormat(endDate);
     $.ajax({
         url: `${BASE_URL}/Reports/GetReportExcelData`,
         type: "GET",
@@ -126,26 +102,26 @@ function GenerateExcel() {
         },
         data: { partytype, timePeriod: $("#timeperiod-report").val(), searchPartyId: searchTextId, startDate, endDate },
         xhrFields: {
-            responseType: 'blob' //binary large object -- to handle binary response
+            responseType: 'blob'
         },
         success: function (data, status, xhr) {
 
-            let filename = `TransactionReport_${startDate}_to_${endDate}.xlsx`;
-            
+            let filename = `TransactionReport_${startDateTemp}_To_${endDateTemp}.xlsx`;
+
             let disposition = xhr.getResponseHeader('Content-Disposition');
             console.log(disposition)
             if (disposition && disposition.indexOf('filename') !== -1) {
-                let matches = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/.exec(disposition); //ExportOrderDataToExcel filename From disposition
+                let matches = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/.exec(disposition); 
                 if (matches && matches[1]) {
-                    filename = matches[1].replace(/['"]/g, ''); // Remove quotes if present
+                    filename = matches[1].replace(/['"]/g, '');
                 }
             }
 
             let blob = new Blob([data], { type: xhr.getResponseHeader('Content-Type') });
             let link = document.createElement('a');
-            link.href = window.URL.createObjectURL(blob); //timePeriod url points to blob obj
-            link.download = filename; //Download file name
-            document.body.appendChild(link); //appendChild so that it Cancelled be cliked
+            link.href = window.URL.createObjectURL(blob); 
+            link.download = filename; 
+            document.body.appendChild(link); 
             link.click();
             document.body.removeChild(link);
 
@@ -153,8 +129,23 @@ function GenerateExcel() {
 
         }, error: function (res) {
             Toaster("Something went wrong. Please try again later.", "error")
-            
+
         }
 
     })
 }
+
+
+function convertDateFormat(dateString) {
+    const date = new Date(dateString);
+  
+    const day = date.getDate();
+    const year = date.getFullYear();
+    const monthNames = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+    const month = monthNames[date.getMonth()];
+  
+    return `${day} ${month} ${year}`;
+  }
