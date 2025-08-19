@@ -63,7 +63,6 @@ function getSerachOptionsSuccess(response) {
         if (response.result != null) {
             let htmlContetnt = "";
             let parties = response.result;
-            console.log(parties)
             parties.forEach(element => {
                 htmlContetnt += `<div class="w-100 p-2 ps-2 border-bottom" data-partyid="${element.partyId}" onclick="searchByParty(${element.partyId},'${element.partyName}')">${element.partyName}</div>`
             });
@@ -80,7 +79,6 @@ function generatePdfSuccess(response) {
     if (response.isSuccess) {
         if (response.result != null) {
             let reportdata = response.result;
-            console.log(reportdata)
             $("#reportpdf-business-name").html(reportdata.businessname)
             $("#reportpdf-startdate").html(reportdata.startdate)
             $("#reportpdf-enddate").html(reportdata.endDate)
@@ -108,14 +106,14 @@ function generatePdfSuccess(response) {
                     }
                     htmlContetnt += `</tr>`
                 })
-            }else{
+            } else {
                 htmlContetnt += `<tr>
                         <td colspan="5" class="text-center " style="font-size: 20px; padding: 10px;">
                             No entries found
                         </td>
                     </tr>`
             }
-            $("#reportpdf-entries").html (htmlContetnt);
+            $("#reportpdf-entries").html(htmlContetnt);
 
             const element = document.getElementById('report-pdf-html').innerHTML;
 
@@ -129,6 +127,10 @@ function generatePdfSuccess(response) {
 
             html2pdf().set(options).from(element).save();
 
+        }
+    } else {
+        if (response.toasterMessgae != null) {
+            Toaster(response.toasterMessgae, "error");
         }
     }
 }

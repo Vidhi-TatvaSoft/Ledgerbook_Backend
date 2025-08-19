@@ -1,0 +1,9 @@
+const UserActivity = "{0} has been {1}.";
+const BusinessActivity = "{0} has been {1} by {2}.";
+const PartyActivity = "{0} '{1}' has been {2} to business '{3}' by {4}.";
+const PartyUpdateActivity = "{0} '{1}' in business '{2}' has been {3} by {4}.";
+const PartyDeleteActivity = "{0} '{1}' has been removed from business '{3}' by {4}.";
+const TransactionAddActivity = "{0} {1} has processed a transaction of ₹{2} for business '{3}' by {4}.";
+const TransactionActivity = "Transaction for {0} '{1}' in business '{2}' has been {3} by {4}.";
+const AddUserInBusinessActivity = "New user '{0}' invited by {1}.";
+const UserInBusinessActivity = "User '{0}' {1} by {2}.";

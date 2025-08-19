@@ -87,6 +87,7 @@ function savePartySuccess(response) {
             $("#party-id").val(response.result.partyId);
         }
         displayPartyList();
+        displaySelectedParyDetails(response.result.partyId);
     } else {
         if (response.toasterMessage != null) {
             Toaster(response.toasterMessage, "error")

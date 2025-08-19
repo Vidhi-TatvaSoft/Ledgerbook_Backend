@@ -84,7 +84,6 @@ function displaySelectedParyDetails(partyId) {
 //display transaction entries of selected parties
 function displayTransactionEntries(partyId) {
     let params = setBusinessParameter("/Party/GetTransationEntries", GET, null, FORM_URL, { partyId: partyId }, transactionEntriesSuccess);
-    console.log(params)
     $("body").addClass("loading");
     ajaxCall(params);
 }

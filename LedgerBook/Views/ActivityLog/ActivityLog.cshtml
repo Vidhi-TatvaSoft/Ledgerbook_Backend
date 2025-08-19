@@ -1,0 +1,242 @@
+@using LedgerBook.Constant
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor;
+@{
+    ViewData["Title"] = "Activity Logs";
+    Layout = "~/Views/Shared/_BusinessCardLayout.cshtml";
+}
+
+<div class="main-container px-4 mt-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="heading fs-2 fw-bold text-color text-nowrap">Activity Logs</div>
+        <span class="d-flex">
+            @if (HttpContextAccessor.HttpContext.Request.Cookies[TokenKey.BusinessToken] != null)
+            {
+                <a class="fs-6 fw-bold btn text-nowrap btn-primary mt-3 cursor-pointer text-decoration-none"
+                    style="height:35px; width:100% !important;" asp-action="ManageBusiness" asp-controller="Party">Back</a>
+            }
+            else
+            {
+                <a class="fs-6 fw-bold btn text-nowrap btn-primary mt-3 cursor-pointer text-decoration-none"
+                    style="height:35px; width:100% !important;" asp-action="Index" asp-controller="Business">Back</a>
+            }
+        </span>
+    </div>
+
+    <div class="row">
+        <div class="category col-12 col-sm-6 col-md-3 col-lg-2 form-floating mb-2 mb-sm-2 mb-md-2">
+            <div class="form-floating">
+                <select class="form-select" id="main-entity-select" aria-label="Floating label select example">
+                    <option value="-1">All</option>
+                    <option value=@EnumHelper.ActivityEntityType.User>@EnumHelper.ActivityEntityType.User</option>
+                    <option value=@EnumHelper.ActivityEntityType.Business>@EnumHelper.ActivityEntityType.Business
+                    </option>
+                </select>
+                <label for="main-entity-select text-secondary">Select Category</label>
+            </div>
+        </div>
+
+        <div class="category col-12 col-sm-6 col-md-3 col-lg-2 form-floating d-none mb-2 mb-sm-2 mb-md-2">
+            <div class="form-floating">
+                <select class="form-select" id="business-select" aria-label="Floating label select example">
+
+                </select>
+                <label for="main-entity-select text-secondary">Select Business</label>
+            </div>
+        </div>
+
+        <div class="category col-12 col-sm-6 col-md-3 col-lg-2 form-floating d-none mb-2 mb-sm-2 mb-md-2">
+            <div class="form-floating">
+                <select class="form-select" id="sub-entity-select" aria-label="Floating label select example">
+                    <option value="-1">All</option>
+                    <option value=@EnumHelper.ActivityEntityType.Party>@EnumHelper.ActivityEntityType.Party</option>
+                    <option value=@EnumHelper.ActivityEntityType.Transaction>@EnumHelper.ActivityEntityType.Transaction
+                    </option>
+                    <option value=@EnumHelper.ActivityEntityType.Role>@EnumHelper.ActivityEntityType.Role</option>
+                </select>
+                <label for="main-entity-select text-secondary">Select SubCategory</label>
+            </div>
+        </div>
+
+        <div class="category col-12 col-sm-6 col-md-3 col-lg-2 form-floating d-none mb-2 mb-sm-2 mb-md-2">
+            <div class="form-floating">
+                <select class="form-select" id="party-entity-select" aria-label="Floating label select example">
+
+                </select>
+                <label for="main-entity-select text-secondary">Select Party</label>
+            </div>
+        </div>
+
+        <div class="category col-12 col-sm-6 col-md-3 col-lg-2 form-floating mb-2  ">
+            <div class="form-floating">
+                <select class="form-select" id="action-select" aria-label="Floating label select example">
+                    <option value="-1">All</option>
+                    <option value=@EnumHelper.Actiontype.Add>@EnumHelper.Actiontype.Add</option>
+                    <option value=@EnumHelper.Actiontype.Update>@EnumHelper.Actiontype.Update</option>
+                    <option value=@EnumHelper.Actiontype.Delete>@EnumHelper.Actiontype.Delete</option>
+                </select>
+                <label for="main-entity-select text-secondary">Select Action</label>
+            </div>
+        </div>
+
+
+        <!--------------------------------------------- Business cards---------------------------------------------->
+        <div class="activity-scroll mt-4">
+            <div class="activity-div p-2 table-responsive">
+                <table class="table display">
+                    <thead>
+                        <tr>
+                            <th class="text-nowrap col-1">Date</th>
+                            <th class="text-nowrap text-center col-2">Time</th>
+                            <th class="text-nowrap col">Activity</th>
+                        </tr>
+                    </thead>
+                    <tbody class="" id="activities-display-div">
+                    </tbody>
+                    <input type="hidden" id="activity-totalCount">
+                </table>
+            </div>
+        </div>
+        <div class="pagination-main-div d-flex justify-content-end gap-2 p-3  bg-white ">
+
+            <span class="mt-2">Items Per page:</span>
+            <select id="itemsperpage">
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="15">15</option>
+
+            </select>
+
+            <span class=" mt-2 ms-1" id="pagination-text"></span>
+            <a id="left-arrow" class="btn border border-dark bg-light ms-2">&lt;</a>
+            <a id="right-arrow" class="btn border border-dark bg-light ms-2">&gt;</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let activityData = {
+            entityType: "-1",
+            businessId: 0,
+            subEntityType: "-1",
+            partyId: 0,
+            actionName: "-1",
+            pageNumber: 1,
+            pageSize: 10
+        };
+        let currentPage = 1;
+
+        String.Format = function () {
+            var s = arguments[0];
+            for (var i = 0; i < arguments.length - 1; i++) {
+                var reg = new RegExp("\\{" + i + "\\}", "gm");
+                s = s.replace(reg, arguments[i + 1]);
+            }
+            return s;
+        };
+
+        $(document).ready(function () {
+            $("#itemsperpage").val("10")
+            let str = String.Format("hiii {0} {1}", "vidhi", "fscas")
+            displayActivities(activityData)
+            getActivityBusinesses();
+
+            $(document).on("change", "#main-entity-select", function () {
+                activityData.entityType = this.value;
+                activityData.pageNumber = 1;
+                activityData.pageSize = 10;
+                $("#itemsperpage").val("10")
+                if (activityData.entityType == "Business") {
+                    document.getElementById("business-select").parentElement.parentElement.classList.remove("d-none");
+                    document.getElementById("sub-entity-select").parentElement.parentElement.classList.remove("d-none");
+                    document.getElementById("business-select").value = "0";
+                    document.getElementById("sub-entity-select").value = "-1";
+                    activityData.businessId = 0;
+                    activityData.subEntityType = "-1";
+                } else {
+                    document.getElementById("business-select").parentElement.parentElement.classList.add("d-none");
+                    document.getElementById("sub-entity-select").parentElement.parentElement.classList.add("d-none");
+                    document.getElementById("party-entity-select").parentElement.parentElement.classList.add("d-none");
+
+                }
+                displayActivities(activityData);
+            })
+
+            //action change
+            $(document).on("change", "#action-select", function () {
+                activityData.actionName = this.value;
+                activityData.pageNumber = 1;
+                activityData.pageSize = 10;
+                $("#itemsperpage").val("10")
+                displayActivities(activityData);
+            })
+            $(document).on("change", "#business-select", function () {
+                activityData.businessId = parseInt(this.value);
+                activityData.pageNumber = 1;
+                activityData.pageSize = 10;
+                $("#itemsperpage").val("10")
+                document.getElementById("sub-entity-select").parentElement.parentElement.classList.remove("d-none");
+                document.getElementById("sub-entity-select").value = "-1";
+                activityData.subEntityType = "-1";
+                activityData.partyId = 0;
+                document.getElementById("party-entity-select").parentElement.parentElement.classList.add("d-none");
+
+                displayActivities(activityData);
+            })
+
+            //change sub entity
+            $(document).on("change", "#sub-entity-select", function () {
+                activityData.subEntityType = this.value;
+                activityData.pageNumber = 1;
+                activityData.pageSize = 10;
+                $("#itemsperpage").val("10")
+                if (activityData.subEntityType == "Party") {
+                    document.getElementById("party-entity-select").parentElement.parentElement.classList.remove("d-none");
+                    let params = setBusinessParameter("/ActivityLog/GetAllParties", GET, null, FORM_URL, { businessId: activityData.businessId }, getActivityPartySuccess);
+                    $("body").addClass("loading");
+                    ajaxCall(params);
+                } else {
+                    document.getElementById("party-entity-select").parentElement.parentElement.classList.add("d-none");
+                }
+                displayActivities(activityData);
+            })
+
+            //change party
+            $(document).on("change", "#party-entity-select", function () {
+                activityData.partyId = parseInt(this.value);
+                activityData.pageNumber = 1;
+                activityData.pageSize = 10;
+                $("#itemsperpage").val("10")
+                displayActivities(activityData);
+            })
+
+            //right arrow click
+            $("#right-arrow").on("click", function () {
+                let rightarrow = !$(this).prop("disabled");
+                if (rightarrow) {
+                    activityData.pageNumber++;
+                    displayActivities(activityData);
+                }
+            });
+
+            //left arrow click
+            $("#left-arrow").on("click", function () {
+                let leftarrow = !$(this).prop("disabled");
+                if (leftarrow) {
+                    activityData.pageNumber--;
+                    displayActivities(activityData);
+                }
+            });
+
+            //chnage items per page
+            $("#itemsperpage").on("change", function () {
+                activityData.pageSize = $(this).val();
+                activityData.pageNumber = 1;
+                displayActivities(activityData);
+            });
+
+        })
+
+        
+    </script>
+}

@@ -30,7 +30,6 @@ public class LoginController : BaseController
         _jwtTokenService = jWTTokenService;
         _cookieService = cookieService;
         _attachmentService = attachmentService;
-        // _loginService = loginService;
     }
 
     #region login 

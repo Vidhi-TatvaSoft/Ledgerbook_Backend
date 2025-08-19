@@ -156,33 +156,6 @@
 
     }
 
-
-    $(document).ready(function () {
-        var successMessage = '@TempData["SuccessMessage"]';
-        var errorMessage = '@TempData["ErrorMessage"]';
-        toastr.options = {
-            "closeButton": true,
-            "progressBar": true,
-            "timeOut": "2000"
-        };
-        if (successMessage) {
-            toastr.success(successMessage);
-        }
-        if (errorMessage) {
-            toastr.error(errorMessage);
-        }
-    });
-
-    $(document).ready(function () {
-        // 1. Show toaster if TempData contains error (normal request)
-
-        // 2. Global AJAX error catcher
-        $(document).ajaxComplete(function (event, xhr, settings) {
-            AjaxComplete(event, xhr, settings)
-        });
-
-    });
-
     function AjaxResponseHandle(response) {
         var parser = new DOMParser();
         var doc = parser.parseFromString(response, 'text/html');

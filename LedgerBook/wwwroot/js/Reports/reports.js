@@ -28,10 +28,8 @@ function daysInMonth(month, year) {
 
 //serach party and transaction by party
 function searchByParty(partyId, partyName) {
-    console.log("hiii")
     $("#partySearch-report").val(partyName);
     searchTextId = partyId;
-    console.log(partyId)
     displayReportTransactionEntries(partytype, searchTextId, startDate, endDate)
 
 }
@@ -43,7 +41,6 @@ function GeneratePdf() {
 }
 
 function GeneratePdf2() {
-    console.log("oko", searchTextId)
     $.ajax({
         url: `${BASE_URL}/Reports/GetReportPdfDatatest`,
         type: "GET",
@@ -58,11 +55,9 @@ function GeneratePdf2() {
             responseType: 'blob' //binary large object -- to handle binary response
         },
         success: function (data, status, xhr) {
-            console.log("ok")
             let filename = `TransactionReport.pdf`;
 
             let disposition = xhr.getResponseHeader('Content-Disposition');
-            console.log(disposition)
             if (disposition && disposition.indexOf('filename') !== -1) {
                 let matches = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/.exec(disposition); //ExportOrderDataToExcel filename From disposition
                 if (matches && matches[1]) {
@@ -77,20 +72,14 @@ function GeneratePdf2() {
             document.body.appendChild(link); //appendChild so that it Cancelled be cliked
             link.click();
             document.body.removeChild(link);
-
-            console.log("Export Successfully");
-
         }, error: function (res) {
-            console.log(res)
             Toaster("Something went wrong. Please try again later.", "error")
-
         }
 
     })
 }
 
 function GenerateExcel() {
-    console.log(searchTextId)
     let startDateTemp = convertDateFormat(startDate)
     let endDateTemp = convertDateFormat(endDate);
     $.ajax({
@@ -109,7 +98,6 @@ function GenerateExcel() {
             let filename = `TransactionReport_${startDateTemp}_To_${endDateTemp}.xlsx`;
 
             let disposition = xhr.getResponseHeader('Content-Disposition');
-            console.log(disposition)
             if (disposition && disposition.indexOf('filename') !== -1) {
                 let matches = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/.exec(disposition); 
                 if (matches && matches[1]) {
@@ -124,9 +112,6 @@ function GenerateExcel() {
             document.body.appendChild(link); 
             link.click();
             document.body.removeChild(link);
-
-            console.log("Export Successfully");
-
         }, error: function (res) {
             Toaster("Something went wrong. Please try again later.", "error")
 

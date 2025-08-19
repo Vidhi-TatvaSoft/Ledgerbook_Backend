@@ -172,21 +172,4 @@ public class CommonMethods
             throw new Exception(ex.ToString());
         }
     }
-
-    // public static bool RegisterEmail(string Email)
-    // {
-    //      try
-    //     {
-    //         string sender = Constant.ConstantVariables.SenderEmail;
-    //         string subject = "Registration Email";
-    //         string body = $@"<div>Your role has been updated to {Role} in {Business} Business.</div>
-    //         <div>You can login using your credentials.</div>";
-    //         return await SendEmail(sender, Email, subject, body);
-    //     }
-    //     catch (Exception e)
-    //     {
-    //         return false;
-    //     }
-    // }
-
 }

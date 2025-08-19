@@ -1,3 +1,4 @@
+using System.Net;
 using BusinessAcessLayer.Constant;
 using BusinessAcessLayer.Interface;
 using DataAccessLayer.Constant;
@@ -33,8 +34,12 @@ public class ActivityLogService : IActivityLogService
         return activityLogs;
     }
 
-    public PaginationViewModel<ActivityLogsViewModel> GetActivities(ActivityDataViewModel activityDataVM, int userId)
+    public ApiResponse<PaginationViewModel<ActivityLogsViewModel>> GetActivities(ActivityDataViewModel activityDataVM, int userId)
     {
+        if (activityDataVM == null || userId == 0)
+        {
+            return new ApiResponse<PaginationViewModel<ActivityLogsViewModel>>(false, Messages.ExceptionMessage, null,HttpStatusCode.BadRequest);
+        }
         List<ActivityLogs> activities = new();
         List<int?> businessIdsList = _genericRepository.GetAll<ActivityLogs>(x => x.EntityType == EnumHelper.ActivityEntityType.Business).Select(x => x.EntityTypeId).Distinct().ToList();
         List<int?> businessIdToDisplay = new();
@@ -122,13 +127,16 @@ public class ActivityLogService : IActivityLogService
             ActivityId = x.Id,
             Message = x.Message,
             Action = x.Action,
+            ActionString = x.Action.ToString(),
             EntityType = x.EntityType,
+            EntityTypeString = x.EntityType.ToString(),
             EntityTypeId = x.EntityTypeId,
             CreatedAt = x.CreatedAt,
             ActivityDate = x.CreatedAt.ToString("dd MMMM yyyy"),
             ActivityTime = x.CreatedAt.ToString("hh:mm:ss tt"),
             CreatedById = x.CreatedById,
             SubEntityType = x.SubEntityType,
+            SubEntityTypeString = x.SubEntityType.ToString(),
             SubEntityTypeId = x.SubEntityTypeId
         }).ToList();
 
@@ -186,6 +194,7 @@ public class ActivityLogService : IActivityLogService
 
         int totalCount = activityList.Count();
         List<ActivityLogsViewModel> items = activityList.Skip((activityDataVM.PageNumber - 1) * activityDataVM.PageSize).Take(activityDataVM.PageSize).ToList();
-        return new PaginationViewModel<ActivityLogsViewModel>(items, totalCount, activityDataVM.PageNumber, activityDataVM.PageSize);
+        var paginatedData = new PaginationViewModel<ActivityLogsViewModel>(items, totalCount, activityDataVM.PageNumber, activityDataVM.PageSize);
+        return new ApiResponse<PaginationViewModel<ActivityLogsViewModel>>(true, null, paginatedData, HttpStatusCode.OK);
     }
 }

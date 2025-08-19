@@ -188,6 +188,8 @@
     <script src="~/js/ajaxCall/ajaxCall.js" asp-append-version="true"></script>
     <script src="~/js/validations.js" asp-append-version="true"></script>
     <script src="~/js/Business/business.js" asp-append-version="true"></script>
+    <script src="~/js/ActivityLog/activityMessages.js" asp-append-version="true"></script>
+    <script src="~/js/ActivityLog/activityLog.js" asp-append-version="true"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
@@ -205,55 +207,10 @@
         $("#businesscard-layout-profilePhoto").attr("src", profilePhoto);
     }
 
-    $(document).ready(function () {
-        var successMessage = '@TempData["SuccessMessage"]';
-        var errorMessage = '@TempData["ErrorMessage"]';
-        toastr.options = {
-            "closeButton": true,
-            "progressBar": true,
-            "timeOut": "2000"
-        };
-        if (successMessage) {
-            toastr.success(successMessage);
-        }
-        if (errorMessage) {
-            toastr.error(errorMessage);
-        }
-    });
 
     $(document).ready(function () {
         SetuserNameImage();
     });
-
-    function AjaxResponseHandle(response) {
-        var parser = new DOMParser();
-        var doc = parser.parseFromString(response, 'text/html');
-        var title = doc.title;
-        if (title === "Login - LedgerBook" || title === "Register - LedgerBook") {
-            window.location.href = '@Url.Action("Login", "Login")';
-        } else if (title === "Business - LedgerBook") {
-            window.location.href = '@Url.Action("Index", "Business")';
-        } else if (title === "View Business - LedgerBook" || "Party Report - LedgerBook") {
-            window.location.href = '@Url.Action("Dashboard", "Dashboard")';
-        } else if (title === "InternalServerError" || title === "Forbidden" || title === "Unauthorize" || title === "PageNotFoundError") {
-            var url = `/ErrorPage/${title}`;
-            window.location.href = url;
-        } else if (title === "InternalServerError - LedgerBook" || title === "Forbidden - LedgerBook" || title === "Unauthorize - LedgerBook" || title === "PageNotFoundError - LedgerBook") {
-            var url = `/ErrorPage/${title.split(" ")[0].toString().trim()}`;
-            window.location.href = url;
-        } else {
-            Toaster('Unexpected response format.', "error");
-        }
-    }
-
-    function IsHtmlDoc(response) {
-        if (response.statusCode) {
-            return;
-        }
-        if ((response.trim().indexOf('<!DOCTYPE html>') === 0) || (response.trim().indexOf('<html>') === 0)) {
-            AjaxResponseHandle(response);
-        }
-    }
 
 </script>
 

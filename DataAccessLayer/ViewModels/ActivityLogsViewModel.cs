@@ -7,7 +7,9 @@ public class ActivityLogsViewModel
     public int ActivityId { get; set; }
     public string Message { get; set; }
     public EnumHelper.Actiontype Action { get; set; }
+    public string ActionString{ get; set; }
     public EnumHelper.ActivityEntityType EntityType { get; set; }
+    public string EntityTypeString { get; set; }
     public int? EntityTypeId { get; set; } = null;
     public string? EntityTypeName { get; set; } = null;
     public DateTime CreatedAt { get; set; }
@@ -16,6 +18,7 @@ public class ActivityLogsViewModel
     public int? CreatedById { get; set; } = null;
     public string? createdByName { get; set; } = null;
     public EnumHelper.ActivityEntityType? SubEntityType { get; set; } = null;
+    public string SubEntityTypeString { get; set; }
     public int? SubEntityTypeId { get; set; } = null;
     public string? SubEntityTypeName { get; set; } = null;
     public string? TransactionType { get; set; } = null;

@@ -702,7 +702,7 @@ public class BusinessService : IBusinessService
         {
             return new ApiResponse<string>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
         }
-        if (!CanEditBusiness(businessId, userId))
+        if (!CanEditBusiness(businessId, logedinUser.Id))
         {
             return new ApiResponse<string>(false, Messages.CanNotDeletUserMessage, null, HttpStatusCode.Forbidden);
         }
@@ -736,7 +736,7 @@ public class BusinessService : IBusinessService
         {
             return new ApiResponse<string>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
         }
-        if (!CanEditBusiness(businessId, userId))
+        if (!CanEditBusiness(businessId, logedinUser.Id))
         {
             return new ApiResponse<string>(false, Messages.ForbiddenMessage, null, HttpStatusCode.Forbidden);
         }
