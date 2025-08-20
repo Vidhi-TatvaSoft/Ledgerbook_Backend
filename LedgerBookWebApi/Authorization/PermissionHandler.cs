@@ -1,7 +1,5 @@
 using BusinessAcessLayer.Interface;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
 using DataAccessLayer.Models;
 using DataAccessLayer.ViewModels;
 using BusinessAcessLayer.Constant;
@@ -11,7 +9,6 @@ namespace LedgerBookWebApi.Authorization;
 
 public class PermissionHandler : AuthorizationHandler<PermissionRequirement>
 {
-
     private readonly IJWTTokenService _jWTService;
     private readonly ILoginService _loginService;
     private readonly IBusinessService _businessService;

@@ -37,7 +37,6 @@ public class MessageHelper
     public const string MobileNumberlength = "Mobile Number must be 10 digits long.";
     public const string Pincodelength = "Pincode must be 6 digits long.";
     public const string TransactionAmountValidation = "Amount should be in between 1 to 10000.";
-
     public const string InvalidGSTIN = "Enter valid GST Number.";
 
 }

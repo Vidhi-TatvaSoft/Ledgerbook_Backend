@@ -157,7 +157,7 @@ public class PartyService : IPartyService
         {
             string verificationToken = GetEmailVerifiactionTokenForParty(partyId);
             string verificationCode = _jwtTokenService.GenerateTokenPartyEmailVerification(partyViewModel.Email, verificationToken, partyId, business.BusinessName, partyViewModel.PartyTypeString.ToString());
-            string verificationLink = "http://localhost:5189/Party/VerifyParty?verificationCode=" + verificationCode;
+            string verificationLink =  ConstantVariables.LoginLink + "/Party/VerifyParty?verificationCode=" + verificationCode;
             _ = CommonMethods.VerifyParty(partyViewModel.PartyName, partyViewModel.Email, verificationLink, partyViewModel.PartyTypeString.ToString(), business.BusinessName);
         }
 

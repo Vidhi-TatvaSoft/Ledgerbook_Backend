@@ -26,15 +26,6 @@ builder.Services.AddDbContext<LedgerBookDbContext>(options =>
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
                     .AddEntityFrameworkStores<LedgerBookDbContext>();
 
-// builder.Services.AddCors(options =>
-// {
-//     options.AddPolicy("AllowLocalhost",
-//         policy => policy.WithOrigins("http://localhost:5189")
-//             .AllowAnyMethod()
-//             .AllowAnyHeader()
-//     );
-// });
-
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
@@ -44,9 +35,6 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod();
     });
 });
-// var app = builder.Build();
-
-// app.UseCors();
 
 // builder.Services.AddScoped<IViewRenderService, ViewRenderService>();
 builder.Services.AddScoped<ILoginService, LoginService>();

@@ -51,7 +51,7 @@ public class LoginService : ILoginService
             {
                 string verificationToken = GetEmailVerifiactionToken(RegisterVM.Email);
                 string verificationCode = _jwttokenService.GenerateTokenEmailVerificationToken(RegisterVM.Email, verificationToken);
-                string verificationLink = "http://localhost:5189/Login/VerifyEmail?verificationCode=" + verificationCode;
+                string verificationLink = ConstantVariables.LoginLink + "/Login/VerifyEmail?verificationCode=" + verificationCode;
                 _ = CommonMethods.RegisterEmail(RegisterVM.FirstName + " " + RegisterVM.LastName, RegisterVM.Email, verificationLink, ConstantVariables.LoginLink);
                 return new ApiResponse<string>(true, Messages.RegistrationSuccessMessage, verificationToken, HttpStatusCode.Created);
             }

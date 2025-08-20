@@ -1,11 +1,9 @@
 using System.Net;
-using System.Reflection.Metadata;
 using System.Text.Json;
 using BusinessAcessLayer.Constant;
 using BusinessAcessLayer.CustomException;
 using BusinessAcessLayer.Interface;
 using DataAccessLayer.ViewModels;
-
 
 namespace LedgerBook.ExceptionMiddleware;
 
@@ -70,9 +68,7 @@ public class ExceptionMiddleware
         using IServiceScope scope = _serviceScopeFactory.CreateAsyncScope();
         IExceptionService exceptionserive = scope.ServiceProvider.GetRequiredService<IExceptionService>();
         await exceptionserive.AddExceptionLog(context, exception);
-
         context.Response.ContentType = "application/json";
-
         var jsonResponse = new ApiResponse<string>(false, message, null, code);
         var options = new JsonSerializerOptions
         {

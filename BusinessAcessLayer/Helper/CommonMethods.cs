@@ -1,29 +1,13 @@
-using BusinessAcessLayer.Interface;
-using DataAccessLayer.Models;
 using MailKit.Security;
 using Microsoft.AspNetCore.Http;
-using MailKit.Net.Smtp;
-using System.Net.Mail;
 using MimeKit;
-using System;
-using DataAccessLayer.Constant;
 
 namespace BusinessAcessLayer.Helper;
 
 public class CommonMethods
 {
-    private readonly IJWTTokenService _jwttokenService;
-    private readonly LedgerBookDbContext _context;
-    private readonly IGenericRepo _genericRepository;
-
-    public CommonMethods(LedgerBookDbContext context,
-    IJWTTokenService jWTTokenService,
-    IGenericRepo genericRepository
-    )
+    public CommonMethods()
     {
-        _context = context;
-        _jwttokenService = jWTTokenService;
-        _genericRepository = genericRepository;
     }
 
     public static string Base64Encode(string plainText)
