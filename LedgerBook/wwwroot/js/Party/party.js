@@ -44,7 +44,7 @@ function saveParty(close) {
         let params = setBusinessParameter("/Party/SaveParty", POST, null, FORMDATA, formData, savePartySuccess);
         $("body").addClass("loading");
         ajaxCall(params);
-        if(close){
+        if (close) {
             ClosePartyModal()
         }
     }
@@ -68,17 +68,36 @@ function closeSettleUpModal() {
 
 //display details of selected party
 function displaySelectedParyDetails(partyId) {
-    let params = setBusinessParameter("/Party/GetPartyDetails", GET, null, FORM_URL, { partyId: partyId }, partyDetailsSuccess);
-    $("body").addClass("loading");
-    ajaxCall(params);
+    let allParties = document.getElementsByClassName("party-list-div")
+    let htmlContent = `<div class="d-flex flex-column justify-content-center align-items-center h-100">
+                <div><img src="/images/users.png" alt="" height="150px"></div>
+                <div class="fs-4 text-secondary">No Party
+                    Selected</div>
+            </div>`
+    $("#displaySelectedParty").html(htmlContent);
+    console.log(allParties)
+    for (i = 0; i < allParties.length; i++) {
+        console.log(parseInt(allParties[i].id.split("-")[2]), " ------", partyId)
+        console.log(parseInt(allParties[i].id.split("-")[2]) == partyId)
+        if (parseInt(allParties[i].id.split("-")[2]) == partyId) {
+            let params = setBusinessParameter("/Party/GetPartyDetails", GET, null, FORM_URL, { partyId: partyId }, partyDetailsSuccess);
+            $("body").addClass("loading");
+            ajaxCall(params);
 
-    let parties = document.getElementsByClassName("party-list-div");
-    for (i = 0; i < parties.length; i++) {
-        parties[i].classList.remove("selected-party")
+            let parties = document.getElementsByClassName("party-list-div");
+            for (i = 0; i < parties.length; i++) {
+                parties[i].classList.remove("selected-party")
+            }
+            setTimeout(function () {
+                document.getElementById(`party-id-${partyId}`).classList.add("selected-party");
+            }, 300);
+            break;
+        }
     }
-    setTimeout(function () {
-        document.getElementById(`party-id-${partyId}`).classList.add("selected-party");
-    }, 300);
+    allParties.forEach(party => {
+
+    })
+
 }
 
 //display transaction entries of selected parties

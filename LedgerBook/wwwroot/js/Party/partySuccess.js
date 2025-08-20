@@ -87,7 +87,9 @@ function savePartySuccess(response) {
             $("#party-id").val(response.result.partyId);
         }
         displayPartyList();
-        displaySelectedParyDetails(response.result.partyId);
+        setTimeout(function(){
+            displaySelectedParyDetails(response.result.partyId);
+        },100)
     } else {
         if (response.toasterMessage != null) {
             Toaster(response.toasterMessage, "error")

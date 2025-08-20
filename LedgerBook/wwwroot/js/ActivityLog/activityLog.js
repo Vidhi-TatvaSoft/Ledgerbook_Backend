@@ -1,5 +1,6 @@
 //display activities
 function displayActivities(activityData) {
+    $("#activities-display-div").html("");
     let params = setBusinessParameter("/ActivityLog/GetActivities", POST, null, APPLICATION_JSON, JSON.stringify(activityData), displayActivitySuccess);
     $("body").addClass("loading");
     ajaxCall(params);
