@@ -56,7 +56,7 @@ function getActivityBusinessesSuccess(response) {
         htmlContent += `<option value="0">All</option>`
         if (response.result != null) {
             response.result.forEach(business => {
-                htmlContent += `<option value="${business.businessId}">${business.busienssName}</option>`
+                htmlContent += `<option value="${business.businessId}">${business.businessName}</option>`
             })
         }
         $("#business-select").html(htmlContent);

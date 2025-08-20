@@ -1,22 +1,16 @@
-using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
-using System.Threading.Tasks;
-using System.Transactions;
 using BusinessAcessLayer.Constant;
 using BusinessAcessLayer.Helper;
 using BusinessAcessLayer.Interface;
 using DataAccessLayer.Constant;
 using DataAccessLayer.Models;
 using DataAccessLayer.ViewModels;
-using Microsoft.EntityFrameworkCore;
-using Org.BouncyCastle.Math.EC.Rfc7748;
 
 namespace BusinessAcessLayer.Services;
 
 public class PartyService : IPartyService
 {
-    private readonly LedgerBookDbContext _context;
     private readonly IAddressService _addressService;
     private readonly IReferenceDataEntityService _referenceDataEntityService;
     private readonly IGenericRepo _genericRepository;
@@ -27,7 +21,7 @@ public class PartyService : IPartyService
     private readonly IJWTTokenService _jwtTokenService;
 
 
-    public PartyService(LedgerBookDbContext context,
+    public PartyService(
     IAddressService addressService,
     IReferenceDataEntityService referenceDataEntityService,
     IGenericRepo genericRepository,
@@ -38,7 +32,6 @@ public class PartyService : IPartyService
     IJWTTokenService jWTTokenService
     )
     {
-        _context = context;
         _addressService = addressService;
         _referenceDataEntityService = referenceDataEntityService;
         _genericRepository = genericRepository;
@@ -53,9 +46,7 @@ public class PartyService : IPartyService
     public ApiResponse<List<PartyViewModel>> GetParties(string partyType, int businessId, int userId, string searchText, string? filter = "-1", string? sort = "-1")
     {
         if (partyType == null || businessId == 0 || userId == 0)
-        {
             return new ApiResponse<List<PartyViewModel>>(false, Messages.ExceptionMessage, null, HttpStatusCode.ServiceUnavailable);
-        }
         if (_userBusinessMappingService.HasPermission(businessId, userId, partyType))
         {
             List<PartyViewModel> parties = GetPartiesByType(partyType, businessId, searchText, filter, sort);
@@ -88,9 +79,7 @@ public class PartyService : IPartyService
             partyViewModel.CreateMonth = party.UpdatedAt != null ? party.UpdatedAt.Value.Month : party.CreatedAt.Month;
             partyViewModel.UpdatedAt = party.UpdatedAt;
             partyViewModel.Amount = _genericRepository.GetAll<LedgerTransactions>(x => x.PartyId == party.Id && x.DeletedAt == null && x.TransactionType == (byte)EnumHelper.TransactionType.GAVE).Sum(x => x.Amount) - _genericRepository.GetAll<LedgerTransactions>(x => x.PartyId == party.Id && x.DeletedAt == null && x.TransactionType == (byte)EnumHelper.TransactionType.GOT).Sum(x => x.Amount);
-
             partyViewModel.TransactionType = partyViewModel.Amount < 0 ? EnumHelper.TransactionType.GOT : EnumHelper.TransactionType.GAVE;
-
             partyViewModel.GSTIN = party.GSTIN == null ? null : party.GSTIN;
             partyViewModel.Address = party.AddressId == null ? null : _addressService.GetAddressById((int)party.AddressId);
             partyViewModel.BusinessId = party.BusinessId;
@@ -128,7 +117,7 @@ public class PartyService : IPartyService
         switch (sort)
         {
             case "-1":
-                partyList = partyList.OrderByDescending(x => x.CreatedAt).ToList();;
+                partyList = partyList.OrderByDescending(x => x.CreatedAt).ToList(); ;
                 break;
             case "mostRecent":
                 partyList = partyList.OrderByDescending(x => x.CreatedAt).ToList();
@@ -152,9 +141,7 @@ public class PartyService : IPartyService
     public async Task<ApiResponse<SavePartyViewModel>> SaveParty(SavePartyViewModel partyViewModel, int userId, Businesses business)
     {
         if (!_userBusinessMappingService.HasPermission(business.Id, userId, partyViewModel.PartyTypeString.ToString()))
-        {
             return new ApiResponse<SavePartyViewModel>(false, Messages.ForbiddenMessage, null, HttpStatusCode.Forbidden);
-        }
         bool IsPartyPresent = partyViewModel.PartyId == 0 ? false : true;
         //check if email changes or not
         if (partyViewModel.PartyId != 0)
@@ -184,35 +171,23 @@ public class PartyService : IPartyService
             transactionViewModel.BusinessName = business.BusinessName;
             int transactionId = await SaveTransactionEntry(transactionViewModel, userId);
             if (transactionId != 0)
-            {
                 return new ApiResponse<SavePartyViewModel>(true, Messages.PartyAddedWithOpeningBalance, partyViewModel, HttpStatusCode.OK);
-            }
             else
-            {
                 return new ApiResponse<SavePartyViewModel>(true, string.Format(Messages.GlobalAddUpdateMesage, "Party", "added"), partyViewModel, HttpStatusCode.OK);
-            }
         }
         if (IsPartyPresent)
         {
             if (partyId != 0)
-            {
                 return new ApiResponse<SavePartyViewModel>(true, string.Format(Messages.GlobalAddUpdateMesage, "Party", "updated"), partyViewModel, HttpStatusCode.OK);
-            }
             else
-            {
                 return new ApiResponse<SavePartyViewModel>(false, string.Format(Messages.GlobalAddUpdateFailMessage, "update", "party"), partyViewModel, HttpStatusCode.BadRequest);
-            }
         }
         else
         {
             if (partyId != 0)
-            {
                 return new ApiResponse<SavePartyViewModel>(true, string.Format(Messages.GlobalAddUpdateMesage, "Party", "added"), partyViewModel, HttpStatusCode.OK);
-            }
             else
-            {
                 return new ApiResponse<SavePartyViewModel>(false, string.Format(Messages.GlobalAddUpdateFailMessage, "add", "party"), partyViewModel, HttpStatusCode.BadRequest);
-            }
         }
     }
 
@@ -230,7 +205,6 @@ public class PartyService : IPartyService
                 {
                     x => x.EntityType
                 })!.Id;
-            // _referenceDataValueRepo.Get(x => x.EntityType.EntityType == "PartyType" && x.EntityValue == partyType).Id;
             party.Email = partyViewModel.Email.ToLower().Trim();
             party.CreatedAt = DateTime.UtcNow;
             party.CreatedById = userId;
@@ -252,7 +226,6 @@ public class PartyService : IPartyService
                     {
                         x => x.EntityType
                     })!.Id;
-            //  _referenceDataValueRepo.Get(x => x.EntityType.EntityType == "PartyType" && x.EntityValue == partyType).Id;
             if (partyViewModel.IsEmailChaneged)
             {
                 party.IsEmailVerified = false;
@@ -276,7 +249,7 @@ public class PartyService : IPartyService
 
     public async Task<ApiResponse<PartyVerifiedViewModel>> PartyEmailVerification(string verificationCode)
     {
-        if (verificationCode == null )
+        if (verificationCode == null)
         {
             return new ApiResponse<PartyVerifiedViewModel>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
         }
@@ -328,14 +301,10 @@ public class PartyService : IPartyService
     public async Task<ApiResponse<int>> SaveTransactionEntryWithPermission(TransactionEntryViewModel transactionEntryViewModel, int userId, Businesses business)
     {
         if (userId == 0 || business.Id == 0 || transactionEntryViewModel.PartyId == 0)
-        {
             return new ApiResponse<int>(false, Messages.ExceptionMessage, transactionEntryViewModel.PartyId, HttpStatusCode.BadRequest);
-        }
         PartyViewModel partyViewModel = GetPartyById(transactionEntryViewModel.PartyId);
         if (!_userBusinessMappingService.HasPermission(business.Id, userId, partyViewModel.PartyTypeString.ToString()))
-        {
             return new ApiResponse<int>(false, Messages.ForbiddenMessage, transactionEntryViewModel.PartyId, HttpStatusCode.Forbidden);
-        }
         transactionEntryViewModel.BusinessName = business.BusinessName;
         transactionEntryViewModel.TransactionType = (byte)transactionEntryViewModel.TransactionTypeEnum;
         bool IsPresentTransaction = transactionEntryViewModel.TransactionId == 0 ? false : true;
@@ -344,24 +313,16 @@ public class PartyService : IPartyService
         if (transactionId != 0)
         {
             if (!IsPresentTransaction)
-            {
                 return new ApiResponse<int>(true, string.Format(Messages.GlobalAddUpdateMesage, "Transaction", "added"), transactionEntryViewModel.PartyId, HttpStatusCode.OK);
-            }
             else
-            {
                 return new ApiResponse<int>(true, string.Format(Messages.GlobalAddUpdateMesage, "Transaction", "updated"), transactionEntryViewModel.PartyId, HttpStatusCode.OK);
-            }
         }
         else
         {
             if (!IsPresentTransaction)
-            {
                 return new ApiResponse<int>(false, string.Format(Messages.GlobalAddUpdateFailMessage, "add", "transaction"), transactionEntryViewModel.PartyId, HttpStatusCode.BadRequest);
-            }
             else
-            {
                 return new ApiResponse<int>(false, string.Format(Messages.GlobalAddUpdateFailMessage, "update", "transaction"), transactionEntryViewModel.PartyId, HttpStatusCode.BadRequest);
-            }
         }
 
     }
@@ -370,9 +331,7 @@ public class PartyService : IPartyService
     {
 
         if (transactionEntryViewModel.PartyId == 0 || transactionEntryViewModel.TransactionType == null)
-        {
             return 0;
-        }
 
         PartyViewModel partyViewModel = GetPartyById(transactionEntryViewModel.PartyId);
         string userName = _userService.GetuserNameById(userId);
@@ -390,17 +349,12 @@ public class PartyService : IPartyService
             ledgerTransaction.CreatedAt = DateTime.UtcNow;
             ledgerTransaction.CreatedById = userId;
 
-
             await _genericRepository.AddAsync<LedgerTransactions>(ledgerTransaction);
             string message;
             if (transactionEntryViewModel.IsSettleup)
-            {
                 message = string.Format(Messages.TransactionActivity, partyViewModel.PartyTypeString, partyViewModel.PartyName, transactionEntryViewModel.BusinessName, "mark as paid", userName);
-            }
             else
-            {
                 message = string.Format(Messages.TransactionAddActivity, partyViewModel.PartyTypeString, partyViewModel.PartyName, ledgerTransaction.Amount.ToString(), transactionEntryViewModel.BusinessName, userName);
-            }
             await _activityLogService.SetActivityLog(message, EnumHelper.Actiontype.Add, EnumHelper.ActivityEntityType.Business, partyViewModel.BusinessId, userId, EnumHelper.ActivityEntityType.Transaction, ledgerTransaction.Id);
             return ledgerTransaction.Id;
         }
@@ -413,13 +367,9 @@ public class PartyService : IPartyService
                 if (ledgerTransaction.IsSettled)
                 {
                     if (ledgerTransaction.Amount == transactionEntryViewModel.TransactionAmount && ledgerTransaction.TransactionType == transactionEntryViewModel.TransactionType)
-                    {
                         transactionEntryViewModel.IsSettleup = true;
-                    }
                     else
-                    {
                         transactionEntryViewModel.IsSettleup = false;
-                    }
                 }
                 else
                 {
@@ -436,15 +386,6 @@ public class PartyService : IPartyService
 
                 await _genericRepository.UpdateAsync<LedgerTransactions>(ledgerTransaction);
                 string message = string.Format(Messages.TransactionActivity, partyViewModel.PartyTypeString, partyViewModel.PartyName, transactionEntryViewModel.BusinessName, "updated", userName);
-
-                // if (ledgerTransaction.TransactionType == (byte)EnumHelper.TransactionType.GAVE)
-                // {
-                //     message = string.Format(Messages.TransactionUpdateGAVEMessage, ledgerTransaction.Amount.ToString(), transactionEntryViewModel.BusinessName, partyViewModel.PartyName);
-                // }
-                // else
-                // {
-                //     message = string.Format(Messages.TransactionUpdateGOTMessage, ledgerTransaction.Amount.ToString(), transactionEntryViewModel.BusinessName, partyViewModel.PartyName);
-                // }
                 await _activityLogService.SetActivityLog(message, EnumHelper.Actiontype.Update, EnumHelper.ActivityEntityType.Business, partyViewModel.BusinessId, userId, EnumHelper.ActivityEntityType.Transaction, ledgerTransaction.Id);
                 return ledgerTransaction.Id;
             }
@@ -459,14 +400,10 @@ public class PartyService : IPartyService
     public ApiResponse<PartyViewModel> GetpartyByIdResponse(int partyId, int businessId, int userId)
     {
         if (partyId == 0 || businessId == 0 || userId == 0)
-        {
             return new ApiResponse<PartyViewModel>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
-        }
         PartyViewModel partyViewModel = GetPartyById(partyId);
         if (!_userBusinessMappingService.HasPermission(businessId, userId, partyViewModel.PartyTypeString.ToString()))
-        {
             return new ApiResponse<PartyViewModel>(false, Messages.ForbiddenMessage, null, HttpStatusCode.Forbidden);
-        }
         return new ApiResponse<PartyViewModel>(true, null, partyViewModel, HttpStatusCode.OK);
     }
 
@@ -503,13 +440,9 @@ public class PartyService : IPartyService
                 if (entry.UpdatedAt <= date)
                 {
                     if (entry.TransactionType == (byte)EnumHelper.TransactionType.GAVE)
-                    {
                         amount -= entry.Amount;
-                    }
                     else
-                    {
                         amount += entry.Amount;
-                    }
                 }
 
             }
@@ -518,13 +451,9 @@ public class PartyService : IPartyService
                 if (entry.CreatedAt <= date)
                 {
                     if (entry.TransactionType == (byte)EnumHelper.TransactionType.GAVE)
-                    {
                         amount -= entry.Amount;
-                    }
                     else
-                    {
                         amount += entry.Amount;
-                    }
                 }
             }
         }
@@ -534,14 +463,10 @@ public class PartyService : IPartyService
     public ApiResponse<LedgerEntriesViewModel> GetTransactionsByPartyId(int partyId, int businessId, int userId)
     {
         if (partyId == 0 || businessId == 0 || userId == 0)
-        {
             return new ApiResponse<LedgerEntriesViewModel>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
-        }
         PartyViewModel partyViewModel = GetPartyById(partyId);
         if (!_userBusinessMappingService.HasPermission(businessId, userId, partyViewModel.PartyTypeString))
-        {
             return new ApiResponse<LedgerEntriesViewModel>(false, Messages.ForbiddenMessage, null, HttpStatusCode.Forbidden);
-        }
         LedgerEntriesViewModel ledgerEntriesVM = new();
         List<TransactionEntryViewModel> EntriesList = _genericRepository.GetAll<LedgerTransactions>(x => x.PartyId == partyId && !x.DeletedAt.HasValue)
                                .Select(x => new TransactionEntryViewModel
@@ -567,13 +492,9 @@ public class PartyService : IPartyService
                 if (entry.CreatedAt <= EntriesList[i].CreatedAt)
                 {
                     if (entry.TransactionType == (byte)EnumHelper.TransactionType.GAVE)
-                    {
                         amount -= entry.Amount;
-                    }
                     else
-                    {
                         amount += entry.Amount;
-                    }
                 }
             }
             EntriesList[i].Balance = amount;
@@ -596,14 +517,10 @@ public class PartyService : IPartyService
     public ApiResponse<TransactionEntryViewModel> GetTransactionDetailById(int businessId, int userId, int partyId, EnumHelper.TransactionType? transactionType, int? transactionId)
     {
         if (businessId == 0 || userId == 0)
-        {
             return new ApiResponse<TransactionEntryViewModel>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
-        }
         PartyViewModel partyViewModel = GetPartyById(partyId);
         if (!_userBusinessMappingService.HasPermission(businessId, userId, partyViewModel.PartyTypeString))
-        {
             return new ApiResponse<TransactionEntryViewModel>(false, Messages.ForbiddenMessage, null, HttpStatusCode.Forbidden);
-        }
         TransactionEntryViewModel transactionEntryVM = new();
         if (transactionId == null)
         {
@@ -637,15 +554,11 @@ public class PartyService : IPartyService
     public ApiResponse<int> DeleteTransaction(int transactionId, int userId, int businessId)
     {
         if (transactionId == 0 || businessId == 0 || userId == 0)
-        {
             return new ApiResponse<int>(false, Messages.ExceptionMessage, 0, HttpStatusCode.BadRequest);
-        }
         LedgerTransactions transaction = _genericRepository.Get<LedgerTransactions>(t => t.Id == transactionId && !t.DeletedAt.HasValue);
         PartyViewModel partyViewModel = GetPartyById(transaction.PartyId);
         if (!_userBusinessMappingService.HasPermission(businessId, userId, partyViewModel.PartyTypeString))
-        {
             return new ApiResponse<int>(false, Messages.ForbiddenMessage, transaction.PartyId, HttpStatusCode.Forbidden);
-        }
 
         bool isDeleted = false;
         string businessname = _businessService.GetBusinessNameById(partyViewModel.BusinessId);
@@ -757,14 +670,10 @@ public class PartyService : IPartyService
     public async Task<ApiResponse<int>> SettleUp(decimal netBalance, int partyId, int userId, Businesses business)
     {
         if (partyId == 0 || userId == 0 || business.Id == 0 || netBalance == 0)
-        {
             return new ApiResponse<int>(false, Messages.ExceptionMessage, 0, HttpStatusCode.BadRequest);
-        }
         PartyViewModel partyViewModel = GetPartyById(partyId);
         if (!_userBusinessMappingService.HasPermission(business.Id, userId, partyViewModel.PartyTypeString.ToString()))
-        {
             return new ApiResponse<int>(false, Messages.ForbiddenMessage, partyId, HttpStatusCode.Forbidden);
-        }
         TransactionEntryViewModel transactionEntryVM = new();
         transactionEntryVM.PartyId = partyId;
         transactionEntryVM.TransactionAmount = Math.Abs(netBalance);
@@ -786,14 +695,10 @@ public class PartyService : IPartyService
     public ApiResponse<string> SendReminder(decimal netBalance, int partyId, int userId, Businesses business)
     {
         if (partyId == 0 || userId == 0 || business.Id == 0 || netBalance == 0)
-        {
             return new ApiResponse<string>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
-        }
         PartyViewModel partyViewModel = GetPartyById(partyId);
         if (!_userBusinessMappingService.HasPermission(business.Id, userId, partyViewModel.PartyTypeString.ToString()))
-        {
             return new ApiResponse<string>(false, Messages.ForbiddenMessage, null, HttpStatusCode.Forbidden);
-        }
         _ = CommonMethods.Sendreminder(partyViewModel.Email, partyViewModel.PartyTypeString, business.BusinessName, netBalance);
         return new ApiResponse<string>(true, Messages.ReminderSentMessage, null, HttpStatusCode.OK);
     }
@@ -801,13 +706,9 @@ public class PartyService : IPartyService
     public ApiResponse<TotalAmountViewModel> GetTotalByPartyType(EnumHelper.PartyType partyType, int userId, int businessId)
     {
         if (userId == 0 || businessId == 0)
-        {
             return new ApiResponse<TotalAmountViewModel>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
-        }
         if (!_userBusinessMappingService.HasPermission(businessId, userId, partyType.ToString()))
-        {
             return new ApiResponse<TotalAmountViewModel>(false, Messages.ForbiddenMessage, null, HttpStatusCode.Forbidden);
-        }
         List<PartyViewModel> parties = GetPartiesByType(partyType.ToString(), businessId, "", "-1", "-1");
 
         TotalAmountViewModel totalAmountViewModel = new();
@@ -829,9 +730,7 @@ public class PartyService : IPartyService
     public ApiResponse<CookiesViewModel> CheckRolepermission(int businessId, int userId)
     {
         if (businessId == 0 || userId == 0)
-        {
             return new ApiResponse<CookiesViewModel>(false, null, null, HttpStatusCode.ServiceUnavailable);
-        }
         CookiesViewModel cookiesViewModel = new();
         List<RoleViewModel> rolesByUser = _userBusinessMappingService.GetRolesByBusinessId(businessId, userId);
         if (rolesByUser.Any(role => role.RoleName == ConstantVariables.OwnerRole))

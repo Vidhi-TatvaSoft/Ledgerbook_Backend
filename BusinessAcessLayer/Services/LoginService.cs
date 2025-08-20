@@ -1,6 +1,5 @@
 using System.Net;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using BusinessAcessLayer.Constant;
 using BusinessAcessLayer.Helper;
 using BusinessAcessLayer.Interface;
@@ -8,13 +7,11 @@ using DataAccessLayer.Constant;
 using DataAccessLayer.Models;
 using DataAccessLayer.ViewModels;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace BusinessAcessLayer.Services;
 
 public class LoginService : ILoginService
 {
-    private readonly LedgerBookDbContext _context;
     private readonly IJWTTokenService _jwttokenService;
     private readonly IGenericRepo _genericRepository;
     private readonly IActivityLogService _activityLogService;
@@ -23,7 +20,7 @@ public class LoginService : ILoginService
     private readonly IUserService _userService;
     private readonly IAttachmentService _attachmentService;
 
-    public LoginService(LedgerBookDbContext context,
+    public LoginService(
     IJWTTokenService jWTTokenService,
     IGenericRepo genericRepository,
     IActivityLogService activityLogService,
@@ -33,7 +30,6 @@ public class LoginService : ILoginService
     IAttachmentService attachmentService
      )
     {
-        _context = context;
         _jwttokenService = jWTTokenService;
         _genericRepository = genericRepository;
         _activityLogService = activityLogService;
@@ -64,30 +60,6 @@ public class LoginService : ILoginService
                 return new ApiResponse<string>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
             }
         }
-    }
-
-    public ApiResponse<CookiesViewModel> Login(string token)
-    {
-        if (token != null)
-        {
-            CookiesViewModel cookiesViewModel = new();
-            ApplicationUser user = GetUserFromTokenIdentity(token);
-            if (user == null)
-            {
-                return new ApiResponse<CookiesViewModel>(false, null, null, HttpStatusCode.BadRequest);
-            }
-            else
-            {
-                if (user.ProfileAttachmentId != null)
-                {
-                    AttachmentViewModel attachmentViewModel = _attachmentService.GetAttachmentById((int)user.ProfileAttachmentId);
-                    cookiesViewModel.ProfilePhoto = attachmentViewModel.BusinesLogoPath;
-                }
-                cookiesViewModel.UserName = user.FirstName + " " + user.LastName;
-                return new ApiResponse<CookiesViewModel>(true, null, result: cookiesViewModel, HttpStatusCode.OK);
-            }
-        }
-        return new ApiResponse<CookiesViewModel>(false, null, null, HttpStatusCode.BadRequest);
     }
 
     public async Task<ApiResponse<CookiesViewModel>> LoginAsync(LoginViewModel loginViewModel)
@@ -142,14 +114,9 @@ public class LoginService : ILoginService
         ApplicationUser userToSaveOrUpdate = _genericRepository.Get<ApplicationUser>(a => a.Email.ToLower() == registrationViewModel.Email.ToLower() && !a.DeletedAt.HasValue);
         bool existingUser = false;
         if (userToSaveOrUpdate != null)
-        {
             existingUser = true;
-        }
         else
-        {
             userToSaveOrUpdate = new();
-            // user = new();
-        }
 
         //add in ApplicationUser
         userToSaveOrUpdate.Email = registrationViewModel.Email.ToLower().Trim();
@@ -213,9 +180,7 @@ public class LoginService : ILoginService
             user.UpdatedById = user.Id;
             IdentityResult result = await _userManager.UpdateAsync(user);
             if (result.Succeeded)
-            {
                 return new ApiResponse<string>(true, Messages.VerificationSuccessMessage, null, HttpStatusCode.OK);
-            }
         }
         return new ApiResponse<string>(false, Messages.VerificationErrorMessage, null, HttpStatusCode.BadRequest);
     }
@@ -252,16 +217,12 @@ public class LoginService : ILoginService
             string email = _jwttokenService.GetClaimValue(resetPasswordToken, "email")!;
             string newpassword = _jwttokenService.GetClaimValue(resetPasswordToken, "password")!;
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(newpassword) || !IsEmailExist(email))
-            {
                 return new ApiResponse<string>(false, Messages.InvalidResetPasswordLink, null, HttpStatusCode.BadRequest);
-            }
+
             ApplicationUser user = _userService.GetuserByEmail(email);
             string savedPassword = user.PasswordHash!;
-
             if (savedPassword == newpassword)
-            {
                 return new ApiResponse<string>(true, null, email, HttpStatusCode.BadRequest);
-            }
             return new ApiResponse<string>(false, Messages.LinkAlreadyUsedMessage, null, HttpStatusCode.BadRequest);
         }
         catch (Exception e)
@@ -280,21 +241,15 @@ public class LoginService : ILoginService
             PasswordVerificationResult result = passwordHasher.VerifyHashedPassword(user, user.PasswordHash, resetPasswordViewModel.Password);
             if (result != PasswordVerificationResult.Failed)
             {
-                // apiResponse.IsSuccess = false;
-                // TempData["ErrorMessage"] = Messages.SamePasswordsErrorMessage;
                 return new ApiResponse<string>(false, Messages.SamePasswordsErrorMessage, null, HttpStatusCode.BadRequest);
             }
             else
             {
                 bool IsPasswordUpdated = await _userService.UpdatePassword(resetPasswordViewModel);
                 if (IsPasswordUpdated)
-                {
                     return new ApiResponse<string>(true, string.Format(Messages.GlobalAddUpdateMesage, "Password", "updated"), null, HttpStatusCode.OK);
-                }
                 else
-                {
                     return new ApiResponse<string>(false, string.Format(Messages.GlobalAddUpdateFailMessage, "update", "Password"), null, HttpStatusCode.BadRequest);
-                }
             }
         }
         else
@@ -316,10 +271,9 @@ public class LoginService : ILoginService
 
             if (user != null)
             {
-                var result = await _signInManager.PasswordSignInAsync(user.Email, loginViewModel.Password, isPersistent:true, lockoutOnFailure: false);
+                SignInResult result = await _signInManager.PasswordSignInAsync(user.Email, loginViewModel.Password, isPersistent:true, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    // string usertoken = _jwttokenService.GenerateToken(loginViewModel.Email);
                     string token = _jwttokenService.GenerateToken(loginViewModel.Email);
                     return token;
                 }
@@ -342,9 +296,7 @@ public class LoginService : ILoginService
     {
         SignInResult result = await _signInManager.PasswordSignInAsync(email, password, false, lockoutOnFailure: false);
         if (result.Succeeded)
-        {
             return true;
-        }
         return false;
     }
 
@@ -360,12 +312,5 @@ public class LoginService : ILoginService
         {
             throw new UnauthorizedAccessException();
         }
-        
     }
-    // public User GetUserFromToken(string token)
-    // {
-    //     ClaimsPrincipal  claims = _jwttokenService.GetClaimsFromToken(token);
-    //     string  Email = _jwttokenService.GetClaimValue(token, "email");
-    //     return _genericRepository.Get<User>(x => x.Email.ToLower().Trim() == Email.ToLower().Trim())!;
-    // }
 }

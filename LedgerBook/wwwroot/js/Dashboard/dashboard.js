@@ -152,7 +152,7 @@ function getDashboardDataSuccess(response) {
     }
 }
 
-function PartyRevenue(partyRevenueTemp) {
+function partyRevenueSetColors(partyRevenueTemp) {
     partyRevenue = partyRevenueTemp;
     for (i = 0; i < partyRevenue.length; i++) {
         if (partyRevenue[i] < 0) {
@@ -164,10 +164,10 @@ function PartyRevenue(partyRevenueTemp) {
             borderColor.push("rgb(13,141,14,1)")
         }
     }
-    ShowGraphs();
+    showGraphs();
 }
 
-function GetPartyrevenue(year) {
+function getPartyrevenue(year) {
     let params = setBusinessParameter("/Dashboard/GetGraphDetails", GET, null, FORM_URL, { year: year.toString() }, getPartyRevenueSuccess);
     $("body").addClass("loading");
     ajaxCall(params);
@@ -176,7 +176,7 @@ function GetPartyrevenue(year) {
 function getPartyRevenueSuccess(response) {
     if (response.isSuccess) {
         if (response.result != null) {
-            PartyRevenue(response.result)
+            partyRevenueSetColors(response.result)
         }
     } else {
         if (response.toasterMessgae != null) {
@@ -185,7 +185,7 @@ function getPartyRevenueSuccess(response) {
     }
 }
 
-function GetYears() {
+function getYears() {
     let params = setBusinessParameter("/Dashboard/GetYearsForRevenue", GET, null, NODATA, null, getYearsSuccess);
     $("body").addClass("loading");
     ajaxCall(params);
@@ -210,7 +210,7 @@ function getYearsSuccess(response) {
                 yearForGraph = years[0];
             }
             document.getElementById("year-for-party-revenue").value = yearForGraph;
-            GetPartyrevenue(yearForGraph);
+            getPartyrevenue(yearForGraph);
         }
     } else {
         if (response.toasterMessgae != null) {
@@ -219,7 +219,7 @@ function getYearsSuccess(response) {
     }
 }
 
-function ShowGraphs() {
+function showGraphs() {
     // Destroy all existing chart instances
     Chart.helpers.each(Chart.instances, function (instance) {
         instance.destroy();

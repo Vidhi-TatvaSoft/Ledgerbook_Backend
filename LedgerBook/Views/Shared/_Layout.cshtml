@@ -22,7 +22,6 @@
         integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-    @* <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> *@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
     <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script>
@@ -68,7 +67,6 @@
                                             <div class=" d-flex ps-3 @((ViewData["sidebar-active"] as string) == "Dashboard" ? "active-div" : "")"
                                                 style="text-decoration: none;" asp-action="Dashboard"
                                                 asp-controller="User">
-                                                @* <img src="~/images/dashboard-default.svg" width="20px" class=" " alt> *@
                                                 <p class="dashboard-text-active text-size-set mt-3 ms-3 fs-6">Dashboard
                                                 </p>
                                             </div>
@@ -162,11 +160,9 @@
                                         </a>
                                     </div>
 
-                                    <!-- 0sidebar -->
-                                    @* @if ((await AuthorizationService.AuthorizeAsync(User, "SalesManager")).Succeeded)
-                                    { *@
+                                    <!-- sidebar -->
                                     <div class="fs-5 fw-bold sidebar-menu-parent" id="customer-layout-div"
-                                        onclick="ManageParty('Customer')">
+                                        onclick="manageParty('Customer')">
                                         <a class=" d-flex sidebar-menu-item @((ViewData["sidebar"] as string) == "Customer" ? "sidebar-active-div" : "")"
                                             style="text-decoration: none;" style="max-width: 210px;">
                                             <i class="fa-solid fa-user text-white mt-1 ms-1 position-absolute"
@@ -177,13 +173,9 @@
                                                 title="Customers">Customers</div>
                                         </a>
                                     </div>
-
-                                    @* }
-                                    @if ((await AuthorizationService.AuthorizeAsync(User, "PurchaseManager")).Succeeded)
-                                    { *@
                                     <div class="fs-5 fw-bold sidebar-menu-parent" id="supplier-layout-div">
                                         <a class=" d-flex sidebar-menu-item @((ViewData["sidebar"] as string) == "Supplier" ? "sidebar-active-div" : "")"
-                                            onclick="ManageParty('Supplier')" style="text-decoration: none;"
+                                            onclick="manageParty('Supplier')" style="text-decoration: none;"
                                             style="max-width: 210px;">
                                             <i class="fa-solid fa-truck text-white mt-1 position-absolute"
                                                 style="margin-left: 2px !important;"></i>
@@ -238,7 +230,7 @@
                     </div>
                 </div>
                 <div class="modal-footer d-flex justify-content-center">
-                    <a type="submit" asp-action="Logout" asp-controller="Login" class="btn btn-primary">Yes</a>
+                    <a type="submit" onclick="logout()" class="btn btn-primary">Yes</a>
                     <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">No</button>
                 </div>
             </div>
@@ -257,8 +249,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="https://cdn.datatables.net/2.3.2/js/dataTables.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/cookie.js" asp-append-version="true"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/constVariables.js" asp-append-version="true"></script>
     <script src="~/js/Login/login.js" asp-append-version="true"></script>
     <script src="~/js/validations.js" asp-append-version="true"></script>
@@ -318,9 +310,8 @@
         checkRolePermission();
         GetBusinessList(getCookie(All_Businesses))
 
-
         $('#businessNameDropdown').change(function () {
-            let params = setParameter("/Business/GetBusinessData", GET, null, FORM_URL, { businessId: this.value }, SetBusinessCookiesSuccess);
+            let params = setParameter("/Business/GetBusinessData", GET, null, FORM_URL, { businessId: this.value }, setBusinessCookiesSuccess);
             $("body").addClass("loading");
             ajaxCall(params);
         });

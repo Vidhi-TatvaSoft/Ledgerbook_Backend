@@ -31,6 +31,7 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
+app.UseStatusCodePagesWithReExecute("/ErrorPage/HandleError/{0}");
 
 app.MapControllerRoute(
     name: "default",

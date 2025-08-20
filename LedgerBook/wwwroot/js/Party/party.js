@@ -1,4 +1,4 @@
-function ManageParty(partyType) {
+function manageParty(partyType) {
     setCookie(Party_Type, partyType, 1);
     window.location = "/Party/ManageBusiness";
 }
@@ -45,12 +45,12 @@ function saveParty(close) {
         $("body").addClass("loading");
         ajaxCall(params);
         if (close) {
-            ClosePartyModal()
+            closePartyModal()
         }
     }
 }
 
-function ClosePartyModal() {
+function closePartyModal() {
     $("#save-party-modal").modal("hide")
 }
 
@@ -77,8 +77,6 @@ function displaySelectedParyDetails(partyId) {
     $("#displaySelectedParty").html(htmlContent);
     console.log(allParties)
     for (i = 0; i < allParties.length; i++) {
-        console.log(parseInt(allParties[i].id.split("-")[2]), " ------", partyId)
-        console.log(parseInt(allParties[i].id.split("-")[2]) == partyId)
         if (parseInt(allParties[i].id.split("-")[2]) == partyId) {
             let params = setBusinessParameter("/Party/GetPartyDetails", GET, null, FORM_URL, { partyId: partyId }, partyDetailsSuccess);
             $("body").addClass("loading");
@@ -94,10 +92,6 @@ function displaySelectedParyDetails(partyId) {
             break;
         }
     }
-    allParties.forEach(party => {
-
-    })
-
 }
 
 //display transaction entries of selected parties
@@ -180,13 +174,13 @@ function partyTimeDisplay() {
 }
 
 function displayAddTransactionModal(partyId, transactionType) {
-    let params = setBusinessParameter("/Party/GetTransactionDetailById", GET, null, FORM_URL, { partyId: partyId, transactionType: transactionType }, AddTransactionModalSuccess);
+    let params = setBusinessParameter("/Party/GetTransactionDetailById", GET, null, FORM_URL, { partyId: partyId, transactionType: transactionType }, addTransactionModalSuccess);
     $("body").addClass("loading");
     ajaxCall(params);
 }
 
 function displayUpdateTransactionModal(partyId, transactionId) {
-    let params = setBusinessParameter("/Party/GetTransactionDetailById", GET, null, FORM_URL, { partyId: partyId, transactionId: transactionId }, UpdateTransactionModalSuccess);
+    let params = setBusinessParameter("/Party/GetTransactionDetailById", GET, null, FORM_URL, { partyId: partyId, transactionId: transactionId }, updateTransactionModalSuccess);
     $("body").addClass("loading");
     ajaxCall(params);
 }
@@ -225,7 +219,7 @@ function settleUp() {
 }
 
 //send reminder to party through email
-function SendReminder(netBalance, partyId) {
+function sendReminder(netBalance, partyId) {
     let params = setBusinessParameter("/Party/SettleUpParty", GET, null, FORM_URL, { netBalance: netBalance, partyId: partyId }, sendReminderSuccess);
     $("body").addClass("loading");
     ajaxCall(params);

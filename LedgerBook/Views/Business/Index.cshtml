@@ -10,7 +10,7 @@
             <div class="heading fs-2 fw-bold text-color mb-3">Businesses</div>
             <span class="d-flex">
                 <input type="text" id="BusinessSearch" class="form-control mt-3 me-3"
-                    style="height:35px; width:100% !important;" placeholder="Search" oninput="RemoveWhiteSpace(this)" />
+                    style="height:35px; width:100% !important;" placeholder="Search" oninput="removeWhiteSpace(this)" />
                 <span class="text-color fs-6 fw-bold btn text-nowrap btn-primary mt-3 cursor-pointer "
                     style="height:35px; width:100% !important;" data-toggle="tooltip" data-placement="top"
                     title="Add business" data-bs-toggle="modal" data-bs-target="#add-business-modal"
@@ -20,7 +20,7 @@
         </div>
 
         <!--------------------------------------------- Business cards---------------------------------------------->
-        <div class="business-cards-scroll d-flex row justify-content-center gap-3 mt-5 " id="businss-cards">
+        <div class="business-cards-scroll d-flex row justify-content-center gap-3 mt-5 " id="business-cards">
         </div>
     </div>
 </div>
@@ -48,7 +48,7 @@
                         <div class="form-floating ">
                             <input type="hidden" id="user-details-userId">
                             <input type="hidden" id="user-details-personalId">
-                            <input type="text" oninput="RemoveWhiteSpace(this);nameValidation(this,'First')"
+                            <input type="text" oninput="removeWhiteSpace(this);nameValidation(this,'First')"
                                 onblur="nameValidation(this,'First')" class="form-control" id="user-details-firstName"
                                 placeholder="First Name*">
                             <label for="user-details-firstName" class="fs-6 text-secondary">First Name*</label>
@@ -57,7 +57,7 @@
                     </div>
                     <div class="col-md-6 col-lg-6 col-xl-6 col-sm-12 col-12 mt-3">
                         <div class="form-floating ">
-                            <input type="text" oninput="RemoveWhiteSpace(this);nameValidation(this,'Last')"
+                            <input type="text" oninput="removeWhiteSpace(this);nameValidation(this,'Last')"
                                 onblur="nameValidation(this,'Last')" id="user-details-lastName" class="form-control"
                                 placeholder="Last Name*">
                             <label for="user-details-lastName" class="fs-6 text-secondary">Last Name*</label>
@@ -67,7 +67,7 @@
 
                     <div class="col-md-6 col-lg-6 col-xl-6 col-sm-12 col-12 mt-3">
                         <div class="form-floating ">
-                            <input type="text" oninput="RemoveWhiteSpace(this);emailValidation(this)"
+                            <input type="text" oninput="removeWhiteSpace(this);emailValidation(this)"
                                 onblur="emailValidation(this)" class="form-control" id="user-details-email"
                                 placeholder="Email*">
                             <label for="user-details-email" class="fs-6 text-secondary">Email*</label>
@@ -143,7 +143,6 @@
                     <div id="add-business-body" class="col-9 col-lg-10 pe-4">
                         <div class="fs-3 fw-bold text-color ">Business Details</div>
                         <div>
-                            @* <form id="business-details-form-id"> *@
                             <div class="row">
 
                                 <div class="col-12 mt-3 d-flex justify-content-center align-content-center">
@@ -191,7 +190,7 @@
                                 </div>
                                 <div class="col-md-6 col-lg-6 col-xl-6 col-sm-12 col-12 mt-3">
                                     <div class="form-floating ">
-                                        <input type="text" onblur="TrimInput(this);buisnessNameValidation(this)"
+                                        <input type="text" onblur="trimInput(this);buisnessNameValidation(this)"
                                             oninput="buisnessNameValidation(this)" class="form-control"
                                             id="business-businessName" placeholder="Business Name*">
                                         <label for="business-businessName" class="fs-6 text-secondary">Business
@@ -230,7 +229,7 @@
 
                                 <div class="col-md-6 col-lg-6 col-xl-6 col-sm-12 col-12 mt-3">
                                     <div class="form-floating ">
-                                        <input type="text" onblur="TrimInput(this)" class="form-control"
+                                        <input type="text" onblur="trimInput(this)" class="form-control"
                                             id="business-addressLine1" placeholder="Building/House Number">
                                         <label for="business-addressLine1"
                                             class="fs-6 text-secondary text-nowrap">Building/House Number</label>
@@ -238,7 +237,7 @@
                                 </div>
                                 <div class="col-md-6 col-lg-6 col-xl-6 col-sm-12 col-12 mt-3">
                                     <div class="form-floating ">
-                                        <input type="text" onblur="TrimInput(this)" class="form-control"
+                                        <input type="text" onblur="trimInput(this)" class="form-control"
                                             id="business-addressLine2" placeholder="Area">
                                         <label for="business-addressLine2" class="fs-6 text-secondary">Area</label>
                                     </div>
@@ -246,14 +245,14 @@
 
                                 <div class="col-md-6 col-lg-6 col-xl-6 col-sm-12 col-12 mt-3">
                                     <div class="form-floating ">
-                                        <input type="text" onblur="TrimInput(this)" class="form-control"
+                                        <input type="text" onblur="trimInput(this)" class="form-control"
                                             id="business-city" placeholder="City">
                                         <label for="business-city" class="fs-6 text-secondary">City</label>
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-lg-6 col-xl-6 col-sm-12 col-12 mt-3">
                                     <div class="form-floating ">
-                                        <input type="Number" oninput="PincodeValidation(this);pincodeValidation(this)"
+                                        <input type="Number" oninput="pincodeValidation(this);pincodeValidation(this)"
                                             class="form-control" id="business-pincode" placeholder="Pincode">
                                         <label for="business-pincode" class="fs-6 text-secondary">Pincode</label>
                                         <span class="text-danger pincodeValidationMessage validationMessage"></span>
@@ -261,7 +260,7 @@
                                 </div>
                                 <div class="col-md-6 col-lg-6 col-xl-6 col-sm-12 col-12 mt-3">
                                     <div class="form-floating ">
-                                        <input type="text" onblur="TrimInput(this)" oninput="GSTINValidation(this)"
+                                        <input type="text" onblur="trimInput(this)" oninput="GSTINValidation(this)"
                                             class="form-control" id="business-GSTIN" placeholder="GSTIN">
                                         <label for="business-GSTIN" class="fs-6 text-secondary">GSTIN</label>
                                         <span class="text-danger GSTINValidationMessage validationMessage"></span>
@@ -379,7 +378,7 @@
                 </div>
             </div>
             <div class="modal-footer d-flex justify-content-center">
-                <a type="submit" class="btn btn-primary" onclick="ActiveInactiveUser()">Yes</a>
+                <a type="submit" class="btn btn-primary" onclick="activeInactiveUser()">Yes</a>
                 <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">No</button>
             </div>
         </div>
@@ -479,6 +478,12 @@
             }
         }
 
+        function closeUserCreateConfModal() {
+            if (!$('#add-business-modal').is(':visible')) {
+                $('#user-details-confirmation-modal').modal('hide');
+            }
+        }
+
         $(document).ready(function () {
             toasterFromLocalstorage();
             displayBusinessCards();
@@ -499,6 +504,10 @@
                 $("#user-details-confirmation-modal").modal("hide")
                 displayBusinessCards()
             })
+
+            setInterval(function () {
+                closeUserCreateConfModal();
+            }, 500);
         })
 
 
@@ -519,7 +528,6 @@
             let params = setParameter("/Business/GetBusinessDetails", GET, null, FORM_URL, { businessId }, getBusinessByIdSuccess);
             $("body").addClass("loading");
             ajaxCall(params);
-
         }
 
         function displayUserDetails() {
@@ -552,7 +560,7 @@
                 if (file) {
                     formData.append("BusinessLogoIForm", file)
                 }
-                let params = setParameter("/Business/SaveBusiness", POST, null, FORMDATA, formData, SaveBusinessSuccess);
+                let params = setParameter("/Business/SaveBusiness", POST, null, FORMDATA, formData, saveBusinessSuccess);
                 $("body").addClass("loading");
                 ajaxCall(params);
             }

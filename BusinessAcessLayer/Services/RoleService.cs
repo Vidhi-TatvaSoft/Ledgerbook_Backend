@@ -7,12 +7,10 @@ namespace BusinessAcessLayer.Services;
 
 public class RoleService : IRoleService
 {
-    private readonly LedgerBookDbContext _context;
     private readonly IGenericRepo _genericRepo;
-    public RoleService(LedgerBookDbContext context,
+    public RoleService(
     IGenericRepo genericRepo)
     {
-        _context = context;
         _genericRepo = genericRepo;
     }
     public List<RoleViewModel> GetAllRoles()

@@ -1,23 +1,17 @@
 using System.Linq.Expressions;
 using System.Net;
-using System.Threading.Tasks;
 using BusinessAcessLayer.Constant;
 using BusinessAcessLayer.Helper;
 using BusinessAcessLayer.Interface;
 using DataAccessLayer.Constant;
 using DataAccessLayer.Models;
 using DataAccessLayer.ViewModels;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Org.BouncyCastle.Bcpg;
-using Org.BouncyCastle.Bcpg.Sig;
 
 namespace BusinessAcessLayer.Services;
 
 public class UserService : IUserService
 {
-    private readonly LedgerBookDbContext _context;
     private readonly IJWTTokenService _jwttokenService;
     private readonly IAttachmentService _attachmentService;
     private readonly IGenericRepo _genericRepository;
@@ -26,7 +20,6 @@ public class UserService : IUserService
     private readonly SignInManager<ApplicationUser> _signInManager;
 
     public UserService(
-        LedgerBookDbContext context,
          IJWTTokenService jWTTokenService,
          IAttachmentService attachmentService,
         IGenericRepo genericRepository,
@@ -35,7 +28,6 @@ public class UserService : IUserService
         SignInManager<ApplicationUser> signInManager
     )
     {
-        _context = context;
         _jwttokenService = jWTTokenService;
         _attachmentService = attachmentService;
         _genericRepository = genericRepository;
@@ -48,12 +40,6 @@ public class UserService : IUserService
     {
         return _genericRepository.Get<ApplicationUser>(u => u.Email.ToLower().Trim() == Email.ToLower().Trim() && u.DeletedAt == null)!;
     }
-
-    // public User GetUserByEmailForUser(string email)
-    // {
-    //     return _genericRepository.Get<User>(u => u.Email.ToLower().Trim() == email.ToLower().Trim() && u.DeletedAt == null)!;
-    // }
-
 
     public async Task<int> SaveUser(UserViewmodel userViewmodel)
     {
@@ -72,9 +58,7 @@ public class UserService : IUserService
             IdentityResult result = await _userManager.CreateAsync(user, userViewmodel.Pasword);
 
             if (result.Succeeded)
-            {
                 return user.Id;
-            }
             return 0;
         }
         catch (Exception e)
@@ -119,7 +103,6 @@ public class UserService : IUserService
         personalDetail.CreatedAt = DateTime.UtcNow;
         personalDetail.CreatedById = userId;
         await _genericRepository.AddAsync<PersonalDetails>(personalDetail);
-
         return personalDetail.Id;
     }
 
@@ -158,7 +141,7 @@ public class UserService : IUserService
             if (ispasswordUpdated)
             {
                 _ = CommonMethods.ChangePasswordEmail(user.Email, user.FirstName + " " + user.LastName, ConstantVariables.LoginLink);
-                var userToken = _jwttokenService.GenerateToken(user.Email);
+                string userToken = _jwttokenService.GenerateToken(user.Email);
                 return new ApiResponse<string>(true, string.Format(Messages.GlobalAddUpdateMesage, "Password", "updated"), userToken, HttpStatusCode.OK);
             }
             else
@@ -179,9 +162,7 @@ public class UserService : IUserService
             user.UpdatedById = user.Id;
             IdentityResult result = await _userManager.UpdateAsync(user);
             if (result.Succeeded)
-            {
                 return true;
-            }
             else
                 return false;
         }
@@ -255,13 +236,9 @@ public class UserService : IUserService
                 {
                     int attachmentId = await _attachmentService.SaveAttachment(userProfileViewModel.AttachmentViewModel, user.Id);
                     if (attachmentId == 0)
-                    {
                         return new ApiResponse<CookiesViewModel>(false, string.Format(Messages.GlobalAddUpdateFailMessage, "update", "user Profile"), null, HttpStatusCode.BadRequest);
-                    }
                     else
-                    {
                         user.ProfileAttachmentId = attachmentId;
-                    }
                 }
             }
             user.UpdatedAt = DateTime.UtcNow;
@@ -281,7 +258,6 @@ public class UserService : IUserService
             }
         }
         return new ApiResponse<CookiesViewModel>(false, string.Format(Messages.GlobalAddUpdateFailMessage, "update", "user Profile"), null, HttpStatusCode.BadRequest);
-
     }
 
     public string GetuserNameById(int userId)
@@ -289,47 +265,4 @@ public class UserService : IUserService
         ApplicationUser user = _genericRepository.Get<ApplicationUser>(x => x.Id == userId && !x.DeletedAt.HasValue);
         return user.FirstName + " " + user.LastName;
     }
-
-
-    //temp method to conver all data of user into aspNetusers
-    // public async Task<bool> ConvertdataToAspNetUsers()
-    // {
-    //     List<User> allUsers = _genericRepository.GetAll<User>(x => x.Id != 0).ToList();
-
-    //     foreach (User user in allUsers)
-    //     {
-    //         ApplicationUser applicationUser = new()
-    //         {
-    //             FirstName = user.FirstName,
-    //             LastName = user.LastName,
-    //             Email = user.Email,
-    //             UserName = user.Email,
-    //             PhoneNumber = user.MobileNumber.ToString(),
-    //             ProfileAttachmentId = user.ProfileAttachmentId,
-    //             IsUserRegistered = user.IsUserRegistered,
-    //             VerificationToken = user.VerificationToken,
-    //             IsEmailVerified = user.IsEmailVerified,
-    //             CreatedAt = user.CreatedAt,
-    //             UpdatedById = user.UpdatedById,
-    //             UpdatedAt = user.UpdatedAt,
-    //             DeletedById = user.DeletedById,
-    //             DeletedAt = user.DeletedAt,
-
-    //         };
-    //         string password = CommonMethods.Base64Decode(user.Password);
-    //         IdentityResult result = await _userManager.CreateAsync(applicationUser, password);
-    //         if (!result.Succeeded)
-    //         {
-    //             throw new Exception("Error while adding " + applicationUser.Email);
-    //             return false;
-    //         }
-    //         else
-    //         {
-    //             user.ApplicationUserId = applicationUser.Id;
-    //             user.Password = applicationUser.PasswordHash;
-    //             await _genericRepository.UpdateAsync<User>(user);
-    //         }
-    //     }
-    //     return true;
-    // }
 }

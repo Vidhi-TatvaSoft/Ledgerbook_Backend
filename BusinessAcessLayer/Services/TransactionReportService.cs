@@ -1,14 +1,11 @@
-using System.Drawing;
 using System.Linq.Expressions;
 using System.Net;
-using System.Threading.Tasks;
 using BusinessAcessLayer.Constant;
 using BusinessAcessLayer.Interface;
 using DataAccessLayer.Constant;
 using DataAccessLayer.Models;
 using DataAccessLayer.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
@@ -18,21 +15,16 @@ namespace BusinessAcessLayer.Services;
 public class TransactionReportService : ITransactionReportSevice
 {
     private readonly IGenericRepo _genericRepository;
-    private readonly LedgerBookDbContext _context;
-    private readonly IBusinessService _businessService;
     private readonly IPartyService _partyService;
     private readonly IUserBusinessMappingService _userBusinessMappingService;
 
-    public TransactionReportService(LedgerBookDbContext context,
+    public TransactionReportService(
      IGenericRepo genericRepo,
-     IBusinessService businessService,
      IPartyService partyService,
      IUserBusinessMappingService userBusinessMappingService
      )
     {
         _genericRepository = genericRepo;
-        _context = context;
-        _businessService = businessService;
         _partyService = partyService;
         _userBusinessMappingService = userBusinessMappingService;
     }
@@ -40,9 +32,7 @@ public class TransactionReportService : ITransactionReportSevice
     public ApiResponse<ReportCountsViewModel> GetReportCounts(int businessId)
     {
         if (businessId == 0)
-        {
             return new ApiResponse<ReportCountsViewModel>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
-        }
         int customerTypeId = _genericRepository.Get<ReferenceDataValues>(x => x.EntityType.EntityType == ConstantVariables.PartyType && x.EntityValue == PartyType.Customer,
          includes: new List<Expression<Func<ReferenceDataValues, object>>>
             {
@@ -63,13 +53,9 @@ public class TransactionReportService : ITransactionReportSevice
     public ApiResponse<List<PartyViewModel>> GetSearchPartyOptions(int businessId, int userId, string partyType, string searchText = "")
     {
         if (partyType.IsNullOrEmpty() || businessId == 0 || userId == 0)
-        {
             return new ApiResponse<List<PartyViewModel>>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
-        }
         if (!_userBusinessMappingService.HasPermission(businessId, userId, partyType))
-        {
             return new ApiResponse<List<PartyViewModel>>(true, Messages.ForbiddenMessage, null, HttpStatusCode.OK);
-        }
         List<PartyViewModel> parties = _partyService.GetPartiesByType(partyType, businessId, searchText, "-1", "-1");
         return new ApiResponse<List<PartyViewModel>>(true, null, parties, HttpStatusCode.OK);
     }
@@ -77,13 +63,9 @@ public class TransactionReportService : ITransactionReportSevice
     public ApiResponse<ReportTransactionEntriesViewModel> GetReportTransactionEntries(int businessId, int userId, string partyType, int searchPartyId = 0, string startDate = "", string endDate = "")
     {
         if (businessId == 0 || partyType == "" || userId == 0)
-        {
             return new ApiResponse<ReportTransactionEntriesViewModel>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
-        }
         if (!_userBusinessMappingService.HasPermission(businessId, userId, partyType))
-        {
             return new ApiResponse<ReportTransactionEntriesViewModel>(false, Messages.ForbiddenMessage, null, HttpStatusCode.BadRequest);
-        }
         List<LedgerTransactions> Entries = new();
         int partyTypeId = _genericRepository.Get<ReferenceDataValues>(x => x.EntityType.EntityType == ConstantVariables.PartyType && x.EntityValue == partyType,
             includes: new List<Expression<Func<ReferenceDataValues, object>>>
@@ -146,21 +128,15 @@ public class TransactionReportService : ITransactionReportSevice
                 if (entry.CreatedAt <= EntriesList[i].CreatedAt)
                 {
                     if (entry.TransactionType == (byte)EnumHelper.TransactionType.GAVE)
-                    {
                         amount -= entry.Amount;
-                    }
                     else
-                    {
                         amount += entry.Amount;
-                    }
                 }
             }
             EntriesList[i].Balance = amount;
         }
         if (!string.IsNullOrEmpty(startDate) && !string.IsNullOrEmpty(endDate))
-        {
             EntriesList = EntriesList.Where(x => x.CreatedAt >= DateTime.Parse(startDate) && x.CreatedAt <= DateTime.Parse(endDate)).ToList();
-        }
         ReportTransactionEntriesViewModel reportTransactionEntriesVM = new()
         {
             TransactionsList = EntriesList,
@@ -173,12 +149,10 @@ public class TransactionReportService : ITransactionReportSevice
 
     public async Task<FileContentResult> GetExcelData(string partytype, string timePeriod, Businesses business, int userId, int searchPartyId = 0, string startDate = "", string endDate = "")
     {
-        var reportData = GetReportdata(partytype, timePeriod, business, userId, searchPartyId, startDate, endDate);
+        ApiResponse<ReportTransactionEntriesViewModel> reportData = GetReportdata(partytype, timePeriod, business, userId, searchPartyId, startDate, endDate);
         ReportTransactionEntriesViewModel reportExcel = new();
         if ((bool)reportData.IsSuccess)
-        {
             reportExcel = reportData.Result;
-        }
         byte[] FileData = await ExportData(reportExcel);
         FileContentResult result = new FileContentResult(FileData, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
         {
@@ -343,27 +317,16 @@ public class TransactionReportService : ITransactionReportSevice
                 headingCol++;
                 worksheet.Cells[row, headingCol].Value = reportExcel.NetBalance;
             }
-
-            //  It creates a Task that is already completed and contains the specified result 
-            // (in this case, the byte array).
-            // This is useful when you need to return a Task in an asynchronous method but already have 
-            // the result available synchronously.
             return Task.FromResult(package.GetAsByteArray());
-
         }
-
     }
 
     public ApiResponse<ReportTransactionEntriesViewModel> GetReportdata(string partytype, string timePeriod, Businesses curBusiness, int userId, int searchPartyId = 0, string startDate = "", string endDate = "")
     {
         if (partytype.IsNullOrEmpty() || curBusiness == null || userId == 0)
-        {
             return new ApiResponse<ReportTransactionEntriesViewModel>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
-        }
         if (!_userBusinessMappingService.HasPermission(curBusiness.Id, userId, partytype))
-        {
             return new ApiResponse<ReportTransactionEntriesViewModel>(false, Messages.ForbiddenMessage, null, HttpStatusCode.BadRequest);
-        }
         ReportTransactionEntriesViewModel reportVM = new();
 
         reportVM.BusinessId = curBusiness.Id;
@@ -372,13 +335,9 @@ public class TransactionReportService : ITransactionReportSevice
         reportVM.TimePeriod = timePeriod;
         reportVM.PartyId = searchPartyId;
         if (searchPartyId != 0)
-        {
             reportVM.PartyName = _partyService.GetPartyById(searchPartyId).PartyName;
-        }
         else
-        {
             reportVM.PartyName = "Account";
-        }
         ApiResponse<ReportTransactionEntriesViewModel> transactionReportData = GetReportTransactionEntries(reportVM.BusinessId, userId, partytype, searchPartyId, startDate, endDate);
         if ((bool)transactionReportData.IsSuccess && transactionReportData.Result != null)
         {
@@ -390,21 +349,13 @@ public class TransactionReportService : ITransactionReportSevice
         DateTime startDateTemp;
         DateTime endDateTemp;
         if (!startDate.IsNullOrEmpty())
-        {
             startDateTemp = DateTime.Parse(startDate);
-        }
         else
-        {
             startDateTemp = DateTime.Now;
-        }
         if (!endDate.IsNullOrEmpty())
-        {
             endDateTemp = DateTime.Parse(endDate);
-        }
         else
-        {
             endDateTemp = DateTime.Now;
-        }
         reportVM.Startdate = startDateTemp.ToString("dd MMMM yyyy");
         reportVM.EndDate = endDateTemp.ToString("dd MMMM yyyy");
         return new ApiResponse<ReportTransactionEntriesViewModel>(true, null, reportVM, HttpStatusCode.OK);

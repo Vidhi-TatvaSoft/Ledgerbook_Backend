@@ -25,10 +25,6 @@
         * {
             box-sizing: border-box !important;
         }
-
-        body,
-        html {}
-
         .body-login {
             margin: 0 !important;
             padding: 0 !important;
@@ -64,9 +60,6 @@
                         <button onclick="flipToLogin()" class="me-4">Login</button>
                         <button onclick="flipToSignup()">Sign Up</button>
                     </div>
-
-
-
                 </div>
             </div>
 
@@ -106,7 +99,7 @@
                     </div>
                 </div>
                 <div class="modal-footer d-flex justify-content-center">
-                    <a type="submit" onclick="Logout()" class="btn btn-primary">Yes</a>
+                    <a type="submit" onclick="logout()" class="btn btn-primary">Yes</a>
                     <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">No</button>
                 </div>
             </div>
@@ -127,65 +120,34 @@
     <script src="~/js/User/userProfile.js" asp-append-version="true"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-
     <partial name="_Toaster" />
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 
-
 <script>
     function flipToLogin() {
         document.title = "Login - LedgerBook";
-        RemoveValidations();
+        removeValidations();
         document.getElementById('flipper').classList.add('flipped');
         document.getElementById("login-signup-form-id").innerHTML = document.getElementById("loginFormDivId").innerHTML;
     }
+
     function flipToSignup() {
-        RemoveValidations();
+        removeValidations();
         document.title = "Register - LedgerBook";
         document.getElementById('flipper').classList.add('flipped');
         document.getElementById("login-signup-form-id").innerHTML = document.getElementById("registerFormDivId").innerHTML;
     }
+
     function flipToForgotPassword() {
-        RemoveValidations();
+        removeValidations();
         document.title = "Forgot password - LedgerBook";
         let email = $("#login-email").val();
         document.getElementById("login-signup-form-id").innerHTML = document.getElementById("forgotPasswordFormDivId").innerHTML;
         $("#forgotpassword-email").val(email);
 
     }
-
-    function AjaxResponseHandle(response) {
-        var parser = new DOMParser();
-        var doc = parser.parseFromString(response, 'text/html');
-        var title = doc.title;
-        if (title === "Login - LedgerBook" || title === "Register - LedgerBook") {
-            window.location.href = '@Url.Action("Login", "Login")';
-        } else if (title === "Business - LedgerBook") {
-            window.location.href = '@Url.Action("Index", "Business")';
-        } else if (title === "View Business - LedgerBook" || "Party Report - LedgerBook") {
-            window.location.href = '@Url.Action("Dashboard", "Dashboard")';
-        } else if (title === "InternalServerError" || title === "Forbidden" || title === "Unauthorize" || title === "PageNotFoundError") {
-            var url = `/ErrorPage/${title}`;
-            window.location.href = url;
-        } else if (title === "InternalServerError - LedgerBook" || title === "Forbidden - LedgerBook" || title === "Unauthorize - LedgerBook" || title === "PageNotFoundError - LedgerBook") {
-            var url = `/ErrorPage/${title.split(" ")[0].toString().trim()}`;
-            window.location.href = url;
-        } else {
-            Toaster('Unexpected response format.', "error");
-        }
-    }
-
-    function IsHtmlDoc(response) {
-        if (response.statusCode) {
-            return;
-        }
-        if ((response.trim().indexOf('<!DOCTYPE html>') === 0) || (response.trim().indexOf('<html>') === 0)) {
-            AjaxResponseHandle(response);
-        }
-    }
-
 </script>
 
 </html>

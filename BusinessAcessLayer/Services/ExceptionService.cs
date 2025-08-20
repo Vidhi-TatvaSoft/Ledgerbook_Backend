@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using System.Threading.Tasks;
 using BusinessAcessLayer.Interface;
 using DataAccessLayer.Models;
 using Microsoft.AspNetCore.Http;
@@ -30,9 +29,7 @@ public class ExceptionService : IExceptionService
     {
         Claim userClaim = context.User?.FindFirst("id");
         if (int.TryParse(userClaim?.Value, out int userId))
-        {
             return userId;
-        }
         return null;
     }
 }

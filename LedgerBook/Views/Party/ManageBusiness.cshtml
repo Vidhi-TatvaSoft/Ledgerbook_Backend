@@ -63,7 +63,6 @@
     </div>
 
     <div id="partyList-partial" class="party-list-scroll">
-
     </div>
 
     <div class="d-flex justify-content-center p-3 w-100">
@@ -105,8 +104,8 @@
                 <div class="col-md-6 col-lg-6 col-xl-6 col-sm-12 col-12 mt-3">
                     <div class="form-floating ">
                         <input type="hidden" id="party-id">
-                        <input type="text" oninput="RemoveWhiteSpace(this);partyNameValidation(this)"
-                            onblur="TrimInput(this);partyNameValidation(this)" class="form-control" id="party-name"
+                        <input type="text" oninput="removeWhiteSpace(this);partyNameValidation(this)"
+                            onblur="trimInput(this);partyNameValidation(this)" class="form-control" id="party-name"
                             placeholder="Party Name">
                         <label for="party-name" class="fs-6 text-secondary">Party Name*</label>
                         <span class="text-danger partyNameValidationMessage validationMessage"></span>
@@ -114,8 +113,8 @@
                 </div>
                 <div class="col-md-6 col-lg-6 col-xl-6 col-sm-12 col-12 mt-3">
                     <div class="form-floating ">
-                        <input type="text" oninput="RemoveWhiteSpace(this);emailValidation(this)"
-                            onblur="TrimInput(this);emailValidation(this)" class="form-control" id="party-email"
+                        <input type="text" oninput="removeWhiteSpace(this);emailValidation(this)"
+                            onblur="trimInput(this);emailValidation(this)" class="form-control" id="party-email"
                             placeholder="Email">
                         <label for="party-email" class="fs-6 text-secondary">Email*</label>
                         <span class=" text-danger emailValidationMessage validationMessage"></span>
@@ -123,8 +122,8 @@
                 </div>
                 <div class=" col-8 mt-3 pe-0 d-none party-amount-div">
                     <div class="form-floating ">
-                        <input type="Number" oninput="RemoveWhiteSpace(this);MinAmount(this)"
-                            onblur="TrimInput(this);MinAmount(this)" class="form-control" id="party-amount"
+                        <input type="Number" oninput="removeWhiteSpace(this);minAmount(this)"
+                            onblur="trimInput(this);minAmount(this)" class="form-control" id="party-amount"
                             placeholder="Opening Amount">
                         <label for="party-amount" class="fs-6 text-secondary">Opening Amount</label>
                         <span class="text-danger amountValidationMessage validationMessage"></span>
@@ -187,8 +186,8 @@
                     <input type="hidden" id="transaction-partyId">
                     <div class=" col-8 mt-3 pe-0">
                         <div class="form-floating ">
-                            <input type="Number" oninput="RemoveWhiteSpace(this);MinAmountRequire(this)" step=".01"
-                                onblur="RemoveWhiteSpace(this);MinAmountRequire(this)" class="form-control"
+                            <input type="Number" oninput="removeWhiteSpace(this);minAmountRequire(this)" step=".01"
+                                onblur="removeWhiteSpace(this);minAmountRequire(this)" class="form-control"
                                 id="transaction-amount" placeholder="Opening Amount">
                             <label for="transaction-amount" class="fs-6 text-secondary">Amount</label>
                             <span class="text-danger amountValidationMessage validationMessage"></span>
@@ -245,7 +244,6 @@
     </div>
 </div>
 
-
 <div id="settleup-modal" class="modal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -270,7 +268,6 @@
         </div>
     </div>
 </div>
-
 
 
 @section Scripts {
@@ -303,13 +300,13 @@
 
             $(document).on('hidden.bs.modal', "#save-party-modal", function (e) {
                 emptyInputValidation("save-party-form-id")
-                RemoveValidations();
+                removeValidations();
                 displayPartyList();
             })
 
             $(document).on('hidden.bs.modal', "#transaction-entry-modal", function (e) {
                 emptyInputValidation("save-transaction-entry-form")
-                RemoveValidations();
+                removeValidations();
             })
 
             $(document).on('hidden.bs.modal', "#delete-entry-modal", function (e) {

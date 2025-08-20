@@ -31,6 +31,8 @@ public class ActivityLogController : BaseController
     [HttpPost]
     [Route("GetActivities")]
     [PermissionAuthorize("User")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public IActionResult GetActivities([FromBody] ActivityDataViewModel activityData)
     {
         ApplicationUser user = GetCurrentUserIdentity();
@@ -42,12 +44,11 @@ public class ActivityLogController : BaseController
     [HttpGet]
     [Route("GetAllBusiness")]
     [PermissionAuthorize("User")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public IActionResult GetAllBusiness()
     {
         ApplicationUser user = GetCurrentUserIdentity();
-
-        List<BusinessViewModel> businesses = _businessService.GetAllBusinesses(user.Id);
-        return Ok(new ApiResponse<List<BusinessViewModel>>(true, null, businesses, HttpStatusCode.OK));
+        return Ok(new ApiResponse<List<BusinessViewModel>>(true, null, _businessService.GetAllBusinesses(user.Id), HttpStatusCode.OK));
     }
     #endregion
 
@@ -55,12 +56,11 @@ public class ActivityLogController : BaseController
     [HttpGet]
     [Route("GetAllParties")]
     [PermissionAuthorize("User")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public IActionResult GetAllParties(int businessId)
     {
         ApplicationUser user = GetCurrentUserIdentity();
-
-        List<Parties> parties = _partyService.GetAllPartiesByBusiness(businessId, user.Id);
-        return Ok(new ApiResponse<List<Parties>>(true, null, parties, HttpStatusCode.OK));
+        return Ok(new ApiResponse<List<Parties>>(true, null, _partyService.GetAllPartiesByBusiness(businessId, user.Id), HttpStatusCode.OK));
     }
     #endregion
 }

@@ -71,7 +71,7 @@ function nameValidation(input, type) {
     }
 }
 
-function NumberValidation(input) {
+function numberValidation(input) {
     let value = input.value.replace(/\D/g, '');
     const regex = /^[a-zA-Z]+$/
     if (value == "") {
@@ -150,25 +150,23 @@ function partyNameValidation(input) {
     }
 }
 
-function MinAmount(input) {
+function minAmount(input) {
     let value = parseFloat(input.value);
     if (value <= 0.0) {
         $(".amountValidationMessage").text("Amount should be greater than 0")
-    }
-    else if (value > 10000) {
+    }else if (value > 10000) {
         $(".amountValidationMessage").text("Amount should be greater than 0")
     } else {
         $(".amountValidationMessage").text("")
     }
 }
 
-function MinAmountRequire(input) {
+function minAmountRequire(input) {
     if (input.value == "") {
         $(".amountValidationMessage").text("Amount is required")
         return;
     }
     let value = parseFloat(input.value);
-   
     if (value <= 0.0) {
         $(".amountValidationMessage").text("Amount should be greater than 0")
     }
@@ -240,7 +238,7 @@ function validateProfileForm() {
 
     nameValidation(firstName, 'First')
     nameValidation(lastname, 'Last')
-    NumberValidation(mobileNumber)
+    numberValidation(mobileNumber)
     if ($(".numberValidationMessage").html() == "") {
         return true;
     } else {
@@ -297,7 +295,6 @@ function validateSaveUserForm() {
     } else {
         return false;
     }
-
 }
 
 //////////validate party forms//////////
@@ -308,7 +305,7 @@ function validateSavePartyForm() {
 
     emailValidation(email)
     partyNameValidation(name);
-    MinAmount(amount)
+    minAmount(amount)
 
     if ($(".amountValidationMessage").html() == "" && $(".emailValidationMessage").html() == "" && $(".partyNameValidationMessage").html() == "") {
         return true;
@@ -319,7 +316,7 @@ function validateSavePartyForm() {
 
 function validateSaveTransactionForm() {
     let amount = document.getElementById("transaction-amount")
-    MinAmountRequire(amount)
+    minAmountRequire(amount)
 
     if ($(".amountValidationMessage").html() == "") {
         return true;
@@ -329,6 +326,6 @@ function validateSaveTransactionForm() {
 
 }
 
-function RemoveValidations() {
+function removeValidations() {
     $(".validationMessage").html("");
 }

@@ -25,7 +25,7 @@ function setProfileSuccess(response) {
             toasterMessage: response.toasterMessage
         };
         localStorage.setItem('Toaster', JSON.stringify(toaster));
-        RemoveValidations();
+        removeValidations();
         if (getCookie(Business_Token)) {
             window.location = "/Party/Managebusiness"
         } else {
@@ -37,7 +37,7 @@ function setProfileSuccess(response) {
 }
 
 function emptyInputValidation(formId) {
-    RemoveValidations();
+    removeValidations();
     $(`#${formId} :input`).each(function () {
         $(this).val("");
     });

@@ -50,7 +50,6 @@ function getAllPartiesSuccess(response) {
                                     <div class="text-secondary party-created-time">1 day ago</div>
                                 </div>
                             </div>
-
                             <div class="amount-type">`
                     if (element.amount == 0) {
                         htmlContent += `<div class="fs-5 fw-bold text-end">₹${Math.abs(element.amount)}</div><div></div>`
@@ -64,8 +63,7 @@ function getAllPartiesSuccess(response) {
                                  <div class="text-secondary">YOU'LL GIVE</div>`
                         }
                     }
-                    htmlContent += `</div>
-                                </div>`;
+                    htmlContent += `</div></div>`;
 
                 });
             }
@@ -96,7 +94,7 @@ function savePartySuccess(response) {
         }
         $(".btn-close").click();
         displayPartyList()
-        RemoveValidations();
+        removeValidations();
         emptyInputValidation("save-party-form-id");
     }
 }
@@ -123,9 +121,7 @@ function partyDetailsSuccess(response) {
                                         </div>
                                     </div>
                                     <div id="transaction-entries-id">
-
                                     </div>
-
                                     <div class=" d-flex justify-content-center mt-3 w-100">
                                         <div class="btn btn-danger gave-button-position me-3" data-bs-toggle="modal"
                                             data-bs-target="#transaction-entry-modal"
@@ -166,7 +162,7 @@ function transactionEntriesSuccess(response) {
                     htmlContent += `<div class="fs-5 d-flex flex-column flex-xl-row align-items-center" style="width: fit-content;">`
                     if (response.result.netBalance > 0 && response.result.ispartyVerified) {
                         htmlContent += `<div class="btn btn-outline-danger text-nowrap p-1" style="max-height: fit-content; width: 100%;"
-                                    onclick="SendReminder(${response.result.netBalance}, ${response.result.transactionsList[0].partyId})"
+                                    onclick="sendReminder(${response.result.netBalance}, ${response.result.transactionsList[0].partyId})"
                                     data-amount="${response.result.netBalance}" data-transactionId="${response.result.transactionsList[0].partyId}">Send reminder
                                 </div>`
                     }
@@ -257,12 +253,12 @@ function getPartyDetailsToUpdateSuccess(response) {
         }
         displayPartyList();
         $(".btn-close").click();
-        RemoveValidations();
+        removeValidations();
         emptyInputValidation("save-party-form-id");
     }
 }
 
-function AddTransactionModalSuccess(response) {
+function addTransactionModalSuccess(response) {
     if (response.isSuccess) {
         if (response.result != null) {
             let transaction = response.result;
@@ -278,7 +274,7 @@ function AddTransactionModalSuccess(response) {
     }
 }
 
-function UpdateTransactionModalSuccess(response) {
+function updateTransactionModalSuccess(response) {
     if (response.isSuccess) {
         if (response.result != null) {
             let transaction = response.result;

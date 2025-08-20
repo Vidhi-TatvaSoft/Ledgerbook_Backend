@@ -3,7 +3,6 @@ using System.Security.Claims;
 using System.Text;
 using BusinessAcessLayer.Interface;
 using DataAccessLayer.Models;
-using DataAccessLayer.ViewModels;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
@@ -25,8 +24,6 @@ public class JWTTokenService : IJWTTokenService
         _tokenDuration = configuration.GetValue<int>("JwtConfig:Duration");
         _issuer = configuration.GetValue<string>("JwtConfig:Issuer");
         _audiance = configuration.GetValue<string>("JwtConfig:Audience");
-
-
         _genericRepository = genericRepository;
     }
 
@@ -55,7 +52,6 @@ public class JWTTokenService : IJWTTokenService
             expires: DateTime.Now.AddHours(_tokenDuration),
             signingCredentials: credentials
         );
-
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
@@ -75,7 +71,6 @@ public class JWTTokenService : IJWTTokenService
                     expires: DateTime.Now.AddHours(_tokenDuration),
                     signingCredentials: credentials
                 );
-
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
@@ -97,7 +92,6 @@ public class JWTTokenService : IJWTTokenService
             expires: DateTime.Now.AddHours(_tokenDuration),
             signingCredentials: credentials
         );
-
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
@@ -123,7 +117,6 @@ public class JWTTokenService : IJWTTokenService
             expires: DateTime.Now.AddHours(_tokenDuration),
             signingCredentials: credentials
         );
-
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
@@ -145,7 +138,6 @@ public class JWTTokenService : IJWTTokenService
             expires: DateTime.Now.AddHours(_tokenDuration),
             signingCredentials: credentials
         );
-
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
@@ -171,7 +163,6 @@ public class JWTTokenService : IJWTTokenService
             expires: DateTime.Now.AddHours(_tokenDuration),
             signingCredentials: credentials
         );
-
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 

@@ -31,7 +31,7 @@ function setBusinessParameter(url, type, headers, contentType, data, successFunc
     if (headers == null) {
         headers = {
             "Authorization": getCookie(User_Token),
-            "BusinessToken":getCookie(Business_Token)
+            "BusinessToken": getCookie(Business_Token)
         }
     }
 
@@ -56,16 +56,20 @@ function ajaxCall(params) {
         processData: false,
         success: function (response) {
             console.log(response)
-                if(response.httpStatusCode == 401){
-                    deleteAllCookies();
-                    window.location = "/Login/Login";
-                }else if(response.httpStatusCode == 403 || response.httpStatusCode == 503){
-                    deleteBusinessCookies();
-                    window.location = "/Business/Index"
-                }
-                else{
-                    params.successFunction(response);
-                }
+            if (response.httpStatusCode == 401) {
+                deleteAllCookies();
+                window.location = "/Login/Login";
+            } else if (response.httpStatusCode == 403 || response.httpStatusCode == 503) {
+                deleteBusinessCookies();
+                window.location = "/Business/Index"
+            } else if (response.httpStatusCode == 404) {
+                window.location = "/ErrorPage/PageNotFoundError";
+            } else if (response.httpStatusCode == 500) {
+                window.location = "/ErrorPage/InternalServerError";
+            }
+            else {
+                params.successFunction(response);
+            }
             $("body").removeClass("loading");
         },
         error: function (response) {
@@ -91,7 +95,7 @@ function ajaxCall(params) {
             ajaxcallObj.contentType = false;
             ajaxcallObj.processData = false;
             break;
-        case APPLICATION_JSON :
+        case APPLICATION_JSON:
             ajaxcallObj.contentType = APPLICATION_JSON;
             ajaxcallObj.processData = false;
             ajaxcallObj.data = params.data;
@@ -107,22 +111,27 @@ function ajaxCall(params) {
             headers: params.headers,
             success: function (response) {
                 console.log(response)
-                if(response.httpStatusCode == 401){
+                if (response.httpStatusCode == 401) {
                     deleteAllCookies();
                     window.location = "/Login/Login";
-                }else if(response.httpStatusCode == 403 || response.httpStatusCode == 503){
+                } else if (response.httpStatusCode == 403 || response.httpStatusCode == 503) {
                     deleteBusinessCookies();
                     window.location = "/Business/Index"
-                }else{
+                } else if (response.httpStatusCode == 404) {
+                    window.location = "/ErrorPage/PageNotFoundError";
+                } else if (response.httpStatusCode == 500) {
+                    window.location = "/ErrorPage/InternalServerError";
+                }
+                else {
                     params.successFunction(response);
                 }
-            $("body").removeClass("loading");
+                $("body").removeClass("loading");
             },
             error: function (response) {
                 if (response.toasterMessage != null) {
                     Toaster(response.toasterMessage, "error")
                 }
-            $("body").removeClass("loading");
+                $("body").removeClass("loading");
             }
         }
     }

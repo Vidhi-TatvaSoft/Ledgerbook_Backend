@@ -66,30 +66,6 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @* @if(Model.TransactionsList.Count != 0){
-                    @foreach(TransactionEntryViewModel transaction in  Model.TransactionsList){
-                        <tr>
-                            <td class="text-center borders" style="text-align: center;  border: 2px solid gray; padding: 10px;">@transaction.CreateDate</td>
-                            <td class="text-center borders" style="text-align: center;  border: 2px solid gray; padding: 10px;">@transaction.PartyName</td>
-                            <td class="text-center borders" style="text-align: center;  border: 2px solid gray; padding: 10px;">@transaction.Description</td>
-                            @if(transaction.TransactionType == (byte)EnumHelper.TransactionType.GAVE){
-                                <td class="text-center borders bg-light" style="text-align: center;  border: 2px solid gray; padding: 10px; background-color: rgb(252, 240, 240); text-align: end;">@transaction.TransactionAmount</td>
-                                <td class="text-center borders bg-success" style="background-color: rgb(218, 245, 238); text-align: end; text-align: center;  border: 2px solid gray; padding: 10px;">-</td>
-                            }else{
-                                 <td class="text-center borders bg-light" style="text-align: center;  border: 2px solid gray; padding: 10px; background-color: rgb(252, 240, 240); text-align: end;">-</td>
-                                <td class="text-center borders bg-success"  style="background-color: rgb(218, 245, 238); text-align: end; text-align: center;  border: 2px solid gray; padding: 10px;">@transaction.TransactionAmount</td>
-                            }
-                            
-                        </tr>
-                    }
-                    }else{
-                        <tr>
-                        <td colspan="5" class="text-center " style="font-size: 20px; padding: 10px; text-align: center;">
-                            No entries found
-                        </td>
-                    </tr>
-                    } *@
-                   
                 </tbody>
             </table>
 

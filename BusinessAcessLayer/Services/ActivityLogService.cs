@@ -4,7 +4,6 @@ using BusinessAcessLayer.Interface;
 using DataAccessLayer.Constant;
 using DataAccessLayer.Models;
 using DataAccessLayer.ViewModels;
-using Org.BouncyCastle.Math.EC.Rfc7748;
 
 namespace BusinessAcessLayer.Services;
 
@@ -15,7 +14,6 @@ public class ActivityLogService : IActivityLogService
     {
         _genericRepository = genericRepo;
     }
-
 
     public async Task<ActivityLogs> SetActivityLog(string message, EnumHelper.Actiontype action, EnumHelper.ActivityEntityType entityType, int EntityTypeId, int? createdById = null, EnumHelper.ActivityEntityType? subEntityType = null, int? subEntityTypeId = null)
     {
@@ -194,7 +192,7 @@ public class ActivityLogService : IActivityLogService
 
         int totalCount = activityList.Count();
         List<ActivityLogsViewModel> items = activityList.Skip((activityDataVM.PageNumber - 1) * activityDataVM.PageSize).Take(activityDataVM.PageSize).ToList();
-        var paginatedData = new PaginationViewModel<ActivityLogsViewModel>(items, totalCount, activityDataVM.PageNumber, activityDataVM.PageSize);
+        PaginationViewModel<ActivityLogsViewModel> paginatedData = new PaginationViewModel<ActivityLogsViewModel>(items, totalCount, activityDataVM.PageNumber, activityDataVM.PageSize);
         return new ApiResponse<PaginationViewModel<ActivityLogsViewModel>>(true, null, paginatedData, HttpStatusCode.OK);
     }
 }

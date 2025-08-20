@@ -4,7 +4,7 @@ public class BusinessViewModel
 {
     public int BusinessId { get; set; }
 
-    public string BusienssName { get; set; }
+    public string BusinessName { get; set; }
 
     public string LogoPath { get; set; }
 

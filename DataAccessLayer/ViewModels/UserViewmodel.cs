@@ -28,21 +28,14 @@ public class UserViewmodel
     [Required(ErrorMessage = MessageHelper.MobileNumberRequire)]
     [Range(1000000000, 9999999999, ErrorMessage = MessageHelper.MobileNumberlength)]
     public long MobileNumber { get; set; }
-
     public int CreatedById { get; set; }
-
     public bool CanEdit { get; set; }
     public bool CanAddOwner { get; set; }
     public bool IsActive { get; set; }
-
     public string Pasword { get; set; }
-
     public int? RoleId { get; set; }
-
     public string? RoleName { get; set; }
-
     public List<RoleViewModel> Roles { get; set; }
-
     public List<RoleViewModel> AllRoles { get; set; }
     public bool IsUserRegistered { get; set; } = false;
 }

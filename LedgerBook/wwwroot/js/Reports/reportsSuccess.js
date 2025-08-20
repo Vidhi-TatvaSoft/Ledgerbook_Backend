@@ -126,7 +126,6 @@ function generatePdfSuccess(response) {
             };
 
             html2pdf().set(options).from(element).save();
-
         }
     } else {
         if (response.toasterMessgae != null) {

@@ -120,14 +120,14 @@
 
         $(document).ready(function () {
             getDashboardData();
-            GetYears();
+            getYears();
 
             $(document).on("change", "#year-for-party-revenue", function () {
                 backgroundColor = [];
                 borderColor = [];
                 partyRevenue = []
                 yearForGraph = $("#year-for-party-revenue").val();
-                GetPartyrevenue(yearForGraph);
+                getPartyrevenue(yearForGraph);
             })
         })
     </script>

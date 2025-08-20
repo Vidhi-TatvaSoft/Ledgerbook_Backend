@@ -3,7 +3,6 @@ using BusinessAcessLayer.Constant;
 using BusinessAcessLayer.Interface;
 using DataAccessLayer.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 
 namespace LedgerBookWebApi.Controllers;
 
@@ -11,42 +10,14 @@ namespace LedgerBookWebApi.Controllers;
 [Route("api/Login")]
 public class LoginController : BaseController
 {
-    // private readonly ILoginService _loginService;
-    private readonly IUserService _userService;
-    private readonly IJWTTokenService _jwtTokenService;
-    private readonly ICookieService _cookieService;
-    private readonly IAttachmentService _attachmentService;
-
     public LoginController(
-        IUserService userService,
-        IJWTTokenService jWTTokenService,
-        ICookieService cookieService,
         ILoginService loginService,
-        IActivityLogService activityLogService,
-        IAttachmentService attachmentService) : base(loginService, activityLogService)
-
+        IActivityLogService activityLogService
+        ) : base(loginService, activityLogService)
     {
-        _userService = userService;
-        _jwtTokenService = jWTTokenService;
-        _cookieService = cookieService;
-        _attachmentService = attachmentService;
     }
 
     #region login 
-    [HttpGet]
-    [Route("Login")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Login()
-    {
-        string token = GetData(TokenKey.Authorization);
-        if (token.IsNullOrEmpty())
-        {
-            return Ok(new ApiResponse<string>(false, null, null, HttpStatusCode.BadRequest));
-        }
-        return Ok(_loginService.Login(token));
-    }
-
     [HttpPost]
     [Route("LoginAsync")]
     [ProducesResponseType(StatusCodes.Status200OK)]

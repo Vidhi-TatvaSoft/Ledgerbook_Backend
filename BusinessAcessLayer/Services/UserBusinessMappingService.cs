@@ -1,27 +1,22 @@
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 using BusinessAcessLayer.Constant;
 using BusinessAcessLayer.Interface;
 using DataAccessLayer.Models;
 using DataAccessLayer.ViewModels;
-using Microsoft.EntityFrameworkCore;
 
 namespace BusinessAcessLayer.Services;
 
 public class UserBusinessMappingService : IUserBusinessMappingService
 {
-    private readonly LedgerBookDbContext _context;
     private readonly IGenericRepo _genericRepository;
     private readonly ITransactionRepository _transactionRepository;
 
 
     public UserBusinessMappingService(
-        LedgerBookDbContext context,
         IGenericRepo genericRepository,
         ITransactionRepository transactionRepository
     )
     {
-        _context = context;
         _genericRepository = genericRepository;
         _transactionRepository = transactionRepository;
     }
@@ -101,9 +96,7 @@ public class UserBusinessMappingService : IUserBusinessMappingService
         foreach (UserViewmodel user in usersList)
         {
             if (user.CreatedById == loginUserId)
-            {
                 user.CanEdit = true;
-            }
         }
         return usersList;
     }
@@ -114,9 +107,7 @@ public class UserBusinessMappingService : IUserBusinessMappingService
         if (mainOwner != null)
         {
             if (mainOwner.UserId == loginUserId)
-            {
                 return true;
-            }
         }
         return false;
     }
@@ -141,9 +132,7 @@ public class UserBusinessMappingService : IUserBusinessMappingService
         for (int i = 0; i < roleId.Count; i++)
         {
             if (!newList.Contains(roleId[i]))
-            {
                 await SaveUserBusinessMapping(userId, businessId, roleId[i], personalDetailId, updatedById);
-            }
         }
         return true;
 
@@ -209,13 +198,9 @@ public class UserBusinessMappingService : IUserBusinessMappingService
     {
         UserBusinessMappings userBusinessMappings = _genericRepository.Get<UserBusinessMappings>(x => x.BusinessId == businessId && x.UserId == userId && !x.DeletedAt.HasValue);
         if (userBusinessMappings == null)
-        {
             return null;
-        }
         else
-        {
             return _genericRepository.Get<PersonalDetails>(x => x.Id == userBusinessMappings.PersonDetailId && !x.DeletedAt.HasValue);
-        }
     }
 
     public async Task<bool> ActiveInactiveUser(int userId, int businessId, bool isActive, int updatedById)
@@ -252,15 +237,12 @@ public class UserBusinessMappingService : IUserBusinessMappingService
         if (partyType.ToLower().Trim() == PartyType.Customer.ToLower().Trim())
         {
             if (rolesByUser.Any(role => role.RoleName == ConstantVariables.SalesManagerRole || role.RoleName == ConstantVariables.OwnerRole))
-            {
                 return true;
-            }
-        }else if (partyType.ToLower().Trim() == PartyType.Supplier.ToLower().Trim())
+        }
+        else if (partyType.ToLower().Trim() == PartyType.Supplier.ToLower().Trim())
         {
             if (rolesByUser.Any(role => role.RoleName == ConstantVariables.PurchaseManagerRole || role.RoleName == ConstantVariables.OwnerRole))
-            {
                 return true;
-            }
         }
         return false;
     }

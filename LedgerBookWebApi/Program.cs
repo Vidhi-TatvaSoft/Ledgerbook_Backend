@@ -60,7 +60,6 @@ builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<IAttachmentService, AttachmentService>();
 builder.Services.AddScoped<IUserBusinessMappingService, UserBusinessMappingService>();
 builder.Services.AddScoped<IPartyService, PartyService>();
-builder.Services.AddScoped<ICookieService, CookieService>();
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 builder.Services.AddScoped<IGenericRepo, GenericRepo>();
 builder.Services.AddScoped<ITransactionReportSevice, TransactionReportService>();

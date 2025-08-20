@@ -9,7 +9,6 @@ namespace BusinessAcessLayer.Services;
 public class DashboardService : IDashboardService
 {
     private readonly IPartyService _partyService;
-
     public DashboardService(IPartyService partyService)
     {
         _partyService = partyService;
@@ -18,9 +17,7 @@ public class DashboardService : IDashboardService
     public ApiResponse<DashboardViewModel> GetDashboardData(int businessId)
     {
         if (businessId == 0)
-        {
             return new ApiResponse<DashboardViewModel>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
-        }
         DashboardViewModel dashboardVM = new();
         List<PartyViewModel> CustomersList = _partyService.GetPartiesByType(PartyType.Customer, businessId, "", "-1", "-1");
         List<PartyViewModel> SuppliersList = _partyService.GetPartiesByType(PartyType.Supplier, businessId, "", "-1", "-1");
@@ -41,21 +38,15 @@ public class DashboardService : IDashboardService
     public ApiResponse<List<string>> Getyears(int businessId)
     {
         if (businessId == 0)
-        {
             return new ApiResponse<List<string>>(false, Messages.ExceptionMessage, null, HttpStatusCode.BadRequest);
-        }
         List<string> years = new();
         List<TransactionEntryViewModel> transactions = _partyService.GetAllTransaction(businessId);
-        foreach (var transaction in transactions)
+        foreach (TransactionEntryViewModel transaction in transactions)
         {
             if (transaction.UpdatedAt != null)
-            {
                 years.Add(transaction.UpdatedAt.Value.ToString("yyyy"));
-            }
             else
-            {
                 years.Add(transaction.CreatedAt.ToString("yyyy"));
-            }
         }
         years = years.Distinct().ToList();
         return new ApiResponse<List<string>>(true, null, years, HttpStatusCode.OK);

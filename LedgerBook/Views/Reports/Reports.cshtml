@@ -39,8 +39,8 @@
 
             <!-- pdf button  -->
             <div class="p-2 w-md-100 text-end">
-                <div class="btn btn-outline-secondary" onclick="GeneratePdf()">Download PDF</div>
-                <div class="btn btn-outline-secondary" onclick="GenerateExcel()">Download Excel</div>
+                <div class="btn btn-outline-secondary" onclick="generatePdf()">Download PDF</div>
+                <div class="btn btn-outline-secondary" onclick="generateExcel()">Download Excel</div>
             </div>
         </div>
 
@@ -49,7 +49,7 @@
     <div class="p-2">
         <div class="bg-white  mt-2 pb-0 d-flex justify-content-start align-item-center border-bottom  ">
             <div class="allParty ms-3 me-3 pb-1 fs-5  fw-bold text-secondary text-nowrap d-flex align-items-center cursor-pointer"
-                id="report-customer-div" data-party="Customer" onclick="SelectOption(this)"
+                id="report-customer-div" data-party="Customer" onclick="selectOption(this)"
                 style="max-width-content=fit;">Customers
                 <div class="bg-secondary text-white ms-1 text-nowrap"
                     style="border-radius: 50% !important; width:22px;">
@@ -58,7 +58,7 @@
                 </div>
             </div>
             <div class="allParty ms-3 me-3 pb-1 fs-5  fw-bold text-secondary text-nowrap d-flex align-items-center cursor-pointer"
-                id="report-supplier-div" data-party="Supplier" onclick="SelectOption(this)"
+                id="report-supplier-div" data-party="Supplier" onclick="selectOption(this)"
                 style="max-width-content=fit;">Suppliers
                 <div class="bg-secondary text-white ms-1 text-nowrap"
                     style="border-radius: 50% !important; width:22px;">
@@ -149,8 +149,7 @@
 
 <div id="report-pdf-html" class="d-none">
     <div style="">
-        <div
-            style="width: 100% !important;margin: 0 !important; padding: 0 !important;  ">
+        <div style="width: 100% !important;margin: 0 !important; padding: 0 !important;  ">
             <!-- Start heading logo -->
             <div class="logo-container d-flex"
                 style=" display: flex !important; align-items: center; margin-bottom: 20px; background-color: #126773; height: 80px;">
@@ -167,7 +166,8 @@
             </div>
 
             <div class="text-center" style="text-align: center;">
-                <div class="statement-name" style="text-align: center; font-size: 25px;"><span id="reportpdf-partyName"></span> Statement</div>
+                <div class="statement-name" style="text-align: center; font-size: 25px;"><span
+                        id="reportpdf-partyName"></span> Statement</div>
                 <div class="text-cneter date-range" style="text-align: center;  margin-top: 10px; font-size: 18px;">
                     (<span id="reportpdf-startdate"></span> - <span id="reportpdf-enddate"></span>)</div>
             </div>
@@ -181,7 +181,7 @@
                                 <div style="">
                                     <div>Total Debit (-)</div>
                                     <div class="margin-left-debit margin-top reportpdf-youGave"
-                                        style=" margin-top: 2%;" >
+                                        style=" margin-top: 2%;">
                                         youGave</div>
                                 </div>
                             </td>
@@ -195,8 +195,8 @@
                             <td class="balance-td" style="text-align: center; font-size: 20px;">
                                 <div>
                                     <div>Net Balance</div>
-                                    <div class="margin-right-net margin-top"
-                                        style="margin-top: 2%; " id="reportpdf-net"></div>
+                                    <div class="margin-right-net margin-top" style="margin-top: 2%; "
+                                        id="reportpdf-net"></div>
                                 </div>
                             </td>
                         </tr>
@@ -205,7 +205,8 @@
                 </table>
             </div>
 
-            <div class="entries-count" style=" padding: 30px; margin-left: 1.5%; padding-bottom: 0px;">No. of entries : <span id="reportpdf-count"></span> (<span id="reportpdf-timePeriod"></span>)
+            <div class="entries-count" style=" padding: 30px; margin-left: 1.5%; padding-bottom: 0px;">No. of entries :
+                <span id="reportpdf-count"></span> (<span id="reportpdf-timePeriod"></span>)
             </div>
 
             <div class="entries-table-div" style="padding: 30px; margin-left: 1.5%; margin-right: 1.5%;">
@@ -242,9 +243,11 @@
                                 style="background-color: rgb(252, 246, 240);text-align: center; border: 2px solid gray; padding: 10px;">
                                 Grand Total</td>
                             <td class="borders reportpdf-youGave"
-                                style=" border: 2px solid gray; padding: 10px; background-color: rgb(252, 240, 240); text-align: end;"></td>
+                                style=" border: 2px solid gray; padding: 10px; background-color: rgb(252, 240, 240); text-align: end;">
+                            </td>
                             <td class="borders reportpdf-youGave"
-                                style=" border: 2px solid gray; padding: 10px; background-color: rgb(218, 245, 238); text-align: end;"></td>
+                                style=" border: 2px solid gray; padding: 10px; background-color: rgb(218, 245, 238); text-align: end;">
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -358,18 +361,8 @@
                 document.getElementById("party-search-options").classList.remove("d-none");
                 if (searchTextTemp != "") {
                     let params = setBusinessParameter("/Reports/GetSearchPartyOptions", GET, null, FORM_URL, { partytype: partytype, searchText: searchTextTemp }, getSerachOptionsSuccess);
-                    @* $("body").addClass("loading"); *@
-                        ajaxCall(params);
-                    @* $.ajax({
-                        url: "/Reports/GetSearchPartyOptions",
-                        type: "GET",
-                        data: { partytype, searchText: searchTextTemp },
-                        success: function (response) {
-                            IsHtmlDoc(response);
-                            $("#party-search-options").html(response);
-                        }
-                    }) *@
-                                } else {
+                    ajaxCall(params);
+                } else {
                     document.getElementById("party-search-options").classList.add("d-none");
                     searchByParty(0, "")
                 }
@@ -379,8 +372,7 @@
                 searchTextTemp = "";
                 document.getElementById("party-search-options").classList.remove("d-none");
                 let params = setBusinessParameter("/Reports/GetSearchPartyOptions", GET, null, FORM_URL, { partytype: partytype, searchText: searchTextTemp }, getSerachOptionsSuccess);
-                @* $("body").addClass("loading"); *@
-                    ajaxCall(params);
+                ajaxCall(params);
             })
 
             $(document).on("blur", "#partySearch-report", function () {

@@ -1,12 +1,9 @@
 using System.Net;
-using System.Threading.Tasks;
-using BusinessAcessLayer.Constant;
 using BusinessAcessLayer.Interface;
 using DataAccessLayer.Models;
 using DataAccessLayer.ViewModels;
 using LedgerBookWebApi.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace LedgerBookWebApi.Controllers;
 
@@ -15,16 +12,13 @@ namespace LedgerBookWebApi.Controllers;
 public class BusinessController : BaseController
 {
     private readonly IBusinessService _businessService;
-    private readonly IJWTTokenService _jwttokenService;
     public BusinessController(
         ILoginService loginService,
         IActivityLogService activityLogService,
-        IBusinessService businessService,
-        IJWTTokenService jWTTokenService
+        IBusinessService businessService
     ) : base(loginService, activityLogService)
     {
         _businessService = businessService;
-        _jwttokenService = jWTTokenService;
     }
 
     #region get all businesses

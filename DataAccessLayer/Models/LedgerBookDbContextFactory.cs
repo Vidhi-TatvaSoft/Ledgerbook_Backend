@@ -23,7 +23,7 @@ public class LedgerBookDbContextFactory : IDesignTimeDbContextFactory<LedgerBook
 
         string connectionString = config.GetConnectionString("LedgerbookDbConnection");
 
-        var optionsBuilder = new DbContextOptionsBuilder<LedgerBookDbContext>();
+        DbContextOptionsBuilder<LedgerBookDbContext> optionsBuilder = new DbContextOptionsBuilder<LedgerBookDbContext>();
         optionsBuilder.UseSqlServer(connectionString);
         return new LedgerBookDbContext(optionsBuilder.Options);
 

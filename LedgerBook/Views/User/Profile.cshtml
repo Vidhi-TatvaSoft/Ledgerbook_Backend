@@ -68,7 +68,6 @@
                             </div>
                         </div>
 
-
                         <!-- </div> -->
                     </div>
                     <div class="row p-3">
@@ -103,7 +102,7 @@
                         </div>
                         <div class="col-12 mt-3">
                             <div class="form-floating">
-                                <input type="Number" class="form-control" oninput="NumberValidation(this)"
+                                <input type="Number" class="form-control" oninput="numberValidation(this)"
                                     id="profile-mobilenumber" placeholder="Mobile Number">
                                 <label for="profile-mobilenumber" class="fs-6 text-secondary">Mobile number</label>
                                 <span class="text-danger numberValidationMessage validationMessage"></span>
@@ -133,7 +132,7 @@
 
 @section Scripts {
     <script>
-        function GetprofileDtails() {
+        function getprofileDtails() {
             let params = setParameter("/User/GetProfile", GET, null, NODATA, null, getProfileSuccess);
             ajaxCall(params);
         }
@@ -179,7 +178,7 @@
         });
 
         $(document).ready(function () {
-            GetprofileDtails();
+            getprofileDtails();
 
             $(document).on("submit", "#profileFormId", function (e) {
                 e.preventDefault();
