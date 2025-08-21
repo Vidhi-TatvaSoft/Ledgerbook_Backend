@@ -7,12 +7,10 @@ namespace BusinessAcessLayer.Services;
 
 public class AttachmentService : IAttachmentService
 {
-    private readonly LedgerBookDbContext _context;
     private readonly IGenericRepo _genericRepository;
 
-    public AttachmentService(LedgerBookDbContext context, IGenericRepo genericRepo)
+    public AttachmentService(IGenericRepo genericRepo)
     {
-        _context = context;
         _genericRepository = genericRepo;
     }
 

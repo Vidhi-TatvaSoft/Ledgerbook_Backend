@@ -9,10 +9,10 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div class="heading fs-2 fw-bold text-color text-nowrap">Activity Logs</div>
         <span class="d-flex">
-            @if (HttpContextAccessor.HttpContext.Request.Cookies[TokenKey.BusinessToken] != null)
+            @if (HttpContextAccessor.HttpContext!.Request.Cookies[TokenKey.BusinessToken] != null)
             {
                 <a class="fs-6 fw-bold btn text-nowrap btn-primary mt-3 cursor-pointer text-decoration-none"
-                    style="height:35px; width:100% !important;" asp-action="ManageBusiness" asp-controller="Party">Back</a>
+                    style="height:35px; width:100% !important;" asp-action="Dashboard" asp-controller="Dashboard">Back</a>
             }
             else
             {

@@ -52,7 +52,6 @@ public class BusinessService : IBusinessService
         _referenceDataEntityService = referenceDataEntityService;
     }
 
-
     public List<BusinessViewModel> GetBusinesses(int userId, string searchText = null)
     {
         IEnumerable<UserBusinessMappings> query = _genericRepository.GetAll<UserBusinessMappings>(predicate: ubm => ubm.UserId == userId && ubm.DeletedAt == null && ubm.IsActive,

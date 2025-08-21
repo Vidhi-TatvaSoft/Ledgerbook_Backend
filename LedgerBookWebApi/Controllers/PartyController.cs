@@ -23,6 +23,7 @@ public class PartyController : BaseController
         _partyService = partyService;
     }
 
+    #region check roles and permissions
     [HttpGet]
     [Route("CheckRolePermission")]
     [PermissionAuthorize("AnyRole")]
@@ -34,7 +35,9 @@ public class PartyController : BaseController
         Businesses business = GetBusinessFromToken();
         return Ok(_partyService.CheckRolepermission(business.Id, user.Id));
     }
+    #endregion
 
+    #region get all parties
     [HttpGet]
     [Route("GetAllParties")]
     [PermissionAuthorize("AnyRole")]
@@ -47,8 +50,22 @@ public class PartyController : BaseController
         Businesses business = GetBusinessFromToken();
         return Ok(_partyService.GetParties(partyType, business.Id, user.Id, searchText, filter, sort));
     }
+    #endregion
 
-    #region save party post method
+    #region get party and save party method
+    [HttpGet]
+    [Route("GetPartyDetails/{partyId}")]
+    [PermissionAuthorize("AnyRole")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public IActionResult GetPartyDetails([FromRoute] int partyId)
+    {
+        ApplicationUser user = GetCurrentUserIdentity();
+        Businesses business = GetBusinessFromToken();
+        return Ok(_partyService.GetpartyByIdResponse(partyId, business.Id, user.Id));
+    }
+
     [HttpPost]
     [Route("SaveParty")]
     [PermissionAuthorize("AnyRole")]
@@ -79,19 +96,6 @@ public class PartyController : BaseController
     }
     #endregion
 
-    [HttpGet]
-    [Route("GetPartyDetails/{partyId}")]
-    [PermissionAuthorize("AnyRole")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public IActionResult GetPartyDetails([FromRoute] int partyId)
-    {
-        ApplicationUser user = GetCurrentUserIdentity();
-        Businesses business = GetBusinessFromToken();
-        return Ok(_partyService.GetpartyByIdResponse(partyId, business.Id, user.Id));
-    }
-
     #region display transaction entries
     [HttpGet]
     [Route("GetTransationEntries/{partyId}")]
@@ -107,7 +111,7 @@ public class PartyController : BaseController
     }
     #endregion
 
-    #region save transaction modal display
+    #region get transaction entry, save transaction entry and delete transaction entry
     [HttpGet]
     [Route("GetTransactionDetailById")]
     [PermissionAuthorize("AnyRole")]
@@ -120,9 +124,7 @@ public class PartyController : BaseController
         Businesses business = GetBusinessFromToken();
         return Ok(_partyService.GetTransactionDetailById(business.Id, user.Id, partyId, transactionType, transactionId));
     }
-    #endregion
 
-    #region save transaction post method
     [HttpPost]
     [Route("SaveTransactionEntry")]
     [PermissionAuthorize("AnyRole")]
@@ -135,9 +137,7 @@ public class PartyController : BaseController
         Businesses business = GetBusinessFromToken();
         return Ok(await _partyService.SaveTransactionEntryWithPermission(transactionEntryVM, user.Id, business));
     }
-    #endregion
 
-    #region delete transaction
     [HttpPost]
     [Route("DeleteTransaction/{transactionId}")]
     [PermissionAuthorize("AnyRole")]
@@ -152,7 +152,7 @@ public class PartyController : BaseController
     }
     #endregion
 
-    #region  total amount base on partytype
+    #region get total amount base on partytype
     [HttpGet]
     [Route("GetTotalAmount/{partyType}")]
     [PermissionAuthorize("AnyRole")]
@@ -196,6 +196,4 @@ public class PartyController : BaseController
         return Ok(_partyService.SendReminder(netBalance, partyId, user.Id, business));
     }
     #endregion
-
-
 }

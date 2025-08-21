@@ -411,6 +411,8 @@
 @section Scripts {
     <script type="module" src="~/js/constant.js"></script>
     <script>
+        let addBusinessClose = false;
+
         function displayBusinessCards(searchText = "") {
             $("body").addClass("loading");
             let params = setParameter("/Business/GetBusinesses", GET, null, FORM_URL, { searchText }, getBusinessesSuccess);
@@ -541,6 +543,7 @@
         }
 
         function saveBusinessDetails(close) {
+            addBusinessClose = false;
             let isValidForm = validateSaveBusinessForm();
             if (isValidForm) {
                 let formData = new FormData();
@@ -566,6 +569,9 @@
             }
             if (close) {
                 $("#add-business-modal").modal("hide");
+                if($("#business-businessId").val() == "" && close){
+                    addBusinessClose = true;
+                }
             }
         }
 

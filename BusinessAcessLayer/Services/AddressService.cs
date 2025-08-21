@@ -7,11 +7,9 @@ namespace BusinessAcessLayer.Services;
 
 public class AddressService : IAddressService
 {
-    private readonly LedgerBookDbContext _context;
     private readonly IGenericRepo _genericRepository;
-    public AddressService(LedgerBookDbContext context, IGenericRepo genericRepo)
+    public AddressService(IGenericRepo genericRepo)
     {
-        _context = context;
         _genericRepository = genericRepo;
     }
 
@@ -21,7 +19,7 @@ public class AddressService : IAddressService
         address.AddressLine1 = addressVM.AddressLine1;
         address.AddressLine2 = addressVM.AddressLine2;
         address.AddressType = (byte)EnumHelper.SourceType.Business;
-        address.City = addressVM.City ;
+        address.City = addressVM.City;
         address.Pincode = addressVM.Pincode;
         address.CreatedAt = DateTime.UtcNow;
         address.CreatedById = userId;

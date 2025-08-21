@@ -14,10 +14,10 @@ function displayActivitySuccess(response) {
             if (activities.length != 0) {
                 activities.forEach(activity => {
                     htmlContent += `<tr>
-                                                <td class="text-nowrap ">${activity.activityDate}</td>
-                                                <td class="text-nowrap text-center">${activity.activityTime}</td>
-                                                <td class="text-nowrap">${activityMessage(activity)}</td>
-                                            </tr>`
+                                    <td class="text-nowrap ">${activity.activityDate}</td>
+                                    <td class="text-nowrap text-center">${activity.activityTime}</td>
+                                    <td class="text-nowrap">${activityMessage(activity)}</td>
+                                </tr>`
                 })
             } else {
                 htmlContent += `<tr>

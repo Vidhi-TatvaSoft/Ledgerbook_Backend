@@ -17,4 +17,3 @@ const INTERNALSERVERERROR_LINK=  "/ErrorPage/InternalServerError";
 const DASHBOARD_LINK = "/Dashboard/Dashboard";
 const USERPROFILE_LINK = "/User/Profile";
 const PARTYPAGE_LINK = "/Party/ManageBusiness";
-

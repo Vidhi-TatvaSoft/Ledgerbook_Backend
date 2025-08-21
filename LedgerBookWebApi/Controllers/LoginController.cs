@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace LedgerBookWebApi.Controllers;
 
 [ApiController]
-[Route("api/Login")]
+[Route("api/[Controller]")]
 public class LoginController : BaseController
 {
     public LoginController(
@@ -59,7 +59,6 @@ public class LoginController : BaseController
     }
     #endregion
 
-
     #region send email for forgot password
     [HttpPost]
     [Route("ForgotPassword/{email}")]
@@ -71,7 +70,7 @@ public class LoginController : BaseController
     }
     #endregion
 
-    #region resetpassword 
+    #region resetpassword - verify token and reset password
     [HttpGet]
     [Route("VerifyResetPasswordToken/{resetPasswordToken}")]
     [ProducesResponseType(StatusCodes.Status200OK)]

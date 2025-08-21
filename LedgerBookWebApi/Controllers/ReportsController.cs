@@ -25,6 +25,7 @@ public class ReportsController : BaseController
         _transactionReportService = transactionReportSevice;
     }
 
+    #region get party counts for report page
     [HttpGet]
     [Route("GetPartyCounts")]
     [PermissionAuthorize("AnyRole")]
@@ -35,9 +36,9 @@ public class ReportsController : BaseController
         Businesses business = GetBusinessFromToken();
         return Ok(_transactionReportService.GetReportCounts(business.Id));
     }
+    #endregion
 
-
-    #region display transaction entries
+    #region get transaction entries
     [HttpGet]
     [Route("GetReportTransactionEntries")]
     [PermissionAuthorize("AnyRole")]
@@ -51,7 +52,7 @@ public class ReportsController : BaseController
     }
     #endregion
 
-    #region  search options 
+    #region get search party options 
     [HttpGet]
     [Route("GetSearchPartyOptions")]
     [PermissionAuthorize("AnyRole")]

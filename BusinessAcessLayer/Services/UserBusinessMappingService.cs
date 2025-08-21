@@ -11,7 +11,6 @@ public class UserBusinessMappingService : IUserBusinessMappingService
     private readonly IGenericRepo _genericRepository;
     private readonly ITransactionRepository _transactionRepository;
 
-
     public UserBusinessMappingService(
         IGenericRepo genericRepository,
         ITransactionRepository transactionRepository
@@ -149,6 +148,7 @@ public class UserBusinessMappingService : IUserBusinessMappingService
         }
         return true;
     }
+
     public async Task<bool> DeleteUserBusinessMappingByBusinessId(int userId, int businessId, int deletedById)
     {
         try

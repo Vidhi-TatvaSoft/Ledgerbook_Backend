@@ -35,6 +35,7 @@ public class BusinessController : BaseController
     }
     #endregion
 
+    #region get business details and save business
     [HttpGet]
     [Route("GetBusinessDetails/{businessId}")]
     [PermissionAuthorize("User")]
@@ -57,7 +58,9 @@ public class BusinessController : BaseController
         ApplicationUser user = GetCurrentUserIdentity();
         return Ok(await _businessService.SaveBusiness(businessItem, user.Id));
     }
+    #endregion
 
+    #region get and update user details of business
     [HttpGet]
     [Route("GetAllUsersOfBusiness/{businessId}")]
     [PermissionAuthorize("User")]
@@ -98,7 +101,6 @@ public class BusinessController : BaseController
         return Ok(await _businessService.SaveUserDetails(userDetailsViewModel.UserDetails, userDetailsViewModel.SelectedRoles, userDetailsViewModel.BusinessId, user.Id));
     }
 
-    #region Delete user from business
     [HttpGet]
     [Route("DeleteUserFromBusiness")]
     [PermissionAuthorize("User")]
@@ -110,9 +112,6 @@ public class BusinessController : BaseController
         ApplicationUser user = GetCurrentUserIdentity();
         return Ok(await _businessService.DeleteUserFromBusiness(userId, businessId, user));
     }
-    #endregion
-
-    #region inactive / active use
     [HttpGet]
     [Route("ActiveInactiveUser")]
     [PermissionAuthorize("User")]
@@ -140,7 +139,7 @@ public class BusinessController : BaseController
     }
     #endregion
 
-    #region getBusinessCookies
+    #region get Business related data to manage business
     [HttpGet]
     [Route("GetBusinessData/{businessId}")]
     [PermissionAuthorize("User")]

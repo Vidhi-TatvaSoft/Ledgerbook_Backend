@@ -42,7 +42,6 @@ public class PartyService : IPartyService
         _jwtTokenService = jWTTokenService;
     }
 
-
     public ApiResponse<List<PartyViewModel>> GetParties(string partyType, int businessId, int userId, string searchText, string? filter = "-1", string? sort = "-1")
     {
         if (partyType == null || businessId == 0 || userId == 0)
@@ -157,7 +156,7 @@ public class PartyService : IPartyService
         {
             string verificationToken = GetEmailVerifiactionTokenForParty(partyId);
             string verificationCode = _jwtTokenService.GenerateTokenPartyEmailVerification(partyViewModel.Email, verificationToken, partyId, business.BusinessName, partyViewModel.PartyTypeString.ToString());
-            string verificationLink =   _genericRepository.GetLoginLink() + "/Party/VerifyParty?verificationCode=" + verificationCode;
+            string verificationLink = _genericRepository.GetLoginLink() + "/Party/VerifyParty?verificationCode=" + verificationCode;
             _ = CommonMethods.VerifyParty(partyViewModel.PartyName, partyViewModel.Email, verificationLink, partyViewModel.PartyTypeString.ToString(), business.BusinessName);
         }
 

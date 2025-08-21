@@ -16,23 +16,10 @@ html {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #126773;
 }
 
-
 select:focus>option:hover {
   background-color: #126773 !important;
   color: white !important;
 }
-
-/* select:focus>option:active {
-  background-color: #126773 !important;
-  color: white !important;
-} */
-/* #dropdowns option[selected] {
-  background: red;
-} */
-/* html {
-  position: relative;
-  min-height: 100%;
-} */
 
 /* remove up down arrow from input number */
 input::-webkit-outer-spin-button,
@@ -73,7 +60,6 @@ input::-ms-clear {
   background-color: #2F8891 !important;
 }
 
-
 .password-div {
   position: relative;
 }
@@ -109,7 +95,6 @@ input::-ms-clear {
   background: white;
   padding: 11px;
   padding-top: 12px;
-  /* padding-bottom: 12px; */
 }
 
 .btn-primary {
@@ -154,10 +139,6 @@ input::-ms-clear {
   font-weight: normal;
 }
 
-/* .opacity{
-  opacity: 0.5;
-} */
-
 body.loading {
   overflow: hidden;
 }
@@ -169,7 +150,6 @@ body.loading .overlay {
 body.loading .overlay-loader {
   display: block;
 }
-
 
 .item-card {
   transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
@@ -257,9 +237,7 @@ body.loading .overlay-loader {
   background-color: #126773 !important;
   border-color: #126773 !important;
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #126773 !important;
-
 }
-
 
 .form-control:focus {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #126773 !important;
@@ -287,7 +265,6 @@ body.loading .overlay-loader {
 .party-list {
   min-height: calc(100vh - 70px);
   max-height: calc(100vh - 70px);
-
 }
 
 .sidebar-menu-parent {
@@ -307,8 +284,6 @@ body.loading .overlay-loader {
   margin-left: 40px !important;
 }
 
-.business-label {}
-
 .sidebar-menu-item {
   height: 100%;
   padding-left: 25% !important;
@@ -316,7 +291,6 @@ body.loading .overlay-loader {
   width: 100%;
   display: flex;
   align-items: center;
-
 }
 
 @media (max-width: 1600px) {
@@ -359,25 +333,11 @@ body.loading .overlay-loader {
   background-color: aqua;
 }
 
-.dt-input {
-  /* width: 100% !important; */
-}
-
-.search-user-class {
-  /* position: fixed;
-  left: 64%;
-  bottom: 74%; */
-}
-
 .uer-detail-div {
   position: relative;
   width: 100% !important;
 
 }
-
-
-
-
 
 /*****Login page style *******/
 .body-login {
@@ -565,8 +525,6 @@ body.loading .overlay-loader {
 }
 
 .login-card input {
-  /* width: 100%;
-  padding: 12px 14px; */
   font-size: 1em;
   border: 1px solid #ccc;
   border-radius: 6px;
@@ -603,7 +561,7 @@ body.loading .overlay-loader {
 }
 
 
-/* reset password */
+/********** reset password ************/
 .login-card1 {
   width: 100%;
   max-width: 90%;
@@ -642,7 +600,6 @@ body.loading .overlay-loader {
   background-color: #fff;
 }
 
-
 .login-card1 button {
   width: 100%;
   padding: 14px;
@@ -659,7 +616,7 @@ body.loading .overlay-loader {
   background-color: #2F8891;
 }
 
-/* profile page */
+/************** profile page *************/
 .camera-image {
   height: 25px;
   width: 25px;
@@ -704,11 +661,6 @@ body.loading .overlay-loader {
   }
 }
 
-/* manage business drop down */
-/* #businessNameDropdown option[selected] {
-  background: black;
-} */
-
 #businessNameDropdown option:checked {
   background: #0E525C;
   color: white;
@@ -721,20 +673,7 @@ body.loading .overlay-loader {
   font-weight: bold;
 }
 
-/* #businessNameDropdown:focus>option:hover {
-  background:  red !important;
-}
-#businessNameDropdown option:hover {
-  background:  red !important;
-} */
-
-/* #businessNameDropdown option:hover{background-color:yellow !important;} */
-
-/* option:hover{
-  background-color:yellow !important;
-} */
-
-/* gave-got-button-position */
+/********************** gave-got-button-position *****************/
 .gave-button-position {
   position: absolute;
   width: 18%;
@@ -804,7 +743,7 @@ body.loading .overlay-loader {
   scrollbar-width: none;
 }
 
-/* hover image effect in add business modal */
+/********** hover image effect in add business modal *******************/
 .image-overlay {
   background-color: rgba(0, 0, 0, 0.5);
 
@@ -821,7 +760,7 @@ body.loading .overlay-loader {
   background-color: #f5dfdf;
 }
 
-/* report  */
+/********************** report  *****************************/
 .party-selected {
   color: #0E525C !important;
   border-bottom: 3px solid #0E525C !important;
@@ -855,7 +794,6 @@ body.loading .overlay-loader {
 
 }
 
-
 /***************** activity logs **************/
 .activity-scroll {
   max-height: calc(100vh - 325px);
@@ -871,7 +809,7 @@ body.loading .overlay-loader {
   color: rgb(65, 194, 65);
 }
 
-/* dashboard */
+/********************* dashboard ********************/
 .dashboard-class {
   height: calc(100vh - 72px);
   overflow: auto;
@@ -903,5 +841,4 @@ body.loading .overlay-loader {
 .dashboard-card {
   background-color: #f5fdfd;
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px !important;
-
 }

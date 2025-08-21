@@ -50,6 +50,7 @@ public class UserController : BaseController
     }
     #endregion
 
+    #region change password post
     [HttpPost]
     [Route("ChangePassword")]
     [PermissionAuthorize("User")]
@@ -57,11 +58,12 @@ public class UserController : BaseController
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ChangePassword([FromForm] ChangePasswordViewModel changePasswordViewModel)
     {
-        ApplicationUser user = GetCurrentUserIdentity();;
+        ApplicationUser user = GetCurrentUserIdentity(); ;
         if (!ModelState.IsValid)
         {
             return Ok(new ApiResponse<string>(false, Messages.InvalidCredentilMessage, null, HttpStatusCode.BadRequest));
         }
         return Ok(await _userService.ChangePasswordAsync(user, changePasswordViewModel));
     }
+    #endregion
 }

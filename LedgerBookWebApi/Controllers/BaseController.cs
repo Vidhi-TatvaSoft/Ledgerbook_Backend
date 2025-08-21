@@ -45,7 +45,7 @@ public class BaseController : ControllerBase
     }
     #endregion
 
-    #region get current user from token
+    #region get current user and business from token
     protected ApplicationUser GetCurrentUserIdentity()
     {
         string token = GetData(TokenKey.Authorization)!;

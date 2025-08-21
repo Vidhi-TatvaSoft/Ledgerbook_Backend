@@ -22,9 +22,7 @@ public class GenericRepo : IGenericRepo
         return _configuration["FrontendSettings:FrontEndBaseURL"];
     }
 
-    public IEnumerable<T> GetAll<T>(Expression<Func<T, bool>>? predicate,
-    List<Expression<Func<T, object>>>? includes = null, List<Func<IQueryable<T>,
-    IQueryable<T>>>? thenIncludes = null) where T : class
+    public IEnumerable<T> GetAll<T>(Expression<Func<T, bool>>? predicate, List<Expression<Func<T, object>>>? includes = null, List<Func<IQueryable<T>, IQueryable<T>>>? thenIncludes = null) where T : class
     {
         IQueryable<T> query = _context.Set<T>();
         if (predicate != null)

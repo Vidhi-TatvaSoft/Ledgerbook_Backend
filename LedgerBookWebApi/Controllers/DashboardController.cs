@@ -24,6 +24,7 @@ public class DashboardController : BaseController
         _dashboardService = dashboardService;
     }
 
+    #region get data for dashboard
     [HttpGet]
     [Route("GetDashboardData")]
     [PermissionAuthorize("AnyRole")]
@@ -34,7 +35,9 @@ public class DashboardController : BaseController
         Businesses business = GetBusinessFromToken();
         return Ok(_dashboardService.GetDashboardData(business.Id));
     }
+    #endregion
 
+    #region get graph details - graph data and years
     [HttpGet]
     [Route("GetGraphDetails")]
     [PermissionAuthorize("AnyRole")]
@@ -44,6 +47,7 @@ public class DashboardController : BaseController
         Businesses business = GetBusinessFromToken();
         return Ok(new ApiResponse<List<decimal>>(true, null, _partyService.GetPartyRevenue(business.Id, year), HttpStatusCode.OK));
     }
+
 
     [HttpGet]
     [Route("GetYearsForRevenue")]
@@ -55,5 +59,5 @@ public class DashboardController : BaseController
         Businesses business = GetBusinessFromToken();
         return Ok(_dashboardService.Getyears(business.Id));
     }
-
+    #endregion
 }

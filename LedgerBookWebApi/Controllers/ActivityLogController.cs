@@ -25,7 +25,7 @@ public class ActivityLogController : BaseController
         _activityLogService = activityLogService;
     }
 
-    #region get activities
+    #region getv activities with filters
     [HttpPost]
     [Route("GetActivities")]
     [PermissionAuthorize("User")]

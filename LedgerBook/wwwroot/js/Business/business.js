@@ -103,16 +103,22 @@ function getBusinessByIdSuccess(response) {
 //add business response success function
 function saveBusinessSuccess(response) {
     if (response.isSuccess) {
-        if (response.isSuccess) {
             let businessId = $("#business-businessId").val() == "" ? 0 : $("#business-businessId").val();
             if (businessId == 0) {
+                console.log(addBusinessClose)
+                if(addBusinessClose){
+                    if (response.toasterMessage != null) {
+                        Toaster(response.toasterMessage);
+                    }
+                    addBusinessClose = false;
+                }
                 $("#user-details-confirmation-modal").modal("show");
             } else {
+                console.log("hiiiiiiiiiiiiiiiiiiiiiiii",response.toasterMessage)
                 if (response.toasterMessage != null) {
                     Toaster(response.toasterMessage);
                 }
             }
-        }
         $("#add-business-modal-header").html("Update Business")
         $("#user-details-btn").removeClass("d-none")
         $("#business-image").val("");
