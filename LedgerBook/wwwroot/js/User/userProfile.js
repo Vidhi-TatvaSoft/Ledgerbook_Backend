@@ -27,9 +27,9 @@ function setProfileSuccess(response) {
         localStorage.setItem('Toaster', JSON.stringify(toaster));
         removeValidations();
         if (getCookie(Business_Token)) {
-            window.location = "/Party/Managebusiness"
+            window.location = DASHBOARD_LINK
         } else {
-            window.location = "/Business/Index"
+            window.location = BUSINESS_PAGE_LINK;
         }
     } else {
         Toaster(response.toasterMessage, "error");
@@ -42,8 +42,8 @@ function emptyInputValidation(formId) {
         $(this).val("");
     });
     $(`#${formId} i`).each(function () {
-        if($(this).hasClass("fa-eye")){
+        if ($(this).hasClass("fa-eye")) {
             $(this).removeClass("fa-eye").addClass("fa-eye-slash");
         };
-    });  
+    });
 }

@@ -12,19 +12,17 @@ namespace LedgerBookWebApi.Controllers;
 public class ActivityLogController : BaseController
 {
     private readonly IActivityLogService _activityLogService;
-    private readonly IBusinessService _businessService;
     private readonly IPartyService _partyService;
 
     public ActivityLogController(
         ILoginService loginService,
-        IActivityLogService activityLogService,
         IBusinessService businessService,
+        IActivityLogService activityLogService,
         IPartyService partyService
-    ) : base(loginService, activityLogService)
+    ) : base(loginService, businessService)
     {
-        _activityLogService = activityLogService;
-        _businessService = businessService;
         _partyService = partyService;
+        _activityLogService = activityLogService;
     }
 
     #region get activities

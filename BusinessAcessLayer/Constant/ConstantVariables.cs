@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Configuration;
+
 namespace BusinessAcessLayer.Constant;
 
 public class ConstantVariables
@@ -5,7 +7,6 @@ public class ConstantVariables
     public static string BasicPassword = "Vvv@1234";
     public static string SmtpServer = "mail.etatvasoft.com";
     public static int port = 587;
-    public static string LoginLink =  "http://localhost:5189";
     public static string SenderEmail = "test.dotnet@etatvasoft.com";
     public static string SenderName = "Ledgerbook";
     public static string EmailServicePassword = "P}N^{z-]7Ilp";

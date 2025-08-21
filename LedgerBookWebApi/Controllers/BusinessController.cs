@@ -12,11 +12,11 @@ namespace LedgerBookWebApi.Controllers;
 public class BusinessController : BaseController
 {
     private readonly IBusinessService _businessService;
+
     public BusinessController(
         ILoginService loginService,
-        IActivityLogService activityLogService,
         IBusinessService businessService
-    ) : base(loginService, activityLogService)
+    ) : base(loginService)
     {
         _businessService = businessService;
     }

@@ -51,8 +51,8 @@ public class LoginService : ILoginService
             {
                 string verificationToken = GetEmailVerifiactionToken(RegisterVM.Email);
                 string verificationCode = _jwttokenService.GenerateTokenEmailVerificationToken(RegisterVM.Email, verificationToken);
-                string verificationLink = ConstantVariables.LoginLink + "/Login/VerifyEmail?verificationCode=" + verificationCode;
-                _ = CommonMethods.RegisterEmail(RegisterVM.FirstName + " " + RegisterVM.LastName, RegisterVM.Email, verificationLink, ConstantVariables.LoginLink);
+                string verificationLink =  _genericRepository.GetLoginLink() + "/Login/VerifyEmail?verificationCode=" + verificationCode;
+                _ = CommonMethods.RegisterEmail(RegisterVM.FirstName + " " + RegisterVM.LastName, RegisterVM.Email, verificationLink,  _genericRepository.GetLoginLink());
                 return new ApiResponse<string>(true, Messages.RegistrationSuccessMessage, verificationToken, HttpStatusCode.Created);
             }
             else
@@ -195,8 +195,8 @@ public class LoginService : ILoginService
                 ApplicationUser user = _userService.GetuserByEmail(email);
                 string username = user.FirstName + " " + user.LastName;
                 string resetPasswordToken = _jwttokenService.GenerateTokenEmailPassword(email, user.PasswordHash);
-                string resetLink = ConstantVariables.LoginLink + "/Login/ResetPassword?resetPasswordToken=" + resetPasswordToken;
-                _ = CommonMethods.ResetPasswordEmail(email, username, resetLink, ConstantVariables.LoginLink);
+                string resetLink =  _genericRepository.GetLoginLink() + "/Login/ResetPassword?resetPasswordToken=" + resetPasswordToken;
+                _ = CommonMethods.ResetPasswordEmail(email, username, resetLink,  _genericRepository.GetLoginLink());
                 return new ApiResponse<string>(true, Messages.SendResetPasswordMailSuccess, null, HttpStatusCode.OK);
             }
             else
@@ -268,7 +268,6 @@ public class LoginService : ILoginService
         try
         {
             ApplicationUser user = _genericRepository.Get<ApplicationUser>(e => e.Email == loginViewModel.Email.ToLower().Trim() && e.DeletedAt == null)!;
-
             if (user != null)
             {
                 SignInResult result = await _signInManager.PasswordSignInAsync(user.Email, loginViewModel.Password, isPersistent:true, lockoutOnFailure: false);

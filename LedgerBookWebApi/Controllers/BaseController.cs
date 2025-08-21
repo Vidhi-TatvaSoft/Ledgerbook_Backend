@@ -12,18 +12,15 @@ namespace LedgerBookWebApi.Controllers;
 public class BaseController : ControllerBase
 {
     protected readonly ILoginService _loginService;
-    private readonly IActivityLogService _activityLogService;
-    private readonly IBusinessService? _businessService;
+    protected readonly IBusinessService? _businessService;
 
-    protected BaseController(ILoginService loginService, IActivityLogService activityLogService)
+    protected BaseController(ILoginService loginService)
     {
         _loginService = loginService;
-        _activityLogService = activityLogService;
     }
-    protected BaseController(ILoginService loginService, IActivityLogService activityLogService, IBusinessService businessService)
+    protected BaseController(ILoginService loginService, IBusinessService businessService)
     {
         _loginService = loginService;
-        _activityLogService = activityLogService;
         _businessService = businessService;
 
     }
@@ -35,7 +32,7 @@ public class BaseController : ControllerBase
         {
             if (Request.Headers.TryGetValue(tokenKey, out StringValues _headerValues))
             {
-                string customHeaderValue = _headerValues.FirstOrDefault()!.Replace("Bearer ","");
+                string customHeaderValue = _headerValues.FirstOrDefault()!.Replace("Bearer ", "");
                 return customHeaderValue;
             }
             return null;
@@ -71,7 +68,7 @@ public class BaseController : ControllerBase
         {
             return null!;
         }
-         Businesses business = _businessService.GetBusinessFromToken(token);
+        Businesses business = _businessService.GetBusinessFromToken(token);
         if (business == null)
         {
             return null!;

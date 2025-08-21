@@ -503,7 +503,7 @@ public class BusinessService : IBusinessService
             users = _userBusinessMappingService.SetPermissions(users, curentUserId, (int)businessId);
             userDetail = users.FirstOrDefault(x => x.UserId == userId) == null ? new UserViewmodel() : users.FirstOrDefault(x => x.UserId == userId);
         }
-        bool isMainOwner = _userBusinessMappingService.IsMainOwner((int)businessId, curentUserId);
+        bool isMainOwner = _userBusinessMappingService.IsMainOwner(businessId, curentUserId);
         if (isMainOwner)
         {
             userDetail.CanAddOwner = true;
@@ -549,7 +549,7 @@ public class BusinessService : IBusinessService
             }
             Task.Run(async () =>
             {
-                await CommonMethods.UpdateRoleEmail(userViewmodel.Email, userViewmodel.RoleName, businessName, ConstantVariables.LoginLink);
+                await CommonMethods.UpdateRoleEmail(userViewmodel.Email, userViewmodel.RoleName, businessName,  _genericRepository.GetLoginLink());
             });
 
             string message = string.Format(Messages.UserInBusinessActivity, userViewmodel.FirstName + " " + userViewmodel.LastName, "updated", user.FirstName + " " + user.LastName);
@@ -602,14 +602,14 @@ public class BusinessService : IBusinessService
             {
                 Task.Run(async () =>
                 {
-                    CommonMethods.CreateUserAndRoleEmail(userViewmodel.Email, userViewmodel.RoleName, businessName, ConstantVariables.LoginLink);
+                    CommonMethods.CreateUserAndRoleEmail(userViewmodel.Email, userViewmodel.RoleName, businessName,  _genericRepository.GetLoginLink());
                 });
             }
             else
             {
                 Task.Run(async () =>
                 {
-                    CommonMethods.CreateRoleEmail(userViewmodel.Email, userViewmodel.RoleName, businessName, ConstantVariables.LoginLink);
+                    CommonMethods.CreateRoleEmail(userViewmodel.Email, userViewmodel.RoleName, businessName,  _genericRepository.GetLoginLink());
                 });
             }
             string message = string.Format(Messages.AddUserInBusinessActivity, userViewmodel.FirstName + " " + userViewmodel.LastName, user.FirstName + " " + user.LastName);
@@ -641,7 +641,7 @@ public class BusinessService : IBusinessService
             string busienssName = GetBusinessNameById(businessId);
             Task.Run(async () =>
                       {
-                          CommonMethods.DeleteUserEmail(user.Email, busienssName, ConstantVariables.LoginLink);
+                          CommonMethods.DeleteUserEmail(user.Email, busienssName,  _genericRepository.GetLoginLink());
                       });
             string message = string.Format(Messages.UserInBusinessActivity, user.FirstName + " " + user.LastName, "deleted", logedinUser.FirstName + " " + logedinUser.LastName);
 

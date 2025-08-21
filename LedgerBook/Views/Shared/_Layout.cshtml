@@ -239,10 +239,67 @@
 
     <div id="change-password-modal" class="modal fade" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered" id="changepassword-body-id">
-
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal-header">Change Password</h5>
+                    <button type="button" class="btn-close userdetail-confirmation-modal-close"
+                        onclick="emptyInputValidation('change-password-form')" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <form id="change-password-form">
+                    <div class="modal-body ">
+                        <div class="col-12 mt-3">
+                            <div class="form-floating mb-4 position-relative">
+                                <input type="password" class="form-control border border-dark w-100 "
+                                    oninput="curPasswordValidation(this)" onblur="curPasswordValidation(this)"
+                                    id="changepassword-old" placeholder="Current password*" />
+                                <i class="fa-solid fa-eye-slash position-absolute translate-middle-y fs-4 me-3 password-icon-class"
+                                    onclick="toggle_fnction('togglePassword','changepassword-old')"
+                                    id="togglePassword"></i>
+                                <label for="changepassword-old" class="form-floating text-dark ">Current
+                                    password*</label>
+                                <span
+                                    class="d-flex justify-content-start  text-danger ms-1 curPasswordValidationMessage validationMessage"></span>
+                            </div>
+                        </div>
+                        <div class="col-12 mt-3">
+                            <div class="form-floating mb-4 position-relative">
+                                <input type="password" class="form-control border border-dark w-100 "
+                                    oninput="passwordValidation(this)" onblur="passwordValidation(this)"
+                                    id="changepassword-new" placeholder="New password*" />
+                                <i class="fa-solid fa-eye-slash position-absolute translate-middle-y fs-4 me-3 password-icon-class"
+                                    onclick="toggle_fnction('togglePassword2','changepassword-new')"
+                                    id="togglePassword2"></i>
+                                <label for="changepassword-new" class="form-floating text-dark ">New password*</label>
+                                <span
+                                    class="d-flex justify-content-start  text-danger ms-1 passwordValidationMessage validationMessage"></span>
+                            </div>
+                        </div>
+                        <div class="col-12 mt-3">
+                            <div class="form-floating mb-4 position-relative">
+                                <input type="password" class="form-control border border-dark w-100 "
+                                    oninput="cnfpasswordValidation(this,'changepassword-new')"
+                                    onblur="cnfpasswordValidation(this,'changepassword-new')"
+                                    id="changepassword-confirm" placeholder="Password*" />
+                                <i class="fa-solid fa-eye-slash position-absolute translate-middle-y fs-4 me-3 password-icon-class"
+                                    onclick="toggle_fnction('togglePassword3','changepassword-confirm')"
+                                    id="togglePassword3"></i>
+                                <label for="changepassword-confirm" class="form-floating text-dark ">Confirm
+                                    password*</label>
+                                <span
+                                    class="d-flex justify-content-start  text-danger ms-1 cnfpasswordValidationMessage validationMessage"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer d-flex justify-content-center">
+                        <button type="submit" class="btn btn-primary">Update</button>
+                        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal"
+                            onclick="emptyInputValidation('change-password-form')">Cancel</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

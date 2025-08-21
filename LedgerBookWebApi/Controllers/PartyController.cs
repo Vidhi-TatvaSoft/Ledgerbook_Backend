@@ -16,10 +16,9 @@ public class PartyController : BaseController
     private readonly IPartyService _partyService;
     public PartyController(
        ILoginService loginService,
-       IActivityLogService activityLogService,
        IBusinessService businessService,
        IPartyService partyService
-    ) : base(loginService, activityLogService, businessService)
+    ) : base(loginService, businessService)
     {
         _partyService = partyService;
     }

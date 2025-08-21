@@ -1,4 +1,3 @@
-using LedgerBook.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LedgerBook.Controllers;
@@ -23,16 +22,4 @@ public class LoginController : Controller
     {
         return View("ResetPassword", resetPasswordToken);
     }
-
-    // [HttpGet]
-    // public IActionResult LoginForm()
-    // {
-    //     return View();
-    // }
-
-    // [HttpPost]
-    // public IActionResult Login(LoginMain loginMain)
-    // {
-    //     return View();
-    // }
 }

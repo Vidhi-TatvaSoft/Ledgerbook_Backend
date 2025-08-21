@@ -15,11 +15,10 @@ public class DashboardController : BaseController
     private readonly IDashboardService _dashboardService;
     public DashboardController(
        ILoginService loginService,
-       IActivityLogService activityLogService,
        IBusinessService businessService,
        IPartyService partyService
        , IDashboardService dashboardService
-    ) : base(loginService, activityLogService, businessService)
+    ) : base(loginService, businessService)
     {
         _partyService = partyService;
         _dashboardService = dashboardService;

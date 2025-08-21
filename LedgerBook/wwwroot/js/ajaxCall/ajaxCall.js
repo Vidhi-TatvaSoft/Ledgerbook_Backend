@@ -46,7 +46,6 @@ function setBusinessParameter(url, type, headers, contentType, data, successFunc
 }
 
 function ajaxCall(params) {
-
     let ajaxcallObj = {
         url: `${params.url}`,
         type: params.type,
@@ -57,15 +56,14 @@ function ajaxCall(params) {
         success: function (response) {
             console.log(response)
             if (response.httpStatusCode == 401) {
-                deleteAllCookies();
-                window.location = "/Login/Login";
+                logout();
             } else if (response.httpStatusCode == 403 || response.httpStatusCode == 503) {
                 deleteBusinessCookies();
-                window.location = "/Business/Index"
+                window.location = BUSINESS_PAGE_LINK;
             } else if (response.httpStatusCode == 404) {
-                window.location = "/ErrorPage/PageNotFoundError";
+                window.location = PAGENOTFOUND_LINK;
             } else if (response.httpStatusCode == 500) {
-                window.location = "/ErrorPage/InternalServerError";
+                window.location = INTERNALSERVERERROR_LINK;
             }
             else {
                 params.successFunction(response);
@@ -112,15 +110,14 @@ function ajaxCall(params) {
             success: function (response) {
                 console.log(response)
                 if (response.httpStatusCode == 401) {
-                    deleteAllCookies();
-                    window.location = "/Login/Login";
+                    logout();
                 } else if (response.httpStatusCode == 403 || response.httpStatusCode == 503) {
                     deleteBusinessCookies();
-                    window.location = "/Business/Index"
+                    window.location = BUSINESS_PAGE_LINK;
                 } else if (response.httpStatusCode == 404) {
-                    window.location = "/ErrorPage/PageNotFoundError";
+                    window.location = PAGENOTFOUND_LINK
                 } else if (response.httpStatusCode == 500) {
-                    window.location = "/ErrorPage/InternalServerError";
+                    window.location =INTERNALSERVERERROR_LINK
                 }
                 else {
                     params.successFunction(response);

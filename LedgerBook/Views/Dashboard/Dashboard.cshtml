@@ -119,9 +119,9 @@
         let years = [];
 
         $(document).ready(function () {
+            toasterFromLocalstorage();
             getDashboardData();
             getYears();
-
             $(document).on("change", "#year-for-party-revenue", function () {
                 backgroundColor = [];
                 borderColor = [];

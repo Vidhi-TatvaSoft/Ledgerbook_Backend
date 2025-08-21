@@ -413,7 +413,7 @@ function setBusinessCookiesSuccess(response) {
             setCookie(All_Businesses, cookies.allBusinesses, 1);
         }
         removeValidations();
-        window.location = "/Dashboard/Dashboard";
+        window.location = DASHBOARD_LINK;
     } else {
         if (response.toasterMessage != null)
             Toaster(response.toasterMessage, "error");

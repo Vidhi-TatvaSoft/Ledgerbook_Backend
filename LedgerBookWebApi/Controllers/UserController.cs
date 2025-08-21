@@ -16,9 +16,8 @@ public class UserController : BaseController
     private readonly IUserService _userService;
     public UserController(
        ILoginService loginService,
-       IActivityLogService activityLogService,
        IUserService userService
-    ) : base(loginService, activityLogService)
+    ) : base(loginService)
     {
         _userService = userService;
     }

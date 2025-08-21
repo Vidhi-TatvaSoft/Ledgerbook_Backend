@@ -1,6 +1,6 @@
 function logout() {
     deleteAllCookies();
-    window.location = "/Login/Login";
+    window.location = LOGIN_LINK;
 }
 
 function loginSuccess(response) {
@@ -18,7 +18,7 @@ function loginSuccess(response) {
             setCookie(Profile_Photo, cookies.profilePhoto, 1);
         }
         removeValidations();
-        window.location = "/Business/Index";
+        window.location = BUSINESS_PAGE_LINK;
     } else {
         if (response.toasterMessage != null)
             Toaster(response.toasterMessage, "error");
@@ -33,7 +33,7 @@ function registerSuccess(response) {
         };
         localStorage.setItem('Toaster', JSON.stringify(toaster));
         removeValidations();
-        window.location = "/Login/Login"
+        window.location = LOGIN_LINK
     } else {
         if (response.toasterMessage != null)
             Toaster(response.toasterMessage, "error");
@@ -48,7 +48,7 @@ function verifyEmailSuccess(response) {
         };
         localStorage.setItem('Toaster', JSON.stringify(toaster));
         removeValidations();
-        window.location = "/Login/Login"
+        window.location = LOGIN_LINK
     } else {
         if (response.toasterMessage != null) {
             Toaster(response.toasterMessage, "error")
@@ -64,7 +64,7 @@ function verifyResetToken(response) {
         };
         localStorage.setItem('Toaster', JSON.stringify(toaster));
         removeValidations()
-        window.location = "/Login/Login"
+        window.location = LOGIN_LINK
     } else {
         $("#resetpassword-email").val(response.result)
     }

@@ -2,19 +2,6 @@ namespace LedgerBook.Constant;
 
 public class EnumHelper
 {
-    public enum SourceType
-    {
-        User,
-        Business,
-        Party
-    }
-
-    public enum EntityType
-    {
-        BusinessCategory,
-        BusinessType,
-    }
-
     public enum TransactionType
     {
         GOT = 1,

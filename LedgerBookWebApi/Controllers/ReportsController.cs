@@ -18,10 +18,9 @@ public class ReportsController : BaseController
 
     public ReportsController(
         ILoginService loginService,
-        IActivityLogService activityLogService,
         IBusinessService businessService,
         ITransactionReportSevice transactionReportSevice
-    ) : base(loginService, activityLogService, businessService)
+    ) : base(loginService, businessService)
     {
         _transactionReportService = transactionReportSevice;
     }

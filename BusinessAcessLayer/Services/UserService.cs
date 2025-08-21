@@ -140,7 +140,7 @@ public class UserService : IUserService
             bool ispasswordUpdated = await UpdatePassword(resetPasswordViewModel);
             if (ispasswordUpdated)
             {
-                _ = CommonMethods.ChangePasswordEmail(user.Email, user.FirstName + " " + user.LastName, ConstantVariables.LoginLink);
+                _ = CommonMethods.ChangePasswordEmail(user.Email, user.FirstName + " " + user.LastName,  _genericRepository.GetLoginLink());
                 string userToken = _jwttokenService.GenerateToken(user.Email);
                 return new ApiResponse<string>(true, string.Format(Messages.GlobalAddUpdateMesage, "Password", "updated"), userToken, HttpStatusCode.OK);
             }

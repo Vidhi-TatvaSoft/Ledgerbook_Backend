@@ -11,9 +11,8 @@ namespace LedgerBookWebApi.Controllers;
 public class LoginController : BaseController
 {
     public LoginController(
-        ILoginService loginService,
-        IActivityLogService activityLogService
-        ) : base(loginService, activityLogService)
+        ILoginService loginService
+        ) : base(loginService)
     {
     }
 

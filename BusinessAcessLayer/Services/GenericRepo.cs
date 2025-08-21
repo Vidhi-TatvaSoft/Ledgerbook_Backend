@@ -2,16 +2,24 @@ using System.Linq.Expressions;
 using BusinessAcessLayer.Interface;
 using DataAccessLayer.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace BusinessAcessLayer.Services;
 
 public class GenericRepo : IGenericRepo
 {
     private LedgerBookDbContext _context;
+    private readonly IConfiguration _configuration;
 
-    public GenericRepo(LedgerBookDbContext _context)
+    public GenericRepo(LedgerBookDbContext _context, IConfiguration configuration)
     {
         this._context = _context;
+        _configuration = configuration;
+    }
+
+    public string GetLoginLink()
+    {
+        return _configuration["FrontendSettings:FrontEndBaseURL"];
     }
 
     public IEnumerable<T> GetAll<T>(Expression<Func<T, bool>>? predicate,

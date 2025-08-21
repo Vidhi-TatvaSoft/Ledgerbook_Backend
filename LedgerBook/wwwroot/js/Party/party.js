@@ -1,6 +1,6 @@
 function manageParty(partyType) {
     setCookie(Party_Type, partyType, 1);
-    window.location = "/Party/ManageBusiness";
+    window.location = PARTYPAGE_LINK;
 }
 
 function displayTotalAmounts() {

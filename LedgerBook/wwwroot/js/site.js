@@ -76,7 +76,7 @@ $(document).on("submit", "#change-password-form", function (e) {
 })
 
 function myProfile() {
-    window.location = "/User/Profile";
+    window.location = USERPROFILE_LINK;
 }
 
 function toasterFromLocalstorage() {

@@ -157,7 +157,7 @@ public class PartyService : IPartyService
         {
             string verificationToken = GetEmailVerifiactionTokenForParty(partyId);
             string verificationCode = _jwtTokenService.GenerateTokenPartyEmailVerification(partyViewModel.Email, verificationToken, partyId, business.BusinessName, partyViewModel.PartyTypeString.ToString());
-            string verificationLink =  ConstantVariables.LoginLink + "/Party/VerifyParty?verificationCode=" + verificationCode;
+            string verificationLink =   _genericRepository.GetLoginLink() + "/Party/VerifyParty?verificationCode=" + verificationCode;
             _ = CommonMethods.VerifyParty(partyViewModel.PartyName, partyViewModel.Email, verificationLink, partyViewModel.PartyTypeString.ToString(), business.BusinessName);
         }
 
@@ -330,7 +330,7 @@ public class PartyService : IPartyService
     public async Task<int> SaveTransactionEntry(TransactionEntryViewModel transactionEntryViewModel, int userId)
     {
 
-        if (transactionEntryViewModel.PartyId == 0 || transactionEntryViewModel.TransactionType == null)
+        if (transactionEntryViewModel.PartyId == 0 || transactionEntryViewModel.TransactionType == 0)
             return 0;
 
         PartyViewModel partyViewModel = GetPartyById(transactionEntryViewModel.PartyId);
@@ -661,7 +661,6 @@ public class PartyService : IPartyService
                                 .Sum(x => x.TransactionAmount)
                                 - transactions.Where(x => x.UpdatedAt == null && x.CreatedAt.Month == i && x.CreatedAt.Year.ToString() == year && x.TransactionType == (byte)EnumHelper.TransactionType.GAVE)
                                 .Sum(x => x.TransactionAmount);
-            // decimal? monthParty = Parties.Where(x => x.CreateMonth == i).Sum(x => x.Amount);
             partyRevenue.Add((decimal)monthParty);
         }
         return partyRevenue;
