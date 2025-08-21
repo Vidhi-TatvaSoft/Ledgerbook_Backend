@@ -12,7 +12,6 @@ public class MessageHelper
     public const string FirstNameRequireMessage = "First Name is required.";
     public const string BusinessNameRequireMessage = "Business Name is required.";
     public const string MobileNumberRequire = "Mobile Number is required.";
-    public const string PincodeRequire = "Pincode is required.";
     public const string PartyNameRequire = "Party Name is required.";
     public const string TransactionAmountRequire = "Amount is required.";
 

@@ -190,7 +190,7 @@
                 $("#itemsperpage").val("10")
                 if (activityData.subEntityType == "Party") {
                     document.getElementById("party-entity-select").parentElement.parentElement.classList.remove("d-none");
-                    let params = setBusinessParameter("/ActivityLog/GetAllParties", GET, null, FORM_URL, { businessId: activityData.businessId }, getActivityPartySuccess);
+                    let params = setBusinessParameter(`/ActivityLog/GetAllParties/${activityData.businessId}`, GET, null, NODATA, null, getActivityPartySuccess);
                     $("body").addClass("loading");
                     ajaxCall(params);
                 } else {

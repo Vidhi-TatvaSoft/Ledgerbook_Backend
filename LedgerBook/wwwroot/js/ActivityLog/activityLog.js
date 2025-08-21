@@ -91,10 +91,10 @@ function activityMessage(activity) {
         case "User":
             switch (activity.actionString) {
                 case "Add":
-                    message = String.Format("{0} has been {1}.", "User", "added");
+                    message = String.Format(UserActivity, "User", "added");
                     break;
                 case "Update":
-                    message = String.Format("{0} has been {1} by {2}.", "User", "updated", activity.createdByName);
+                    message = String.Format(BusinessActivity, "User", "updated", activity.createdByName);
                     break;
                 case "Delete":
                     break;

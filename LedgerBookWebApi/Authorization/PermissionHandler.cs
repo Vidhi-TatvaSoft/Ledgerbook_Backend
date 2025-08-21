@@ -45,14 +45,14 @@ public class PermissionHandler : AuthorizationHandler<PermissionRequirement>
         if (user == null)
             throw new UnauthorizedAccessException();
 
-        string businessToken = httpContext.Request.Headers[TokenKey.BusinessToken];
+        string businessToken = httpContext.Request.Headers[TokenKey.BusinessToken]!;
         if (requirement.Permission != "User")
         {
             if (string.IsNullOrEmpty(businessToken))
-                throw new BusinessNotFoundException("Business Token Not found.");
+                throw new BusinessNotFoundException(Messages.BusinessNotFoundException);
             Businesses business = _businessService.GetBusinessFromToken(businessToken);
             if (business == null)
-                throw new BusinessNotFoundException("Business Token Not found.");
+                throw new BusinessNotFoundException(Messages.BusinessNotFoundException);
             List<RoleViewModel> rolesByUser = _userBusinessMappingService.GetRolesByBusinessId(business.Id, user.Id);
             switch (requirement.Permission)
             {
@@ -94,7 +94,7 @@ public class PermissionHandler : AuthorizationHandler<PermissionRequirement>
             }
         }
 
-        string email = _jWTService.GetClaimValue(usertoken, "email");
+        string email = _jWTService.GetClaimValue(usertoken, "email")!;
         if (string.IsNullOrEmpty(email))
         {
             throw new UnauthorizedAccessException();

@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using BusinessAcessLayer.Constant;
 using BusinessAcessLayer.Interface;
 using DataAccessLayer.Models;
 using Microsoft.Extensions.Configuration;
@@ -61,8 +62,8 @@ public class JWTTokenService : IJWTTokenService
         SigningCredentials credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
         Claim[] claims = new[]
        {
-                new Claim("UserToken", userToken),
-                new Claim("BusinessToken", businessToken)
+                new Claim( TokenKey.UserToken, userToken),
+                new Claim( TokenKey.BusinessToken, businessToken)
         };
         JwtSecurityToken token = new JwtSecurityToken(
                     issuer: _issuer,
@@ -185,7 +186,7 @@ public class JWTTokenService : IJWTTokenService
         }
         catch (Exception e)
         {
-            throw new("Invalid Token Exception");
+            throw new(Messages.InvalidTokenExceptionMessage);
         }
 
     }

@@ -2,9 +2,9 @@ namespace BusinessAcessLayer.Constant;
 
 public class EmailTemplates
 {
-    public static string GetUserAddedEmailTemplate()
+    public static string GetUserAddedEmailTemplate(string userEmail, string businessName, string loginLink)
     {
-        return @"
+        return $@"
         <!DOCTYPE html>
         <html>
         <head>
@@ -23,14 +23,14 @@ public class EmailTemplates
         <h2 style=""color: #126773; margin-top: 0;"">You've been added to a business</h2>
         <p style=""font-size: 16px; line-height: 1.6;"">
             Hello,<br><br>
-            You’ve just been added to the business <strong>{{BusinessName}}</strong> in <strong>Ledger Book</strong> by <strong>{{InviterName}}</strong>.
+            You’ve just been added to the business <strong>{{BusinessName}}</strong> in <strong>Ledger Book</strong> by <strong>Admin</strong>.
         </p>
         
             <!-- Info Box -->
         <div style=""background-color: #f4fdfd; border-left: 4px solid #126773; padding: 15px; margin-top: 20px; font-size: 15px;"">
-        <strong>Your Email:</strong> {{UserEmail}}<br />
-        <strong>Business Name:</strong> {{BusinessName}}<br />
-        <strong>Added By:</strong> {{InviterName}}
+        <strong>Your Email:</strong> {userEmail}<br />
+        <strong>Business Name:</strong> {businessName}<br />
+        <strong>Added By:</strong> Admin
         </div>
         
             <p style=""font-size: 16px; line-height: 1.6; margin-top: 25px;"">
@@ -38,7 +38,7 @@ public class EmailTemplates
         </p>
         
             <!-- Button -->
-        <a href={{loginLink}} style=""display: inline-block; margin-top: 25px; padding: 14px 28px; background-color: #126773; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px;"">
+        <a href={loginLink} style=""display: inline-block; margin-top: 25px; padding: 14px 28px; background-color: #126773; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px;"">
             Log In to Ledger Book
         </a>
         
@@ -52,14 +52,14 @@ public class EmailTemplates
         <!-- Footer -->
         <div style=""text-align: center; padding: 25px; font-size: 13px; color: #666; background-color: #f8f8f8;"">
         &copy; 2025 Ledger Book &nbsp;|&nbsp;
-        <a href={{loginLink}} style=""color: #126773; text-decoration: none;"">Visit our site</a>
+        <a href={loginLink} style=""color: #126773; text-decoration: none;"">Visit our site</a>
         </div>
         </div>
         </body>
         </html>";
     }
 
-    public static string GetRoleUpdatedEmailTemplate(string userName, string role, string business, string loginlink)
+    public static string GetRoleUpdatedEmailTemplate(string role, string business, string loginlink)
     {
         return $@"
             <!DOCTYPE html>
@@ -116,7 +116,7 @@ public class EmailTemplates
             <html>
             <head>
             <meta charset=""UTF-8"" />
-            <title>Delete user – Ledger Book</title>
+            <title>Delete user - Ledger Book</title>
             </head>
             <body style=""font-family: 'Segoe UI', sans-serif; background-color: #f0f9f8; margin: 0; padding: 0; color: #333;"">
             <div style=""max-width: 600px; margin: 30px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);"">

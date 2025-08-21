@@ -9,7 +9,7 @@
 @section Scripts {
     <script>
         function verifyEmail(verificationCode) {
-            let params = setParameter("/Login/VerifyEmail", POST, null, FORM_URL, { verificationCode }, verifyEmailSuccess);
+            let params = setParameter(`/Login/VerifyEmail/${verificationCode}`, POST, null, NODATA, null, verifyEmailSuccess);
             ajaxCall(params);
         }
 

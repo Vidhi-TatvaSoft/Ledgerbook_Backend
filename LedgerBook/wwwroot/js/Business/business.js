@@ -375,7 +375,7 @@ function deleteBusinessmodal(businessId) {
 //delete business submit
 function deleteBusinessYes() {
     let businessId = $("#businessId-delete").val();
-    let params = setParameter("/Business/DeleteBusiness", POST, null, FORM_URL, { businessId: businessId }, deleteBusinessSuccess);
+    let params = setParameter(`/Business/DeleteBusiness/${businessId}`, POST, null, NODATA, null, deleteBusinessSuccess);
     $("body").addClass("loading");
     ajaxCall(params);
 }
@@ -421,7 +421,7 @@ function setBusinessCookiesSuccess(response) {
 }
 
 function manageBusinessDetails(businessId) {
-    let params = setParameter("/Business/GetBusinessData", GET, null, FORM_URL, { businessId: businessId }, setBusinessCookiesSuccess);
+    let params = setParameter(`/Business/GetBusinessData/${businessId}`, GET, null,NODATA, null, setBusinessCookiesSuccess);
     $("body").addClass("loading");
     ajaxCall(params);
 }

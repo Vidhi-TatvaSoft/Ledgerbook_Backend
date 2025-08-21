@@ -4,7 +4,7 @@ function manageParty(partyType) {
 }
 
 function displayTotalAmounts() {
-    let params = setBusinessParameter("/Party/GetTotalAmount", GET, null, FORM_URL, { partyType: getCookie(Party_Type) }, getTotalsSuccess);
+    let params = setBusinessParameter(`/Party/GetTotalAmount/${getCookie(Party_Type)}`, GET, null, NODATA, null, getTotalsSuccess);
     $("body").addClass("loading");
     ajaxCall(params);
 }
@@ -78,7 +78,7 @@ function displaySelectedParyDetails(partyId) {
     console.log(allParties)
     for (i = 0; i < allParties.length; i++) {
         if (parseInt(allParties[i].id.split("-")[2]) == partyId) {
-            let params = setBusinessParameter("/Party/GetPartyDetails", GET, null, FORM_URL, { partyId: partyId }, partyDetailsSuccess);
+            let params = setBusinessParameter(`/Party/GetPartyDetails/${partyId}`, GET, null, NODATA, null, partyDetailsSuccess);
             $("body").addClass("loading");
             ajaxCall(params);
 
@@ -96,7 +96,7 @@ function displaySelectedParyDetails(partyId) {
 
 //display transaction entries of selected parties
 function displayTransactionEntries(partyId) {
-    let params = setBusinessParameter("/Party/GetTransationEntries", GET, null, FORM_URL, { partyId: partyId }, transactionEntriesSuccess);
+    let params = setBusinessParameter(`/Party/GetTransationEntries/${partyId}`, GET, null, NODATA, null, transactionEntriesSuccess);
     $("body").addClass("loading");
     ajaxCall(params);
 }
@@ -111,7 +111,7 @@ function updateParty(partyId) {
         $("#supplier-radio").parent().addClass("d-none");
     }
     $(".party-amount-div").addClass("d-none")
-    let params = setBusinessParameter("/Party/GetPartyDetails", GET, null, FORM_URL, { partyId: partyId }, getPartyDetailsToUpdateSuccess);
+    let params = setBusinessParameter(`/Party/GetPartyDetails/${partyId}`, GET, null, NODATA, null, getPartyDetailsToUpdateSuccess);
     $("body").addClass("loading");
     ajaxCall(params);
 }
@@ -192,7 +192,7 @@ function deleteTransactionId(transactionId) {
 //delete transaction ajax
 function deleteTransaction() {
     let transactionId = document.getElementById("delete-transaction-id").value;
-    let params = setBusinessParameter("/Party/DeleteTransaction", POST, null, FORM_URL, { transactionId: transactionId }, deleteTransactionSuccess);
+    let params = setBusinessParameter(`/Party/DeleteTransaction/${transactionId}`, POST, null, NODATA, null, deleteTransactionSuccess);
     $("body").addClass("loading");
     ajaxCall(params);
 }

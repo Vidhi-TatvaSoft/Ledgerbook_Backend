@@ -52,10 +52,10 @@ public class ActivityLogController : BaseController
 
     #region get all parties by business
     [HttpGet]
-    [Route("GetAllParties")]
+    [Route("GetAllParties/{businessId}")]
     [PermissionAuthorize("User")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public IActionResult GetAllParties(int businessId)
+    public IActionResult GetAllParties([FromRoute] int businessId)
     {
         ApplicationUser user = GetCurrentUserIdentity();
         return Ok(new ApiResponse<List<Parties>>(true, null, _partyService.GetAllPartiesByBusiness(businessId, user.Id), HttpStatusCode.OK));

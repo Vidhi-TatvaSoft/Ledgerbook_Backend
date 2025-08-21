@@ -10,18 +10,6 @@ public class CommonMethods
     {
     }
 
-    public static string Base64Encode(string plainText)
-    {
-        byte[] plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText);
-        return Convert.ToBase64String(plainTextBytes);
-    }
-
-    public static string Base64Decode(string base64EncodedData)
-    {
-        byte[] base64EncodedBytes = Convert.FromBase64String(base64EncodedData);
-        return System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
-    }
-
     public static string UploadImage(IFormFile file, string folderPath)
     {
         if (file == null || file.Length == 0)
@@ -96,11 +84,7 @@ public class CommonMethods
     public static async Task<bool> CreateRoleEmail(string Email, string Role, string Business, string loginLink)
     {
         string subject = Constant.ConstantVariables.EmailSubject;
-        string body = Constant.EmailTemplates.GetUserAddedEmailTemplate().Replace("{{UserName}}", "User")
-                .Replace("{{UserEmail}}", Email)
-                .Replace("{{BusinessName}}", Business)
-                .Replace("{{InviterName}}", "Admin")
-                .Replace("{{loginLink}}", loginLink);
+        string body = Constant.EmailTemplates.GetUserAddedEmailTemplate(Email, Business, loginLink);
 
         return await SendEmail(Email, subject, body);
     }
@@ -109,7 +93,6 @@ public class CommonMethods
     {
         string subject = Constant.ConstantVariables.RoleUpdatedSubject;
         string body = Constant.EmailTemplates.GetRoleUpdatedEmailTemplate(
-            userName: Email,
             role: Role,
             business: Business,
             loginlink: loginLink
@@ -141,19 +124,5 @@ public class CommonMethods
         string subject = Constant.ConstantVariables.PaymentDueSubject;
         string body = Constant.EmailTemplates.PartyEmailVerificationEmail(partyType, businessName, amount);
         return await SendEmail(Email, subject, body);
-    }
-
-    public static void AddLog(string message)
-    {
-        string logMessage = $"[{DateTime.UtcNow}] : {message}";
-        string filePath = "log.txt";
-        try
-        {
-            File.AppendAllText(filePath, logMessage + Environment.NewLine);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception(ex.ToString());
-        }
     }
 }

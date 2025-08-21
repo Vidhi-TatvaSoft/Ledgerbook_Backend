@@ -70,22 +70,22 @@ public class PartyController : BaseController
 
     #region verify party email
     [HttpGet]
-    [Route("VerifyPartyEmail")]
+    [Route("VerifyPartyEmail/{verificationCode}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> VerifyPartyEmail(string verificationCode)
+    public async Task<IActionResult> VerifyPartyEmail([FromRoute] string verificationCode)
     {
         return Ok(await _partyService.PartyEmailVerification(verificationCode));
     }
     #endregion
 
     [HttpGet]
-    [Route("GetPartyDetails")]
+    [Route("GetPartyDetails/{partyId}")]
     [PermissionAuthorize("AnyRole")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public IActionResult GetPartyDetails(int partyId)
+    public IActionResult GetPartyDetails([FromRoute] int partyId)
     {
         ApplicationUser user = GetCurrentUserIdentity();
         Businesses business = GetBusinessFromToken();
@@ -94,12 +94,12 @@ public class PartyController : BaseController
 
     #region display transaction entries
     [HttpGet]
-    [Route("GetTransationEntries")]
+    [Route("GetTransationEntries/{partyId}")]
     [PermissionAuthorize("AnyRole")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public IActionResult GetTransationEntries(int partyId)
+    public IActionResult GetTransationEntries([FromRoute] int partyId)
     {
         ApplicationUser user = GetCurrentUserIdentity();
         Businesses business = GetBusinessFromToken();
@@ -139,12 +139,12 @@ public class PartyController : BaseController
 
     #region delete transaction
     [HttpPost]
-    [Route("DeleteTransaction")]
+    [Route("DeleteTransaction/{transactionId}")]
     [PermissionAuthorize("AnyRole")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public IActionResult DeleteTransaction([FromForm] int transactionId)
+    public IActionResult DeleteTransaction([FromRoute] int transactionId)
     {
         ApplicationUser user = GetCurrentUserIdentity();
         Businesses business = GetBusinessFromToken();
@@ -154,12 +154,12 @@ public class PartyController : BaseController
 
     #region  total amount base on partytype
     [HttpGet]
-    [Route("GetTotalAmount")]
+    [Route("GetTotalAmount/{partyType}")]
     [PermissionAuthorize("AnyRole")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public IActionResult GetTotalAmount(EnumHelper.PartyType partyType)
+    public IActionResult GetTotalAmount([FromRoute] EnumHelper.PartyType partyType)
     {
         ApplicationUser user = GetCurrentUserIdentity();
         Businesses business = GetBusinessFromToken();

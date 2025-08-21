@@ -36,11 +36,11 @@ public class BusinessController : BaseController
     #endregion
 
     [HttpGet]
-    [Route("GetBusinessDetails")]
+    [Route("GetBusinessDetails/{businessId}")]
     [PermissionAuthorize("User")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status206PartialContent)]
-    public IActionResult GetBusinessDetails(int businessId)
+    public IActionResult GetBusinessDetails([FromRoute] int businessId)
     {
         ApplicationUser user = GetCurrentUserIdentity();
         return Ok(_businessService.GetBusinessItemById(businessId));
@@ -59,12 +59,12 @@ public class BusinessController : BaseController
     }
 
     [HttpGet]
-    [Route("GetAllUsersOfBusiness")]
+    [Route("GetAllUsersOfBusiness/{businessId}")]
     [PermissionAuthorize("User")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> GetAllUsersOfBusiness(int businessId)
+    public async Task<IActionResult> GetAllUsersOfBusiness([FromRoute] int businessId)
     {
         ApplicationUser user = GetCurrentUserIdentity();
         return Ok(await _businessService.GetUsersOfBusiness(businessId, user.Id));
@@ -128,12 +128,12 @@ public class BusinessController : BaseController
 
     #region delete business
     [HttpPost]
-    [Route("DeleteBusiness")]
+    [Route("DeleteBusiness/{businessId}")]
     [PermissionAuthorize("User")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> DeleteBusiness([FromForm] int businessId)
+    public async Task<IActionResult> DeleteBusiness([FromRoute] int businessId)
     {
         ApplicationUser user = GetCurrentUserIdentity();
         return Ok(await _businessService.DeleteBusiness(businessId, user.Id));
@@ -142,12 +142,12 @@ public class BusinessController : BaseController
 
     #region getBusinessCookies
     [HttpGet]
-    [Route("GetBusinessData")]
+    [Route("GetBusinessData/{businessId}")]
     [PermissionAuthorize("User")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public IActionResult GetBusinessData(int businessId)
+    public IActionResult GetBusinessData([FromRoute] int businessId)
     {
         ApplicationUser user = GetCurrentUserIdentity();
         return Ok(_businessService.GetBusinessData(businessId, user));

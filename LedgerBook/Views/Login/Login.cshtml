@@ -186,7 +186,7 @@
                     let formData = new FormData();
                     formData.append("Email", $("#forgotpassword-email").val())
                     let email = $("#forgotpassword-email").val()
-                    let params = setParameter("/Login/ForgotPassword", POST, null, FORM_URL, { email }, verifyEmailSuccess);
+                    let params = setParameter(`/Login/ForgotPassword/${email}`, POST, null, NODATA, null, verifyEmailSuccess);
                     ajaxCall(params);
                 }
             })

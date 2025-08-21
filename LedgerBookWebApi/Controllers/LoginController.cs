@@ -46,11 +46,11 @@ public class LoginController : BaseController
     #endregion
 
     #region verify email
-    [Route("VerifyEmail")]
+    [Route("VerifyEmail/{verificationCode}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [HttpPost]
-    public async Task<IActionResult> VerifyEmail([FromForm] string verificationCode)
+    public async Task<IActionResult> VerifyEmail([FromRoute] string verificationCode)
     {
         if (verificationCode == null)
             return Ok(new ApiResponse<string>(false, Messages.InvalidCredentilMessage, null, HttpStatusCode.BadRequest));
@@ -62,8 +62,8 @@ public class LoginController : BaseController
 
     #region send email for forgot password
     [HttpPost]
-    [Route("ForgotPassword")]
-    public IActionResult ForgotPassword([FromForm] string email)
+    [Route("ForgotPassword/{email}")]
+    public IActionResult ForgotPassword([FromRoute] string email)
     {
         if (email != null)
             return Ok(_loginService.ForgotPassword(email));
@@ -73,11 +73,11 @@ public class LoginController : BaseController
 
     #region resetpassword 
     [HttpGet]
-    [Route("VerifyResetPasswordToken")]
+    [Route("VerifyResetPasswordToken/{resetPasswordToken}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
 
-    public IActionResult VerifyResetPasswordToken(string resetPasswordToken)
+    public IActionResult VerifyResetPasswordToken([FromRoute]string resetPasswordToken)
     {
         if (resetPasswordToken == null)
             return Ok(new ApiResponse<string>(false, Messages.InvalidCredentilMessage, null, HttpStatusCode.BadRequest));

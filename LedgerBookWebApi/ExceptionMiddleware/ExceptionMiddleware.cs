@@ -36,8 +36,7 @@ public class ExceptionMiddleware
 
     private async Task HandleExceptions(HttpContext context, Exception exception)
     {
-        var exceptiontype = exception.GetType();
-         HttpStatusCode code;
+        HttpStatusCode code;
         string message;
         switch (exception)
         {
@@ -47,10 +46,10 @@ public class ExceptionMiddleware
                 break;
             case BusinessNotFoundException:
                 code = HttpStatusCode.ServiceUnavailable;
-                message = exception.Message;
+                message = null!;
                 break;
             default:
-                code =  context.Response.StatusCode switch
+                code = context.Response.StatusCode switch
                 {
                     400 => HttpStatusCode.BadRequest,
                     401 => HttpStatusCode.Unauthorized,
@@ -61,9 +60,9 @@ public class ExceptionMiddleware
                     _ => HttpStatusCode.InternalServerError
                 };
                 message = Messages.ExceptionMessage;
-                break;  
+                break;
         }
-       
+
         //add exception in db
         using IServiceScope scope = _serviceScopeFactory.CreateAsyncScope();
         IExceptionService exceptionserive = scope.ServiceProvider.GetRequiredService<IExceptionService>();
@@ -73,9 +72,9 @@ public class ExceptionMiddleware
         var options = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = true 
+            WriteIndented = true
         };
-        string jsonMessage = JsonSerializer.Serialize(jsonResponse,options);
+        string jsonMessage = JsonSerializer.Serialize(jsonResponse, options);
         await context.Response.WriteAsync(jsonMessage);
     }
 }

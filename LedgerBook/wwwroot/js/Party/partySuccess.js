@@ -104,7 +104,7 @@ function partyDetailsSuccess(response) {
     if (response.isSuccess) {
         if (response.result != null) {
             let party = response.result;
-            // $("#displaySelectedParty").html($("#party-details-div").html());
+            console.log(party)
             let htmlContent = "";
             htmlContent += `    <div class="ps-3 pt-3">
                                     <div class="party-details d-flex justify-content-between align-items-center mt-1 ">

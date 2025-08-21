@@ -101,6 +101,4 @@ public class GenericRepo : IGenericRepo
     {
         await _context.SaveChangesAsync();
     }
-
-    
 }

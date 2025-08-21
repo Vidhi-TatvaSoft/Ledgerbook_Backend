@@ -368,7 +368,7 @@
         GetBusinessList(getCookie(All_Businesses))
 
         $('#businessNameDropdown').change(function () {
-            let params = setParameter("/Business/GetBusinessData", GET, null, FORM_URL, { businessId: this.value }, setBusinessCookiesSuccess);
+            let params = setParameter(`/Business/GetBusinessData/${this.value}`, GET, null,NODATA, null, setBusinessCookiesSuccess);
             $("body").addClass("loading");
             ajaxCall(params);
         });

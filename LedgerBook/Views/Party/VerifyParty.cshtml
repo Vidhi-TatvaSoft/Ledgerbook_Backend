@@ -26,7 +26,7 @@
 
         function verifyPartyEmail() {
             let verificationCode = $("#party-email-verificationcode").val();
-            let params = setParameter("/Party/VerifyPartyEmail", GET, {}, FORM_URL, { verificationCode: verificationCode }, verifyPartySuccess);
+            let params = setParameter(`/Party/VerifyPartyEmail/${verificationCode}`, GET, {}, NODATA, null, verifyPartySuccess);
             ajaxCall(params);
         }
 

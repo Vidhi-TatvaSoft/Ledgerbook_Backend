@@ -525,7 +525,7 @@
                 $("#add-business-modal-header").html("Update Business")
                 $("#user-details-btn").removeClass("d-none")
             }
-            let params = setParameter("/Business/GetBusinessDetails", GET, null, FORM_URL, { businessId }, getBusinessByIdSuccess);
+            let params = setParameter(`/Business/GetBusinessDetails/${businessId}`, GET, null, NODATA, null, getBusinessByIdSuccess);
             $("body").addClass("loading");
             ajaxCall(params);
         }
@@ -535,7 +535,7 @@
             emptyInputValidation("add-newuser-form-id");
             $("#businessdetail-modal-body").html($("#user-details-body-content").html())
             let businessId = $("#business-businessId").val() == "" ? 0 : $("#business-businessId").val();
-            let params = setParameter("/Business/GetAllUsersOfBusiness", GET, null, FORM_URL, { businessId }, getAllUserDetailsSuccess);
+            let params = setParameter(`/Business/GetAllUsersOfBusiness/${businessId}`, GET, null, NODATA, null, getAllUserDetailsSuccess);
             $("body").addClass("loading");
             ajaxCall(params);
         }
